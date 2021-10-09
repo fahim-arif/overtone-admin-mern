@@ -170,7 +170,7 @@
 .product_status {
 font-size: 14px;
 font-weight: 500;
-padding: 20px;
+padding: 10px 20px 10px 20px;
 border-bottom: 1px solid #dbdbdb;
 }
 .product_status_container {
@@ -184,7 +184,7 @@ border-bottom: 1px solid #dbdbdb;
   border-bottom: 1px solid #dbdbdb;
 }
 .product_publish_container {
-  padding: 20px 20px 20px 0;
+  padding: 10px 20px 10px 0;
 }
 .product_status_value {
   padding-bottom: 5px;
@@ -199,12 +199,26 @@ border-bottom: 1px solid #dbdbdb;
     color: #fff;
     font-weight: 400;
 }
-.product_gallery_upload_container a {
+.add_gallery_link {
   padding: 20px;
+  
 }
 .product_gallery_conatiner {
   margin-top: 20px;
   padding-bottom: 20px;
+}
+
+.product_group_container {
+  margin-top: 20px;
+  background-color: #fff;
+}
+.product_options_container {
+  margin-top: 20px;
+  background-color: #fff;
+}
+.product_maintanence_container {
+   margin-top: 20px;
+  background-color: #fff;
 }
 /* Modal Create Parent attribute */
 .create_attribute_modal_container {

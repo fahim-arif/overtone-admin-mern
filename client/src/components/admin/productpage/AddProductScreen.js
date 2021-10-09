@@ -47,6 +47,7 @@ class AddProductScreen extends React.Component {
       subcategoryChildID: "",
       isEnabled: "Yes",
       keyword: "",
+      productValue: "",
 
     };
 
@@ -78,8 +79,98 @@ class AddProductScreen extends React.Component {
       });
   }
 
+// onSkuSubmit () {
+
+// }
+
 
   render() {
+
+    const { errors } = this.state;
+    const { productloading } = this.props.product;
+    //category  list
+    const { listcategory, categoryloading } = this.props.category;  
+
+      var optionResultCategory = [];
+    if (listcategory == null || categoryloading) {
+      optionResultCategory = <option value=''>Loading...</option>;
+    } else {
+      if (Object.keys(listcategory).length > 0) {
+        optionResultCategory = listcategory.map((result) => {
+          return <option value={result._id}>{result.categoryName}</option>;
+        });
+      } else {
+        optionResultCategory = <option value=''>No Category Found...</option>;
+      }
+    }
+
+// Learn this
+
+    const { listsubCategory, subCategoryloading } = this.props.subCategory;
+
+    var optionResultSubCategory = [];
+    if (listsubCategory == null || subCategoryloading) {
+      optionResultSubCategory = <option value=''>Loading...</option>;
+    } else {
+      if (
+        Object.keys(listsubCategory).length > 0 &&
+        this.state.categoryID != ""
+      ) {
+        var filterSub = listsubCategory.filter(
+          (x) => x.categoryID === this.state.categoryID
+        );
+        if (Object.keys(filterSub).length > 0) {
+          optionResultSubCategory = listsubCategory.map((result) => {
+            return <option value={result._id}>{result.subCategoryName}</option>;
+          });
+        } else {
+          optionResultSubCategory = (
+            <option value=''>
+              No SubCategory Found For Selected Category..
+            </option>
+          );
+        }
+      } else {
+        optionResultSubCategory = (
+          <option value=''>No SubCategory Found...</option>
+        );
+      }
+    }
+
+    const { listsubCategoryChild, subCategoryChildloading } =
+      this.props.subCategoryChild;
+
+    var optionResultSubCategoryChild = [];
+    if (listsubCategoryChild == null || subCategoryChildloading) {
+      optionResultSubCategoryChild = <option value=''>Loading...</option>;
+    } else {
+      if (
+        Object.keys(listsubCategoryChild).length > 0 &&
+        this.state.categoryID != ""
+      ) {
+        var filterSub = listsubCategoryChild.filter(
+          (x) => x.categoryID === this.state.categoryID
+        );
+        if (Object.keys(filterSub).length > 0) {
+          optionResultSubCategoryChild = listsubCategoryChild.map((result) => {
+            return (
+              <option value={result._id}>{result.subCategoryChildName}</option>
+            );
+          });
+        } else {
+          optionResultSubCategoryChild = (
+            <option value=''>
+              No SubCategory Found For Selected Category..
+            </option>
+          );
+        }
+      } else {
+        optionResultSubCategoryChild = (
+          <option value=''>No SubCategory Found...</option>
+        );
+      }
+    }
+
     return (
       <div className={"add_product_screen"}>
         <Asidebar></Asidebar>
@@ -104,7 +195,14 @@ class AddProductScreen extends React.Component {
                 <div className='title_and_value'>
                   <div className='add_product_title'>
                     <label className='main_title'>Title</label>
-                    <input type='text' className='add_product_input' />
+                            <input 
+                              onChange={this.onChange}
+                              value={this.state.name} 
+                              type='text' className='add_product_input' 
+                              />
+                              <span className='form-text text-danger'>
+                              {errors.name}
+                            </span>
                   </div>
                   <div className='add_product_value'>
                     <label className='main_title'>Value</label>
@@ -165,7 +263,7 @@ class AddProductScreen extends React.Component {
                   <input type='text' className='add_product_input' />
                 </div>
                 <div className='add_product_value'>
-                  <label className='main_title'>SKU (Manual)</label>
+                  <label className='main_title'>SKU </label>
                   <input type='text' className='add_product_input' />
                 </div>
               </div>
@@ -274,7 +372,7 @@ class AddProductScreen extends React.Component {
                   </div>
               </div>
               <div className='attribute_create_button'>
-                <button className='product_publish_btn'>Save</button>
+                <button onClick={onSkuSubmit} className='product_publish_btn'>Save</button>
               </div>
             </div>
           </div>
@@ -343,16 +441,119 @@ class AddProductScreen extends React.Component {
                   <button className='product_publish_btn'>Publish</button>
                 </div>
               </div>
+              <div className='product_group_container'>
+                  <div className='product_status'>Product Group</div>
+                    <div style={{padding:'30px 20px 0 20px'}} className='add_product_title'>
+                      <label className='main_title'>Select Group</label>
+                      <select
+                        name='subcategoryChildID'
+                        onChange={(e) => this.onChange(e)}
+                        value={this.state.subcategoryChildID}
+                        className='form-control_select'
+                        placeholder=''
+                        >
+                          <option value=''>Select</option>
+                            {/* {optionResultSubCategoryChild} */}
+                      </select> 
+                    </div>
+                      <div style={{padding:'0 20px'}} className='add_product_title'>
+                      <label className='main_title'>Select Sub Group</label>
+                      <select
+                        name='subcategoryChildID'
+                        onChange={(e) => this.onChange(e)}
+                        value={this.state.subcategoryChildID}
+                        className='form-control_select'
+                        placeholder=''
+                        >
+                          <option value=''>Select</option>
+                            {/* {optionResultSubCategoryChild} */}
+                      </select> 
+                    </div>
+                      <div style={{padding:'0 20px 30px 20px'}} className='add_product_title'>
+                      <label className='main_title'>Select Sub Group Child</label>
+                      <select
+                        name='subcategoryChildID'
+                        onChange={(e) => this.onChange(e)}
+                        value={this.state.subcategoryChildID}
+                        className='form-control_select'
+                        placeholder=''
+                        >
+                          <option value=''>Select</option>
+                            {/* {optionResultSubCategoryChild} */}
+                      </select> 
+                    </div>
+              </div>
+              <div className='product_options_container'>
+                <div className='product_status'>Product Options</div>
+                    <div style={{padding:'30px 20px 0 20px'}} className='add_product_title'>
+                      <label className='main_title'>Keyword (Optional)</label>
+                      <select
+                        name='subcategoryChildID'
+                        onChange={(e) => this.onChange(e)}
+                        value={this.state.subcategoryChildID}
+                        className='form-control_select'
+                        placeholder=''
+                        >
+                          <option value=''>Select</option>
+                            {/* {optionResultSubCategoryChild} */}
+                      </select> 
+                    </div>
+                    <div style={{padding:'0 20px 0 20px'}} className='add_product_title'>
+                      <label className='main_title'>Quick Ship</label>
+                      <select
+                        name='subcategoryChildID'
+                        onChange={(e) => this.onChange(e)}
+                        value={this.state.subcategoryChildID}
+                        className='form-control_select'
+                        placeholder=''
+                        >
+                          <option value=''>Select</option>
+                            {/* {optionResultSubCategoryChild} */}
+                      </select> 
+                    </div>
+                    <div style={{padding:'0px 20px 30px 20px'}} className='add_product_title'>
+                      <label className='main_title'>isEnabled</label>
+                      <select
+                        name='subcategoryChildID'
+                        onChange={(e) => this.onChange(e)}
+                        value={this.state.subcategoryChildID}
+                        className='form-control_select'
+                        placeholder=''
+                        >
+                          <option value=''>Select</option>
+                            {/* {optionResultSubCategoryChild} */}
+                      </select> 
+                    </div>
+              </div>
               <div className='product_gallery_conatiner'>
                 <div className='product_status_container'>
                   <div className='product_status'>Product Gallery</div>
                   <div className='product_gallery_upload_container'>
-                    <Link to='#'>Add Product Image Gallery</Link>
+                    <div className='add_gallery_link'>
+                    <Link to='#'>Add Product Image Gallery <span className='red' style={{color:'#ff0000'}}>*</span></Link>
+
+                    </div>
                   <div className='product_btn_name_container'>
-                    <label className='main_title mt-3'>Button Name</label>
-                    <input style={{width:'245px', marginTop:'10px', marginLeft:'20px', marginRight:'20px'}} type='text' className='add_product_input'></input>
+                    <label style={{marginLeft:'20px'}} className='main_title mt-3'>Button Name</label>
+                    <input style={{width:'245px', marginTop:'10px', marginLeft:'20px', marginRight:'20px', marginBottom: '30px'}} type='text' className='add_product_input'></input>
                   </div>
                   </div>
+                </div>
+              </div>
+              <div className='product_maintanence_container'>
+                <div className='product_status'>Product Maintanence</div>
+                <div className='maintancence_upload'>
+                  <div className='add_gallery_link'>
+                    <Link to='#'>Maintenance File Upload <span className='red' style={{color:'#ff0000'}}>*</span> </Link>
+                    </div>
+                </div>
+                <div style={{padding:'30px 20px 0 20px'}} className='add_product_title'>
+                        <label className='main_title'>Keyword (Optional)</label>
+                        <textarea style={{height:'75px'}} type='text' />
+                </div>
+                <div style={{padding:'30px 20px 30px 20px'}} className='add_product_title'>
+                        <label className='main_title'>Acoustic Text</label>
+                        <textarea style={{height:'75px'}} type='text' />
                 </div>
               </div>
             </div>
