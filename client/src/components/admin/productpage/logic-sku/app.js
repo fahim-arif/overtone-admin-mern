@@ -49,7 +49,7 @@ const helper = (val1, val2, val3, val4, val5) => {
 }
 
 console.log(val4.length);
-  if (val4.length > 0 && typeof val4[0] == 'string') {
+  if (val4[0]) {
     console.log('hi there')
     tempRes='';
     for(let i = 0; i < temp3.length; i = i + 1) {
@@ -64,7 +64,7 @@ console.log(val4.length);
           }
 }
 
-  if (val5.length > 0 && typeof val5[1] == 'string') {
+  if (val5[0]) {
     console.log('hi there')
     tempRes='';
     for(let i = 0; i < temp4.length; i = i + 1) {
