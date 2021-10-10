@@ -7,6 +7,9 @@ import SubHeader from "../../layouts/SubHeader";
 import HeaderTopbar from "../../layouts/HeaderTopbar";
 import { Link } from "react-router-dom";
 import axios from 'axios'
+import swal from "sweetalert2";
+
+import skuGen from "./logic-sku/app";
 
 // Imported
 import { PropTypes } from "prop-types";
@@ -16,6 +19,7 @@ import { addProduct } from "../../../actions/productAction";
 import { listCategory } from "../../../actions/categoryAction";
 import { listSubCategoryOne } from "../../../actions/subCategoryAction";
 import { listSubCategoryChildOne } from "../../../actions/subCategoryChildAction";
+import ListAttributeMapping from "./ListAttributeMapping";
 
 // import ArrowBackIcon from "@mui/icons-material";
 import {
@@ -24,6 +28,17 @@ import {
   KeyboardArrowDown,
   KeyboardArrowUp
 } from "@material-ui/icons";
+import { listAttributeMapping } from "../../../actions/attributemappingAction";
+
+
+const Toast = swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 3000,
+});
+
+
 
 class AddProductScreen extends React.Component {
   constructor() {
@@ -48,15 +63,18 @@ class AddProductScreen extends React.Component {
       isEnabled: "Yes",
       keyword: "",
       productValue: "",
+      attributeValue: "",
+      variantValue: "",
+      count:0,
 
     };
 
 
-    // this.onChange = this.onChange.bind(this);
-    //   this.onSubmit = this.onSubmit.bind(this);
-    //   this.onReset = this.onReset.bind(this);
-    //   this.uploadImage = this.uploadImage.bind(this);
-    //   this.uploadImageBulk = this.uploadImageBulk.bind(this);
+    this.onChange = this.onChange.bind(this);
+      this.onSubmit = this.onSubmit.bind(this);
+      this.onReset = this.onReset.bind(this);
+      this.uploadImage = this.uploadImage.bind(this);
+      this.uploadImageBulk = this.uploadImageBulk.bind(this);
       
   }
     //for upload image
@@ -79,15 +97,148 @@ class AddProductScreen extends React.Component {
       });
   }
 
-// onSkuSubmit () {
+   //for upload url
+  uploadImageBulk(e, index) {
+    var self = this;
+    const data = new FormData();
+    var sFileName = e.target.files[0].name;
+    let temp = this.state.documents;
+    temp[index].uploadstatus = "Uploading please wait..";
+    this.setState({ documents: temp });
+    console.log("temp");
+    var sFileExtension = sFileName
+      .split(".")
+      [sFileName.split(".").length - 1].toLowerCase();
 
-// }
+    data.append("file", e.target.files[0]);
+    data.append("filename", e.target.files[0].name);
+    axios
+      .post("/upload", data)
+      .then((response) => {
+        temp[index].url = response.data.file;
+        temp[index].fileName = sFileName;
+        temp[index].uploadstatus = "Uploaded SuccessFully";
+        self.setState({ documents: temp }, () => {
+          Toast.fire({
+            type: "success",
+            title: "File Uploaded SuccessFully",
+          });
+        });
 
+        // self.setState({
+        //     url:response.data,
+        //     uploadStatus:'Uploaded SuccessFully'
+        // })
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
+onSkuSubmit () {
+  const result = skuGen(this.state.productValue, this.state.attributeValue, this.state.variantValue)
+  console.log(result);
+}
+
+ onChange(e) {
+    this.setState({ [e.target.name]: e.target.value });
+    // if(e.target.name==='authorID' && e.target.value !=""){
+    //     this.props.listCategory({authorID:e.target.value});
+    // }
+      if (this.state.productValue) {
+      this.setState({count:1})
+    } else {
+      this.setState({count:0})
+    }
+
+      if (this.state.attributeValue) {
+      this.setState({count:2})
+    } else {
+      this.setState({count:1})
+    }
+
+      if (this.state.variantValue) {
+      this.setState({count:3})
+    } else {
+      this.setState({count:2})
+    }
+
+    if (e.target.name === "categoryID" && e.target.value != "") {
+      this.props.listSubCategoryOne({ categoryID: e.target.value });
+    }
+    if (e.target.name === "subcategoryID" && e.target.value != "") {
+      this.props.listSubCategoryChildOne({ subcategoryID: e.target.value });
+    }
+  }
+
+    onSubmit(e) {
+    this.setState({ errors: {} });
+    e.preventDefault();
+    const Data = {
+      name: this.state.name,
+      description: this.state.description,
+      price: this.state.price,
+      discountPrice: this.state.discountPrice,
+      stockCount: this.state.stockCount,
+      photoUrl1: this.state.photoUrl1,
+      photoUrl2: this.state.photoUrl2,
+      documents: JSON.stringify(this.state.documents),
+      maintenanceText: this.state.maintenanceText,
+      maintenanceBtnText: this.state.maintenanceBtnText,
+      maintenanceFileUrl: this.state.maintenanceFileUrl,
+      acousticsText: this.state.acousticsText,
+      categoryID: this.state.categoryID,
+      subcategoryID: this.state.subcategoryID,
+      subcategoryChildID: this.state.subcategoryChildID,
+      isEnabled: this.state.isEnabled,
+      keyword: this.state.keyword,
+    };
+    this.props.addProduct(Data);
+  }
+
+    //Reset all statevalues
+  onReset() {
+    this.setState({
+      errors: {},
+      name: "",
+      description: "",
+      price: "",
+      discountPrice: "",
+      stockCount: "",
+      photoUrl1: "",
+      photoUrl2: "",
+      documents: [{ url: "", uploadstatus: "", fileName: "", buttonName: "" }],
+      maintenanceText: "",
+      maintenanceBtnText: "",
+      maintenanceFileUrl: "",
+      acousticsText: "",
+      categoryID: "",
+      subcategoryID: "",
+      subcategoryChildID: "",
+      isEnabled: "Yes",
+      keyword: "",
+    });
+  }
+
+  
   render() {
 
-    const { errors } = this.state;
+
+    const {listattributemapping,attributemappingloading}=this.props.attributemapping;
+
+    if (Object.keys(listAttributeMapping).length > 0){
+      
+      let fa = listattributemapping.map(result=>(result.mappingName))
+      console.log(fa)
+    } 
+    
+    
+    console.log(this.props.attributemapping.listattributemapping)
+    
+    const { errors,productValue,count } = this.state;
     const { productloading } = this.props.product;
+
+  
     //category  list
     const { listcategory, categoryloading } = this.props.category;  
 
@@ -151,19 +302,19 @@ class AddProductScreen extends React.Component {
         var filterSub = listsubCategoryChild.filter(
           (x) => x.categoryID === this.state.categoryID
         );
-        if (Object.keys(filterSub).length > 0) {
-          optionResultSubCategoryChild = listsubCategoryChild.map((result) => {
-            return (
-              <option value={result._id}>{result.subCategoryChildName}</option>
-            );
-          });
-        } else {
-          optionResultSubCategoryChild = (
-            <option value=''>
-              No SubCategory Found For Selected Category..
-            </option>
-          );
-        }
+        // if (Object.keys(filterSub).length > 0) {
+        //   optionResultSubCategoryChild = listsubCategoryChiild.map((result) => {
+        //     return (
+        //       <option value={result._id}>{result.subCategoryChildName}</option>
+        //     );
+        //   });
+        // } else {
+        //   optionResultSubCategoryChild = (
+        //     <option value=''>
+        //       No SubCategory Found For Selected Category..
+        //     </option>
+        //   );
+        // }
       } else {
         optionResultSubCategoryChild = (
           <option value=''>No SubCategory Found...</option>
@@ -206,7 +357,7 @@ class AddProductScreen extends React.Component {
                   </div>
                   <div className='add_product_value'>
                     <label className='main_title'>Value</label>
-                    <input type='text' className='add_product_input' />
+                    <input type='text' name='productValue' onChange={this.onChange} className='add_product_input' />
                   </div>
                 </div>
                 <div className='text_area_container'>
@@ -262,9 +413,9 @@ class AddProductScreen extends React.Component {
                   <label className='main_title'>Count In Stock</label>
                   <input type='text' className='add_product_input' />
                 </div>
-                <div className='add_product_value'>
-                  <label className='main_title'>SKU </label>
-                  <input type='text' className='add_product_input' />
+                 <div className='add_product_title'>
+                  <label style={{width:'100%'}} className='main_title'>Genarated SKU </label>
+                  <div className='add_product_input sku_genarated_text'>No SKU Genarated</div>
                 </div>
               </div>
 
@@ -368,17 +519,18 @@ class AddProductScreen extends React.Component {
                 </div>
                   <div className='add_product_title'>
                     <label className='main_title'>Value</label>
-                    <input className='add_product_input' type='text'></input>
+                    <input name='attributeValue' onChange={(e) => this.onChange(e)} className='add_product_input' type='text'></input>
                   </div>
               </div>
               <div className='attribute_create_button'>
-                <button onClick={onSkuSubmit} className='product_publish_btn'>Save</button>
+                <button onClick={() => this.onSkuSubmit()} className='product_publish_btn'>Save</button>
               </div>
             </div>
           </div>
 {/* Attribute Container End */}
           <div className='add_variant_container'>
               <label className='main_title'>Add Variants</label>
+          
                 <div className='select_container'>
                 <select
                   name='subcategoryChildID'
@@ -387,7 +539,11 @@ class AddProductScreen extends React.Component {
                   className='form-control_select'
                   placeholder=''
                   >
-                  <option value=''>Select Attribute</option>
+                    {this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (<option value={result.mappingName}> {result.mappingName} </option>))}
+                  {/* <option value={this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (result.mappingName))}
+                    
+                   >{this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (result.mappingName))}
+                  </option> */}
                   {/* {optionResultSubCategoryChild} */}
                 </select>
                 <span className='select_add_btn'>Add</span>
@@ -425,6 +581,10 @@ class AddProductScreen extends React.Component {
                    <div className='add_product_value'>
                       <label className='main_title'>Additional Cost</label>
                       <input type='text' className='add_product_input' />
+                    </div>
+                    <div className='add_product_value'>
+                      <label className='main_title'>Value</label>
+                      <input name='variantValue'  onChange={(e) => this.onChange(e)} type='text' className='add_product_input' />
                     </div>
                   </div>
             </div>
@@ -613,6 +773,8 @@ class AddProductScreen extends React.Component {
             </div>
           </div>
         </div>
+         Hello world
+          <ListAttributeMapping history={this.props.history} location={this.props.location}></ListAttributeMapping>
         <Footer/>
 
       </div>
@@ -635,6 +797,7 @@ const mapStateToProps = (state) => ({
   category: state.category,
   subCategory: state.subCategory,
   subCategoryChild: state.subCategoryChild,
+  attributemapping :state.attributemapping
 });
 
 export default connect(mapStateToProps, {
