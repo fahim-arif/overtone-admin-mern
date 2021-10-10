@@ -235,6 +235,7 @@ border-bottom: 1px solid #dbdbdb;
   background-color: #fff;
   flex: 1;
   padding: 20px;
+  height: 256px;
 }
 .attribute_name_input {
   background-color: #fff;
@@ -260,5 +261,5 @@ border-bottom: 1px solid #dbdbdb;
   padding: 20px;
 }
 .sku_genarated_text {
-  
+
 }

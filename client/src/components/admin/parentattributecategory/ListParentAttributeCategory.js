@@ -115,7 +115,7 @@ render() {
       <div>
     
         
-              <div className="kt-content  kt-grid__item kt-grid__item--fluid" id="kt_content">
+              <div style={{padding:'0'}} className="kt-content  kt-grid__item kt-grid__item--fluid" id="kt_content">
                     <div className="kt-portlet">
                         <div className="kt-portlet__head kt-portlet__head--lg">
                             <div className="kt-portlet__head-label">
