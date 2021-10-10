@@ -138,7 +138,7 @@ class AddProductScreen extends React.Component {
 
 onSkuSubmit () {
   const result = skuGen(this.state.productValue, this.state.attributeValue, this.state.variantValue)
-  console.log(result, 'here');
+  console.log(result);
   // var joined = this.state.sku.concat(result)
   // this.setState({sku:joined})
   this.setState({sku:[ ...result]});
@@ -227,7 +227,15 @@ onSkuSubmit () {
   
   render() {
 
-console.log(this.state.sku);
+console.log(this.state.sku[1]);
+
+
+const list = this.state.sku.toString()
+// const list = this.state.sku.length >1 && this.state.sku.forEach(function(result, idx) {
+//   console.log('hiii')
+//   return <li>{this.state.sku[idx]}</li>
+// })
+console.log(list)
     const {listattributemapping,attributemappingloading}=this.props.attributemapping;
 
     if (Object.keys(listAttributeMapping).length > 0){
@@ -420,7 +428,9 @@ console.log(this.state.sku);
                  <div className='add_product_title'>
                   <label style={{width:'100%'}} className='main_title'>Genarated SKU </label>
                   <div className='add_product_input sku_genarated_text'>
-                    {this.state.sku.length > 0 ? <div>{"this.state.sku[0]"}</div> :
+                    {this.state.sku.length > 0 ? <div>
+                      {list}
+                    </div> :
                     <p>
 
                       No SKU Genarated
