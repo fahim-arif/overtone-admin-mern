@@ -122,13 +122,13 @@ render() {
                     {/*begin::Form*/}
                     <form className="kt-form kt-form--fit kt-form--label-right" onSubmit={this.onSubmit}>
                         <div className="kt-portlet__body">
+                                <label style={{minWidth:'100px'}} className="col-lg-2 col-form-label">Attribute Name:</label>
                             <div className="form-group row">
-                                <label className="col-lg-2 col-form-label">Attribute Name:</label>
                                 <div className="col-lg-3">
-                                        <input type="text" name="attributeName" onChange={this.onChange} value={this.state.attributeName} className="form-control" placeholder="" />
+                                        <input style={{width:'200px'}} type="text" name="attributeName" onChange={this.onChange} value={this.state.attributeName} className="form-control" placeholder="" />
                                         <span className="form-text text-danger">{errors.attributeName}</span>
                                 </div>  
-                                <label className="col-lg-2 col-form-label">isEnabled:</label>
+                                {/* <label className="col-lg-2 col-form-label">isEnabled:</label>
                                 <div className="col-lg-3">
                                 <select  name="isEnabled" onChange={this.onChange} value={this.state.isEnabled} className="form-control" placeholder="" >
                                             <option value="">Select isEnabled</option>
@@ -136,7 +136,7 @@ render() {
                                             <option value="No">No</option>
                                 </select>
                                         <span className="form-text text-danger">{errors.isEnabled}</span>
-                                </div>   
+                                </div>    */}
                             </div>                           
                         </div>
                         <div className="kt-portlet__foot kt-portlet__foot--fit-x">
