@@ -755,7 +755,7 @@ console.log(list)
                   <div className='product_status_value'>Created At: </div>
                 </div>
                 <div style={{marginLeft:'20px'}} className='product_publish_container'>
-                  <button className='product_publish_btn'>Publish</button>
+                  <button onClick={this.onReset} className='product_publish_btn'>Publish</button>
                 </div>
               </div>
               <div className='product_group_container'>
@@ -879,15 +879,48 @@ console.log(list)
                 <div className='maintancence_upload'>
                   <div className='add_gallery_link'>
                     <Link to='#'>Maintenance File Upload <span className='red' style={{color:'#ff0000'}}>*</span> </Link>
+                    <input
+                                type='file'
+                                name='maintenanceFileUrl'
+                                onChange={(e) =>
+                                  this.uploadImage(e, "uploadStatus3")
+                                }
+                                className='form-control'
+                                placeholder=''
+                              />
                     </div>
+                      <span className='form-text text-danger'>
+                              {errors.maintenanceFileUrl}
+                            </span>
+
+                            <span className='form-text text-success'>
+                              {this.state.uploadStatus3}
+                            </span>
                 </div>
+                 <div style={{padding:'30px 20px 0 20px'}} className='add_product_title'>
+                        <label className='main_title'>Maintanence Button Text</label>
+                        <textarea  type='text'
+                              name='maintenanceBtnText'
+                              onChange={this.onChange}
+                              value={this.state.maintenanceBtnText} style={{height:'30px'}} type='text' />
+                </div>
+                <span className='form-text text-danger'>
+                              {errors.maintenanceBtnText}
+                            </span>
                 <div style={{padding:'30px 20px 0 20px'}} className='add_product_title'>
-                        <label className='main_title'>Keyword (Optional)</label>
-                        <textarea style={{height:'75px'}} type='text' />
+                        <label className='main_title'>Maintanence Text</label>
+                        <textarea name='maintenanceText'
+                              onChange={this.onChange}
+                              value={this.state.maintenanceText} style={{height:'75px'}} type='text' />
+                              <span className='form-text text-danger'>
+                              {errors.maintenanceText}
+                            </span>
                 </div>
                 <div style={{padding:'30px 20px 30px 20px'}} className='add_product_title'>
                         <label className='main_title'>Acoustic Text</label>
-                        <textarea style={{height:'75px'}} type='text' />
+                        <textarea name='acousticsText'
+                              onChange={this.onChange}
+                              value={this.state.acousticsText} style={{height:'75px'}} type='text' />
                 </div>
               </div>
             </div>
