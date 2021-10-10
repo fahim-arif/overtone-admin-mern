@@ -422,7 +422,6 @@ console.log(list)
                   </div>
                   <div className='media_col'>
                     <label htmlFor="file">
-
                     <Publish className='upload_img_icon'></Publish>
                     </label>
                     <input
@@ -440,18 +439,34 @@ console.log(list)
               <div className='add_price_container'>
                 <div className='add_product_title'>
                   <label className='main_title'>Price</label>
-                  <input type='text' className='add_product_input' />
+                  <input type='text' name='price'
+                              onChange={this.onChange}
+                              value={this.state.price} className='add_product_input' />
+                               <span className='form-text text-danger'>
+                              {errors.price}
+                            </span>
                 </div>
                 <div className='add_product_value'>
-                  <label className='main_title'>Discount Price</label>
-                  <input type='text' className='add_product_input' />
+                  <label  className='main_title'>Discount Price</label>
+                  <input 
+                  name='discountPrice'
+                  onChange={this.onChange}
+                              value={this.state.discountPrice} type='text' className='add_product_input' />
+                    <span className='form-text text-danger'>
+                              {errors.discountPrice}
+                            </span>
                 </div>
               </div>
               <div className='add_inventory_container'>
                 
                 <div className='add_product_title'>
                   <label className='main_title'>Count In Stock</label>
-                  <input type='text' className='add_product_input' />
+                  <input name='stockCount'
+                              onChange={this.onChange}
+                              value={this.state.stockCount} type='text' className='add_product_input' />
+                               <span className='form-text text-danger'>
+                              {errors.stockCount}
+                            </span>
                 </div>
                  <div className='add_product_title'>
                   <label style={{width:'100%'}} className='main_title'>Genarated SKU </label>
@@ -660,9 +675,9 @@ console.log(list)
                     <div style={{padding:'30px 20px 0 20px'}} className='add_product_title'>
                       <label className='main_title'>Select Group</label>
                       <select
-                        name='subcategoryChildID'
-                        onChange={(e) => this.onChange(e)}
-                        value={this.state.subcategoryChildID}
+                              name='categoryID'
+                              onChange={(e) => this.onChange(e)}
+                              value={this.state.categoryID}
                         className='form-control_select'
                         placeholder=''
                         >
@@ -680,8 +695,11 @@ console.log(list)
                         placeholder=''
                         >
                           <option value=''>Select</option>
-                            {/* {optionResultSubCategoryChild} */}
+                            {optionResultSubCategoryChild}
                       </select> 
+                      <span className='form-text text-danger'>
+                              {errors.subcategoryID}
+                            </span>
                     </div>
                       <div style={{padding:'0 20px 30px 20px'}} className='add_product_title'>
                       <label className='main_title'>Select Sub Group Child</label>
@@ -693,8 +711,11 @@ console.log(list)
                         placeholder=''
                         >
                           <option value=''>Select</option>
-                            {/* {optionResultSubCategoryChild} */}
+                            {optionResultSubCategoryChild}
                       </select> 
+                      <span className='form-text text-danger'>
+                              {errors.subcategoryChildID}
+                            </span>
                     </div>
               </div>
               <div className='product_options_container'>
