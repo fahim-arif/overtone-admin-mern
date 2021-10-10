@@ -121,14 +121,18 @@ render() {
                     </div>
                     {/*begin::Form*/}
                     <form className="kt-form kt-form--fit kt-form--label-right" onSubmit={this.onSubmit}>
-                        <div className="kt-portlet__body">
-                                <label style={{minWidth:'200px', fontWeight:'500', fontSize:'14px', paddingBottom:'10px'}} className="col-lg-2 col-form-label">Attribute Name:</label>
-                            <div className="form-group row">
+                        <div style={{paddingBottom:'0'}} className="kt-portlet__body">
+                                <label style={{minWidth:'200px', fontWeight:'500', fontSize:'14px', padding:' 0 0 10px 0'}} className="col-lg-2 col-form-label">Attribute Name:</label>
+                            <div style={{marginBottom:'0'}} className="form-group row">
                                 <div className="col-lg-3">
                                         <input style={{width:'335px', border:'1px solid #000'}} type="text" name="attributeName" onChange={this.onChange} value={this.state.attributeName} className="form-control" placeholder="" />
                                         <span className="form-text text-danger">{errors.attributeName}</span>
                                 </div>  
-                                {/* <label className="col-lg-2 col-form-label">isEnabled:</label>
+                                
+                            </div>                           
+                        </div>
+
+                        <label style={{minWidth:'200px', fontWeight:'500', fontSize:'14px', padding:' 0 0 10px 0'}} className="col-lg-2 col-form-label">isEnabled:</label>
                                 <div className="col-lg-3">
                                 <select  name="isEnabled" onChange={this.onChange} value={this.state.isEnabled} className="form-control" placeholder="" >
                                             <option value="">Select isEnabled</option>
@@ -136,9 +140,7 @@ render() {
                                             <option value="No">No</option>
                                 </select>
                                         <span className="form-text text-danger">{errors.isEnabled}</span>
-                                </div>    */}
-                            </div>                           
-                        </div>
+                                </div>   
                         <div className="kt-portlet__foot kt-portlet__foot--fit-x">
                             <div className="kt-form__actions">
                             <div className="row">
