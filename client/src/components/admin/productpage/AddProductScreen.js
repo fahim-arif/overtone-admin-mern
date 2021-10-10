@@ -11,6 +11,7 @@ import swal from "sweetalert2";
 
 import skuGen from "./logic-sku/app";
 import ListParentAttributeCategory from "../parentattributecategory/ListParentAttributeCategory";
+import AddParentAttributeCategory from "./AddParentAttributeCategory";
 
 // Imported
 import { PropTypes } from "prop-types";
@@ -750,29 +751,8 @@ console.log(list)
           <div className='create_attribute_modal_container'>
             <div className='modal_attribute_row'>
               <div className='modal_attribute_col-1'>
-                <div className='modal_col-1_container'>
-                  <div className='main_heading'>Add Parent Attribute Category</div>
-                </div>
-                <div className='add_product_value'>
-                  <label className='main_title'>Name</label>
-                  <input type='text' className='add_product_input' />
-                </div>
-                <div className='add_product_value mt-2'>
-                  <label className='main_title'>isEnabled</label>
-                    <select
-                        name='subcategoryChildID'
-                        onChange={(e) => this.onChange(e)}
-                        value={this.state.subcategoryChildID}
-                        className='form-control_select'
-                        placeholder=''
-                        >
-                        <option value=''>Select</option>
-                        {/* {optionResultSubCategoryChild} */}
-                    </select> 
-                </div>
-                <div className='product_publish_container'>
-                  <button className='product_publish_btn ml-0'>Save</button>
-                </div>
+                <AddParentAttributeCategory/>
+            
               </div>
               <div className='modal_attribute_col-2'>
                 <div className='main_heading'>Parent Attribute Category List</div>
@@ -782,7 +762,6 @@ console.log(list)
             </div>
           </div>
         </div>
-         Hello world
           <ListAttributeMapping history={this.props.history} location={this.props.location}></ListAttributeMapping>
         <Footer/>
 
