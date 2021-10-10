@@ -89,12 +89,12 @@ render() {
    return (
       <div>
      <Sidebarmobile/>
-      <div className="kt-grid kt-grid--hor kt-grid--root">
+      <div  className="kt-grid kt-grid--hor kt-grid--root">
         <div className="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver kt-page">
           {/* begin:: Aside */}
           <Asidebar/>
           {/* end:: Aside */}
-          <div className="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor kt-wrapper" id="kt_wrapper">
+          <div style={{padding:'0'}} className="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor kt-wrapper" id="kt_wrapper">
             {/* begin:: Header */}
             <div id="kt_header" className="kt-header kt-grid__item  kt-header--fixed ">
               {/* begin:: Header Menu */}
@@ -110,7 +110,7 @@ render() {
               <SubHeader first="Home" second="Add Parent Attribute Category" third=""/>
               {/* end:: Subheader */}
               {/* begin:: Content */}
-              <div className="kt-content  kt-grid__item kt-grid__item--fluid" id="kt_content">
+              <div style={{padding:'0'}} className="kt-content  kt-grid__item kt-grid__item--fluid" id="kt_content">
                     <div className="kt-portlet">
                      <div className="kt-portlet__head">
                         <div className="kt-portlet__head-label">
@@ -164,7 +164,6 @@ render() {
               {/* end:: Content */}
             </div>
             {/* begin:: Footer */}
-            <Footer/>
             {/* end:: Footer */}
           </div>
         </div>
