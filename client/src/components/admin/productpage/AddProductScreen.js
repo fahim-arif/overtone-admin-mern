@@ -10,6 +10,7 @@ import axios from 'axios'
 import swal from "sweetalert2";
 
 import skuGen from "./logic-sku/app";
+import ListParentAttributeCategory from "../parentattributecategory/ListParentAttributeCategory";
 
 // Imported
 import { PropTypes } from "prop-types";
@@ -334,6 +335,8 @@ console.log(list)
       }
     }
 
+
+    
     return (
       <div className={"add_product_screen"}>
         <Asidebar></Asidebar>
@@ -773,28 +776,8 @@ console.log(list)
               </div>
               <div className='modal_attribute_col-2'>
                 <div className='main_heading'>Parent Attribute Category List</div>
-                     <table   className="table table-striped table-bordered table-hover table-checkable">
-                            <thead>
-                            <tr>
-                                <th>Category Name</th>
-                                <th>Is Enabled</th>
-                                <th>View/Edit</th>
-                                <th>Delete</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                  {/* {tableResult}                    */}
-                                
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                <th>Category Name</th>
-                                <th>Is Enabled</th>
-                                <th>View/Edit</th>
-                                <th>Delete</th>
-                                </tr>
-                            </tfoot>
-                        </table>
+                {/*Here add Parent Attribute */}
+                <ListParentAttributeCategory/>                 
               </div>
             </div>
           </div>
