@@ -141,7 +141,7 @@ render() {
                                 </select>
                                         <span className="form-text text-danger">{errors.isEnabled}</span>
                                 </div>   
-                        <div style={{paddingLeft:'50px'}} className="kt-portlet__foot kt-portlet__foot--fit-x">
+                        <div style={{paddingLeft:'50px', marginTop:'30px'}} className="kt-portlet__foot kt-portlet__foot--fit-x">
                             <div className="kt-form__actions">
                             <div className="row">
                             <div className="col-lg-3 d-flex justify-content-around">
