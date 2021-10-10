@@ -247,6 +247,19 @@ onSkuSubmit () {
     });
   }
 
+
+  handleChange(e, index) {
+    const temp = this.state.documents;
+    const name = e.target.name;
+    const value = e.target.value;
+    if (name === "buttonName") {
+      temp[index].buttonName = value;
+    }
+    this.setState({
+      documents: temp,
+    });
+  }
+
   
   render() {
 
@@ -357,6 +370,81 @@ console.log(list)
       }
     }
 
+
+    // Document
+
+     const documents = this.state.documents.map((value, index) => {
+      return (
+        <React.Fragment>
+          <div className='col-lg-12 mt-3'>
+            <div className='row'>
+              <label className='col-lg-2 col-form-label'>Button Name</label>
+              <div className='col-lg-3'>
+                <input
+                  type='text'
+                  required
+                  name='buttonName'
+                  onChange={(e) => this.handleChange(e, index)}
+                  className='form-control'
+                  placeholder=''
+                />
+              </div>
+              <label className='col-lg-2 col-form-label'>
+                File {index + 1}
+              </label>
+              <div className='col-lg-3'>
+                <div className='kt-input-icon'>
+                  {value.fileName === "" ? (
+                    <input
+                      type='file'
+                      required
+                      name='url'
+                      onChange={(e) => this.uploadImageBulk(e, index)}
+                      className='form-control'
+                      placeholder=''
+                    />
+                  ) : (
+                    <button
+                      type='button'
+                      value={value.fileName}
+                      className='btn btn-success btn-sm mt-1'
+                    >
+                      {value.fileName}
+                    </button>
+                  )}
+                  <span className='form-text text-danger'>{errors.url}</span>
+                </div>
+                <span className='form-text text-success'>
+                  {value.uploadstatus}
+                </span>
+                <span className='form-text text-muted'>Upload Image Only</span>
+              </div>
+              <div className='col-lg-2'>
+                <button
+                  type='button'
+                  value={value.fileurl}
+                  onClick={() => this.addDocument()}
+                  className='btn btn-success btn-sm mt-1'
+                >
+                  <i class='fa fa-plus'></i>
+                </button>
+                &nbsp;&nbsp;&nbsp;
+                {this.state.documents.length > 1 ? (
+                  <button
+                    type='button'
+                    value={value.fileurl}
+                    onClick={() => this.removeDocument(index, value.fileurl)}
+                    className='btn btn-danger btn-sm mt-1'
+                  >
+                    <i class='fa fa-trash'></i>
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </React.Fragment>
+      );
+    });
 
     
     return (
@@ -773,14 +861,16 @@ console.log(list)
                 <div className='product_status_container'>
                   <div className='product_status'>Product Gallery</div>
                   <div className='product_gallery_upload_container'>
-                    <div className='add_gallery_link'>
+                   {documents} 
+                    {/* <div className='add_gallery_link'>
                     <Link to='#'>Add Product Image Gallery <span className='red' style={{color:'#ff0000'}}>*</span></Link>
 
                     </div>
                   <div className='product_btn_name_container'>
                     <label style={{marginLeft:'20px'}} className='main_title mt-3'>Button Name</label>
-                    <input style={{width:'245px', marginTop:'10px', marginLeft:'20px', marginRight:'20px', marginBottom: '30px'}} type='text' className='add_product_input'></input>
-                  </div>
+                    <input name='buttonName'
+                  onChange={(e) => this.handleChange(e, index)} style={{width:'245px', marginTop:'10px', marginLeft:'20px', marginRight:'20px', marginBottom: '30px'}} type='text' className='add_product_input'></input>
+                  </div> */}
                   </div>
                 </div>
               </div>
