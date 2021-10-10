@@ -141,12 +141,12 @@ render() {
                                 </select>
                                         <span className="form-text text-danger">{errors.isEnabled}</span>
                                 </div>   
-                        <div className="kt-portlet__foot kt-portlet__foot--fit-x">
+                        <div style={{paddingLeft:'50px'}} className="kt-portlet__foot kt-portlet__foot--fit-x">
                             <div className="kt-form__actions">
                             <div className="row">
                             <div className="col-lg-3 d-flex justify-content-around">
-                                <button type="submit" className={`btn btn-success ${parentattributecategoryloading ?  'kt-spinner kt-spinner--sm kt-spinner--light':''}`}>Submit</button>
-                                <button  type="button" onClick={this.onReset} className="btn btn-secondary">Cancel</button>
+                                <button style={{marginLeft:'56px'}} type="submit" className={`btn btn-success ${parentattributecategoryloading ?  'kt-spinner kt-spinner--sm kt-spinner--light':''}`}>Submit</button>
+                                <button  style={{marginLeft:'17px'}} type="button" onClick={this.onReset} className="btn btn-secondary">Cancel</button>
                             </div>
                             <div className="col-lg-10" />
                                 
