@@ -428,7 +428,7 @@ console.log(list)
                  <div className='add_product_title'>
                   <label style={{width:'100%'}} className='main_title'>Genarated SKU </label>
                   <div className='add_product_input sku_genarated_text'>
-                    {this.state.sku.length > 0 ? <div>
+                    {this.state.sku.length > 1 ? <div>
                       {list}
                     </div> :
                     <p>
@@ -454,6 +454,8 @@ console.log(list)
                   placeholder=''
                   >
                   <option value=''>Custom Add Attribute</option>
+                  <option value=''>Select</option>
+                         {this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (<option value={result.mappingName}> {result.mappingName} </option>))}
                   {/* {optionResultSubCategoryChild} */}
                 </select>
                 <span className='select_add_btn'>Add</span>
@@ -536,7 +538,7 @@ console.log(list)
                        className='form-control_select'
                        placeholder=''
                       >
-                        <option value=''>Select</option>
+                        
                           {/* {optionResultSubCategoryChild} */}
                       </select>
                 </div>
@@ -562,6 +564,7 @@ console.log(list)
                   className='form-control_select'
                   placeholder=''
                   >
+                      <option value=''>Select</option>
                     {this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (<option value={result.mappingName}> {result.mappingName} </option>))}
                   {/* <option value={this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (result.mappingName))}
                     
