@@ -103,6 +103,7 @@ const skuGen = (val1, val2,val3,val4='',val5='') => {
   
   
   console.log(res);
+  return res;
 }
 
 export default skuGen;
