@@ -122,10 +122,10 @@ render() {
                     {/*begin::Form*/}
                     <form className="kt-form kt-form--fit kt-form--label-right" onSubmit={this.onSubmit}>
                         <div className="kt-portlet__body">
-                                <label style={{minWidth:'100px'}} className="col-lg-2 col-form-label">Attribute Name:</label>
+                                <label style={{minWidth:'200px', fontWeight:'500', fontSize:'14px', paddingBottom:'10px'}} className="col-lg-2 col-form-label">Attribute Name:</label>
                             <div className="form-group row">
                                 <div className="col-lg-3">
-                                        <input style={{width:'200px'}} type="text" name="attributeName" onChange={this.onChange} value={this.state.attributeName} className="form-control" placeholder="" />
+                                        <input style={{width:'335px', border:'1px solid #000'}} type="text" name="attributeName" onChange={this.onChange} value={this.state.attributeName} className="form-control" placeholder="" />
                                         <span className="form-text text-danger">{errors.attributeName}</span>
                                 </div>  
                                 {/* <label className="col-lg-2 col-form-label">isEnabled:</label>
