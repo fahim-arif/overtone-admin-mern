@@ -722,16 +722,20 @@ console.log(list)
                 <div className='product_status'>Product Options</div>
                     <div style={{padding:'30px 20px 0 20px'}} className='add_product_title'>
                       <label className='main_title'>Keyword (Optional)</label>
-                      <select
-                        name='subcategoryChildID'
-                        onChange={(e) => this.onChange(e)}
-                        value={this.state.subcategoryChildID}
+                      <input
+                       name='keyword'
+                              onChange={this.onChange}
+                              value={this.state.keyword}
                         className='form-control_select'
                         placeholder=''
                         >
-                          <option value=''>Select</option>
-                            {/* {optionResultSubCategoryChild} */}
-                      </select> 
+                      </input> 
+                        <span className='form-text text-danger'>
+                              {errors.keyword}
+                            </span>
+                            <span className='form-text'>
+                              Enter the values seprated by Comma (Dress,Jeans)
+                            </span>
                     </div>
                     <div style={{padding:'0 20px 0 20px'}} className='add_product_title'>
                       <label className='main_title'>Quick Ship</label>
@@ -749,15 +753,20 @@ console.log(list)
                     <div style={{padding:'0px 20px 30px 20px'}} className='add_product_title'>
                       <label className='main_title'>isEnabled</label>
                       <select
-                        name='subcategoryChildID'
-                        onChange={(e) => this.onChange(e)}
-                        value={this.state.subcategoryChildID}
+                        name='isEnabled'
+                              onChange={this.onChange}
+                              value={this.state.isEnabled}
                         className='form-control_select'
                         placeholder=''
                         >
-                          <option value=''>Select</option>
+                         <option value=''>Select isEnabled</option>
+                              <option value='Yes'>Yes</option>
+                              <option value='No'>No</option>
                             {/* {optionResultSubCategoryChild} */}
                       </select> 
+                      <span className='form-text text-danger'>
+                              {errors.isEnabled}
+                            </span>
                     </div>
               </div>
               <div className='product_gallery_conatiner'>
