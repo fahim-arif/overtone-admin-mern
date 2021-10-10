@@ -132,9 +132,9 @@ render() {
                             </div>                           
                         </div>
 
-                        <label style={{minWidth:'200px', fontWeight:'500', fontSize:'14px', padding:' 0 0 10px 0'}} className="col-lg-2 col-form-label">isEnabled:</label>
+                        <label style={{minWidth:'200px', fontWeight:'500', fontSize:'14px', padding:' 10px 0 10px 25px'}} className="col-lg-2 col-form-label">isEnabled:</label>
                                 <div className="col-lg-3">
-                                <select  name="isEnabled" onChange={this.onChange} value={this.state.isEnabled} className="form-control" placeholder="" >
+                                <select style={{width:'240px'}} name="isEnabled" onChange={this.onChange} value={this.state.isEnabled} className="form-control" placeholder="" >
                                             <option value="">Select isEnabled</option>
                                             <option value="Yes">Yes</option>
                                             <option value="No">No</option>
