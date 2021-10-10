@@ -22,6 +22,7 @@ import { listCategory } from "../../../actions/categoryAction";
 import { listSubCategoryOne } from "../../../actions/subCategoryAction";
 import { listSubCategoryChildOne } from "../../../actions/subCategoryChildAction";
 import ListAttributeMapping from "./ListAttributeMapping";
+import EditAttributeMapping from "./EditAttributeMapping";
 
 // import ArrowBackIcon from "@mui/icons-material";
 import {
@@ -377,10 +378,10 @@ console.log(list)
       return (
         <React.Fragment>
           <div className='col-lg-12 mt-3'>
-            <div className='row'>
-              <label className='col-lg-2 col-form-label'>Button Name</label>
+              <label style={{minWidth:'200px'}} className='col-lg-2 col-form-label main_title'>Button Name</label>
               <div className='col-lg-3'>
                 <input
+                style={{minWidth:'245px', border:'1px solid #000'}}
                   type='text'
                   required
                   name='buttonName'
@@ -388,14 +389,16 @@ console.log(list)
                   className='form-control'
                   placeholder=''
                 />
+            <div className='row'>
               </div>
-              <label className='col-lg-2 col-form-label'>
+              <label style={{minWidth:'200px'}} className='col-lg-2 col-form-label main_title'>
                 File {index + 1}
               </label>
               <div className='col-lg-3'>
                 <div className='kt-input-icon'>
                   {value.fileName === "" ? (
                     <input
+                     style={{minWidth:'245px', marginLeft:'-8px', border:'1px solid #000'}}
                       type='file'
                       required
                       name='url'
@@ -417,7 +420,7 @@ console.log(list)
                 <span className='form-text text-success'>
                   {value.uploadstatus}
                 </span>
-                <span className='form-text text-muted'>Upload Image Only</span>
+                <span style={{minWidth:'200px'}} className='col-lg-2 col-form-label main_title'>Upload Image Only</span>
               </div>
               <div className='col-lg-2'>
                 <button
@@ -426,7 +429,8 @@ console.log(list)
                   onClick={() => this.addDocument()}
                   className='btn btn-success btn-sm mt-1'
                 >
-                  <i class='fa fa-plus'></i>
+                  Add
+                  {/* <i class='fa fa-plus'></i> */}
                 </button>
                 &nbsp;&nbsp;&nbsp;
                 {this.state.documents.length > 1 ? (
@@ -614,7 +618,6 @@ console.log(list)
                        placeholder=''
                       >
                         <option value=''>Select</option>
-                          {/* {optionResultSubCategoryChild} */}
                       </select> 
                   </div>
                 <div className='add_product_value'>
@@ -633,7 +636,6 @@ console.log(list)
                        placeholder=''
                       >
                         <option value=''>Select</option>
-                          {/* {optionResultSubCategoryChild} */}
                       </select> 
                   </div>
                 <div className='add_product_value'>
@@ -651,7 +653,6 @@ console.log(list)
                        className='form-control_select'
                        placeholder=''
                       > <option value=''>Select</option>
-                          {/* {optionResultSubCategoryChild} */}
                       </select> 
                   </div>
                 <div className='add_product_value'>
@@ -670,7 +671,6 @@ console.log(list)
                        placeholder=''
                       >
                         
-                          {/* {optionResultSubCategoryChild} */}
                       </select>
                 </div>
                   <div className='add_product_title'>
@@ -681,9 +681,10 @@ console.log(list)
               <div className='attribute_create_button'>
                 <button onClick={() => this.onSkuSubmit()} className='product_publish_btn'>Save</button>
               </div>
-            </div>
+            </div> 
           </div>
 {/* Attribute Container End */}
+      <EditAttributeMapping/>
           <div className='add_variant_container'>
               <label className='main_title'>Add Variants</label>
           
