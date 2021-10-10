@@ -80,6 +80,26 @@ class AddProductScreen extends React.Component {
       this.uploadImageBulk = this.uploadImageBulk.bind(this);
       
   }
+
+  componentDidMount() {
+    this.props.listCategory();
+  }
+
+
+  addDocument() {
+    const documents = this.state.documents.concat([
+      { url: "", uploadstatus: "", fileName: "", buttonName: "" },
+    ]);
+    this.setState({ documents });
+  }
+
+  removeDocument(idx, sub) {
+    this.setState({
+      documents: this.state.documents.filter((s, sidx) => idx !== sidx),
+    });
+  }
+
+
     //for upload image
   uploadImage(e, status) {
     var self = this;
@@ -145,6 +165,7 @@ onSkuSubmit () {
   // this.setState({sku:joined})
   this.setState({sku:[ ...result]});
 }
+
 
  onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
@@ -363,6 +384,7 @@ console.log(list)
                   <div className='add_product_title'>
                     <label className='main_title'>Title</label>
                             <input 
+                              name='name'
                               onChange={this.onChange}
                               value={this.state.name} 
                               type='text' className='add_product_input' 
@@ -378,7 +400,9 @@ console.log(list)
                 </div>
                 <div className='text_area_container'>
                   <label className='main_title'>Description</label>
-                  <textarea name='' id='' cols='55' rows='5'></textarea>
+                  <textarea   name='description'
+                              onChange={this.onChange}
+                              value={this.state.description} id='' cols='55' rows='5'></textarea>
                 </div>
               </div>
               <div className='add_product_media_container'>
@@ -389,7 +413,7 @@ console.log(list)
                     <input
                       type='file'
                       name='photoUrl1'
-                      // onChange={(e) => uploadImage(e, "uploadStatus1")}
+                      onChange={(e) => this.uploadImage(e, "uploadStatus1")}
                       className='form-control_upload'
                       placeholder='Upload Image'
                       style={{display:'none'}}
@@ -404,7 +428,7 @@ console.log(list)
                     <input
                       type='file'
                       name='photoUrl1'
-                      // onChange={(e) => uploadImage(e, "uploadStatus1")}
+                      onChange={(e) => this.uploadImage(e, "uploadStatus1")}
                       className='form-control_upload'
                       placeholder='Upload Image'
                       style={{display:'none' }}
