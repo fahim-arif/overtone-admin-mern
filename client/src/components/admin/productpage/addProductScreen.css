@@ -1,9 +1,14 @@
+body {
+  z-index: 10;
+}
+
 .add_main_wrapper {
   max-width: 1000px;
   padding-left: 255px;
   margin: 0 auto;
 }
 .add_main_wrapper {
+  position: relative;
   margin-top: 50px;
 }
 .add_heading {
@@ -137,7 +142,7 @@
   cursor: pointer;
   font-weight: 500;
 }
-.attribute_dropdown_container {
+.attribute_dropdown_wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -222,10 +227,13 @@ border-bottom: 1px solid #dbdbdb;
 }
 /* Modal Create Parent attribute */
 .create_attribute_modal_container {
-  
+  /* position: absolute; */
+  top: 200px;
+  left: 100px;
   margin-top: 30px;
   margin-bottom: 30px;
   width: 1000px;
+  z-index: 1000;
 }
 .modal_attribute_row {
   display: flex;
