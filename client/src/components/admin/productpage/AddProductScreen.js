@@ -73,6 +73,9 @@ class AddProductScreen extends React.Component {
       count: 0,
       sku: [{}],
       click: false,
+      attributeCount: 0,
+      demo: [1, 2, 3],
+      dependentField: [{ type: "", label: "", value: "", additionalPrice: "0", parentCategory: '', mappingName: '', isEnabled: '', subField: '' }],
 
     };
 
@@ -271,10 +274,42 @@ class AddProductScreen extends React.Component {
       this.setState({ click: false })
     }
   }
+  onAttributeAdd() {
+    this.setState({ attributeCount: this.state.attributeCount + 1 });
+    const dependentField = this.state.dependentField.concat([{ type: "", label: "", value: "", additionalPrice: "0", parentCategory: '', mappingName: '', isEnabled: '', subField: '' }]);
+    this.setState({ dependentField });
+  }
+
+
+  onhandleChangeSubField(e, index) {
+    const name = e.target.name;
+    const value = e.target.value;
+    const temp = this.state.dependentField;
+    if (name === "label") {
+      temp[index].label = value;
+    } else if (name === "value") {
+      temp[index].value = value;
+    } else if (name === "additionalPrice") {
+      temp[index].additionalPrice = value;
+    } else if (name === 'parentCategory') {
+      temp[index].parentCategory = value;
+    } else if (name === 'mappingValue') {
+      temp[index].mappingValue = value;
+    } else if (name === "isEnabled") {
+      temp[index].isEnabled = value;
+    } else if (name === "subField") {
+      temp[index].subField = value;
+    } else if (name === 'type') {
+      temp[index].type= value;
+    }
+    this.setState({
+      dependentField: temp
+    })
+  }
 
 
   render() {
-
+    console.log(this.state.dependentField)
     const { listparentattributecategory, parentattributecategoryloading } = this.props.parentattributecategory;
 
     var optionParentCategory = [];
@@ -283,7 +318,7 @@ class AddProductScreen extends React.Component {
     } else {
       if (Object.keys(listparentattributecategory).length > 0) {
         optionParentCategory = listparentattributecategory.map(result => {
-          return <option value={result._id}>{result.attributeName}</option>
+          return <option value={result.attributeName}>{result.attributeName}</option>
         })
       } else {
         optionParentCategory = (<option value="">No Parent Attributes  Found...</option>)
@@ -591,6 +626,7 @@ class AddProductScreen extends React.Component {
                 </div>
 
                 <div className='add_attribute_container'>
+                  {/* {this.state.demo.forEach((res))} */}
                   <label className='main_title'>Add Attribute</label>
                   <div className='select_container'>
 
@@ -602,112 +638,118 @@ class AddProductScreen extends React.Component {
                       placeholder=''
                     >
                       <option value=''>Custom Add Attribute</option>
-                      <option value=''>Select</option>
-                      {this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (<option value={result.mappingName}> {result.mappingName} </option>))}
-                      {/* {optionResultSubCategoryChild} */}
                     </select>
-                    <span className='select_add_btn'>Add</span>
+                    <span onClick={() => this.onAttributeAdd()} className='select_add_btn'>Add</span>
                   </div>
-                  <div className='attribute_dropdown_container'>
-                    <div className='attribute_dropdown_wrapper'>
+                  {this.state.dependentField.map((res, index) => (
+                    <div className='attribute_dropdown_container'>
+                      <div className='attribute_dropdown_wrapper'>
 
-                      <div className='attirbute_dropdown_content'>
+                        <div className='attirbute_dropdown_content'>
 
-                        color
+                          New Attribute
+                        </div>
+                        <div className='attribute_dropdown_icon_container'>
+                          <KeyboardArrowDown></KeyboardArrowDown>
+                          <KeyboardArrowUp></KeyboardArrowUp>
+                          <span className='attribute_dropdown_delete'>Delete</span>
+                        </div>
                       </div>
-                      <div className='attribute_dropdown_icon_container'>
-                        <KeyboardArrowDown></KeyboardArrowDown>
-                        <KeyboardArrowUp></KeyboardArrowUp>
-                        <span className='attribute_dropdown_delete'>Delete</span>
+                      <div className='create_attribute_container'>
+                        <div className='create_attribute_row'>
+                          <div className='add_product_title'>
+                            <label className='main_title'>Select Parent Category</label>
+                            <select
+                              name='parentCategory'
+                              onChange={(e) => this.onhandleChangeSubField(e, index)}
+                              value={res.parentCategory}
+                              className='form-control_select'
+                              placeholder=''
+                            >
+                              <option value=''>Select</option>
+                              <option value='modal'>Create New Parent Category</option>
+                              {optionParentCategory}
+                            </select>
+                          </div>
+                          <div className='add_product_value'>
+                            <label className='main_title'>Mapping Name</label>
+                            <input type='text' name='mappingValue' onChange={(e) => this.onhandleChangeSubField(e, index)}
+                              value={res.mappingValue} 
+                              className='add_product_input' />
+                          </div>
+                        </div>
+                        <div className='create_attribute_row'>
+                          <div className='add_product_title'>
+                            <label className='main_title'>Type</label>
+                            <select
+                              name='type'
+                              onChange={(e) => this.onhandleChangeSubField(e, index)}
+                              value={res.type}
+                              className='form-control_select'
+                              placeholder=''
+                            >
+                              <option value=''>Select</option>
+                              <option value="dropdown">Dropdown</option>
+                              <option value="color">Color Code</option>
+                              <option value="image+text">Image+Text</option>
+                            </select>
+                          </div>
+                          <div className='add_product_value'>
+                            <label className='main_title'>Label</label>
+                            <input type='text' name='label' onChange={(e) => this.onhandleChangeSubField(e, index)}
+                              value={res.label} className='add_product_input' />
+                          </div>
+                        </div>
+                        <div className='create_attribute_row'>
+                          <div className='add_product_title'>
+                            <label className='main_title'>isEnabled</label>
+                            <select
+                              name='isEnabled'
+                              onChange={(e) => this.onhandleChangeSubField(e, index)}
+                              value={res.isEnabled}
+                              className='form-control_select'
+                              placeholder=''
+                            >
+                              <option value="">Select isEnabled</option>
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                            </select>
+                          </div>
+                          <div className='add_product_value'>
+                            <label className='main_title'>Additional Cost</label>
+                            <input name='additionalPrice' onChange={(e) => this.onhandleChangeSubField(e, index)}
+                              value={res.additionalPrice} type='text' className='add_product_input' />
+                          </div>
+                        </div>
+                        <div className='create_attribute_row'>
+                          <div className='add_product_value'>
+                            <label className='main_title'>Sub Field</label>
+                            <select
+                              name='subField'
+                              onChange={(e) => this.onhandleChangeSubField(e, index)}
+                              value={res.subField}
+                              className='form-control_select'
+                              placeholder=''
+                            >
+                              <option value='select'>Select</option>
+                              <option value='Yes'>Yes</option>
+                              <option value='No'>No</option>
+                            </select>
+                          </div>
+                          <div className='add_product_title'>
+                            <label className='main_title'>Value</label>
+                            <input name='value' onChange={(e) => this.onhandleChangeSubField(e, index)}
+                              value={res.value} className='add_product_input' type='text'></input>
+                          </div>
+                        </div>
+                      </div>
+                      <div className='attribute_create_button'>
+                        <button onClick={() => this.onSkuSubmit()} className='product_publish_btn'>Save</button>
                       </div>
                     </div>
-                       <div className='create_attribute_container'>
-                    <div className='create_attribute_row'>
-                      <div className='add_product_title'>
-                        <label className='main_title'>Select Parent Category</label>
-                        <select
-                          name='subcategoryChildID'
-                          onChange={(e) => this.onChange(e)}
-                          onClick={(e) => this.handleModal(e)}
-                          value={this.state.subcategoryChildID}
-                          className='form-control_select'
-                          placeholder=''
-                        >
-                          <option value=''>Select</option>
-                          <option value='modal'>Create New Parent Category</option>
-                          {optionParentCategory}
-                        </select>
-                      </div>
-                      <div className='add_product_value'>
-                        <label className='main_title'>Mapping Name</label>
-                        <input type='text' className='add_product_input' />
-                      </div>
-                    </div>
-                    <div className='create_attribute_row'>
-                      <div className='add_product_title'>
-                        <label className='main_title'>Type</label>
-                        <select
-                          name='subcategoryChildID'
-                          onChange={(e) => this.onChange(e)}
-                          value={this.state.subcategoryChildID}
-                          className='form-control_select'
-                          placeholder=''
-                        >
-                          <option value=''>Select</option>
-                          <option value="dropdown">Dropdown</option>
-                          <option value="color">Color Code</option>
-                          <option value="image+text">Image+Text</option>
-                        </select>
-                      </div>
-                      <div className='add_product_value'>
-                        <label className='main_title'>Label</label>
-                        <input type='text' className='add_product_input' />
-                      </div>
-                    </div>
-                    <div className='create_attribute_row'>
-                      <div className='add_product_title'>
-                        <label className='main_title'>isEnabled</label>
-                        <select
-                          name='subcategoryChildID'
-                          value={this.state.mappingType}
-                          onChange={(e) => this.onChange(e)}
-                          className='form-control_select'
-                          placeholder=''
-                        >
-                          <option value="">Select isEnabled</option>
-                          <option value="Yes">Yes</option>
-                          <option value="No">No</option>
-                        </select>
-                      </div>
-                      <div className='add_product_value'>
-                        <label className='main_title'>Additional Cost</label>
-                        <input type='text' className='add_product_input' />
-                      </div>
-                    </div>
-                    <div className='create_attribute_row'>
-                      <div className='add_product_value'>
-                        <label className='main_title'>Sub Field</label>
-                        <select
-                          name='subcategoryChildID'
-                          onChange={(e) => this.onChange(e)}
-                          value={this.state.subcategoryChildID}
-                          className='form-control_select'
-                          placeholder=''
-                        >
+                  ))}
 
-                        </select>
-                      </div>
-                      <div className='add_product_title'>
-                        <label className='main_title'>Value</label>
-                        <input name='attributeValue' onChange={(e) => this.onChange(e)} className='add_product_input' type='text'></input>
-                      </div>
-                    </div>
-                    <div className='attribute_create_button'>
-                      <button onClick={() => this.onSkuSubmit()} className='product_publish_btn'>Save</button>
-                    </div>
-                  </div>
-                  </div>
-               
+
                 </div>
                 {/* Attribute Container End */}
                 {/* <EditAttributeMapping /> */}
