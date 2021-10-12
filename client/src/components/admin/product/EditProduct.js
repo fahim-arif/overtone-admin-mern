@@ -44,6 +44,7 @@ class EditProduct extends Component {
        subcategoryID:'',
        subcategoryChildID:'',
        isEnabled:'Yes',
+       quickship:'Yes',
        keyword:'',
     }   
     this.onChange = this.onChange.bind(this);
@@ -141,6 +142,7 @@ componentDidMount(){
         subcategoryID:editResult.subcategoryID,
         subcategoryChildID:editResult.subcategoryChildID,
         isEnabled:editResult.isEnabled,
+        quickship:editResult.quickship,
         keyword:editResult.keyword,
     },()=>{
         
@@ -218,6 +220,7 @@ onSubmit(e){
         subcategoryID:this.state.subcategoryID,
         subcategoryChildID:this.state.subcategoryChildID,
         isEnabled:this.state.isEnabled,
+        quickship:this.state.quickship,
         keyword:this.state.keyword,
         _id:this.state._id,
        
@@ -244,6 +247,7 @@ onReset(){
         subcategoryID:'',
         subcategoryChildID:'',
         isEnabled:'Yes',
+        quickship:'Yes',
         keyword:'',
  
     })
@@ -485,7 +489,18 @@ render() {
                                             <span className="form-text text-danger">{errors.keyword}</span>
                                             <span className="form-text">Enter the values seprated by Comma (Dress,Jeans)</span>
                                     </div>
-                            </div>   
+                            </div>  
+                            <div className="form-group row">
+                                <label className="col-lg-2 col-form-label">Quickship:</label>
+                                <div className="col-lg-3">
+                                <select  name="quickship" onChange={this.onChange} value={this.state.quickship} className="form-control" placeholder="" >
+                                            <option value="">Select QuickShip</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                </select>
+                                        <span className="form-text text-danger">{errors.quickship}</span>
+                                </div>
+                            </div> 
                             
                         </div>
                     

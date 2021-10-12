@@ -43,7 +43,7 @@ const Toast = swal.mixin({
   timer: 3000,
 });
 
-
+let lenRes = 1;
 
 class AddProductScreen extends React.Component {
   constructor() {
@@ -71,10 +71,14 @@ class AddProductScreen extends React.Component {
       attributeValue: "",
       variantValue: "",
       count: 0,
-      sku: [{}],
+      sku: [],
       click: false,
       attributeCount: 0,
       demo: [1, 2, 3],
+      tempAtbName: [],
+      tempAtbValue: [],
+      tempVarLen: [{ num: '' }],
+      demoValue: [{ num: '' }],
       dependentField: [{ type: "", label: "", value: "", additionalPrice: "0", parentCategory: '', mappingName: '', isEnabled: '', subField: '' }],
 
     };
@@ -165,12 +169,61 @@ class AddProductScreen extends React.Component {
       });
   }
 
-  onSkuSubmit() {
-    const result = skuGen(this.state.productValue, this.state.attributeValue, this.state.variantValue)
-    console.log(result);
-    // var joined = this.state.sku.concat(result)
-    // this.setState({sku:joined})
-    this.setState({ sku: [...result] });
+  onSkuSubmit(submit = false) {
+    let atbName = this.state.dependentField.map((res) => res.mappingValue)
+    this.setState({ tempAtbName: [...this.state.tempAtbName, atbName] })
+    let combineAtbName = this.state.tempAtbName.toString().replace(/,/g, '-');
+    let firstPortion = this.state.productValue;
+    console.log(firstPortion)
+    // second portion
+    let atbValue = this.state.dependentField.map((res) => res.value).toString();
+    console.log(atbValue.toString())
+    // let tempValLen = atbValue.length();
+    // console.log(tempValLen)
+    let variantLen = atbValue.toString().split(',').length;
+    console.log(variantLen, 'varinat');
+    this.setState({ tempVarLen: [...this.state.tempVarLen, variantLen] });
+    let thirdArg = ''
+    let forthArg = ''
+
+    if (this.state.dependentField.length == 2) {
+      thirdArg = this.state.dependentField[1].value;
+      atbValue = this.state.dependentField[0].value;
+    } else if (this.state.dependentField.length == 3) {
+      thirdArg = this.state.dependentField[1].value;
+      atbValue = this.state.dependentField[0].value;
+      forthArg = this.state.dependentField[2].value;
+    }
+
+
+    if (submit) {
+
+      console.log(forthArg);
+      const result = skuGen(firstPortion, atbValue, thirdArg, forthArg)
+      console.log(result);
+      this.setState({ sku: result });
+
+      // const tempVarLen = {...result}
+      // this.setState({tempVarLen});
+
+      let varLength = this.state.tempAtbValue;
+      for (let i = 0; i < result.length; i++) {
+        varLength = this.state.tempAtbValue.concat([{ num: '1' }])
+      }
+      this.setState({ tempVarLen: varLength })
+
+    }
+
+
+
+    lenRes = 1;
+    lenRes = lenRes * variantLen;
+    console.log(lenRes)
+
+
+    const demoValue = this.state.demoValue.concat([{ num: '' }])
+    this.setState({ demoValue })
+
   }
 
 
@@ -300,7 +353,7 @@ class AddProductScreen extends React.Component {
     } else if (name === "subField") {
       temp[index].subField = value;
     } else if (name === 'type') {
-      temp[index].type= value;
+      temp[index].type = value;
     }
     this.setState({
       dependentField: temp
@@ -309,7 +362,52 @@ class AddProductScreen extends React.Component {
 
 
   render() {
-    console.log(this.state.dependentField)
+
+
+    const elements = ['one', 'two', 'three'];
+
+    const items = []
+
+    for (const [index, value] of this.state.sku.entries()) {
+      items.push(<div style={{backgroundColor:'#fff'}} key={index} className='attribute_dropdown_container'>
+        <div className='attribute_dropdown_wrapper'>
+
+          <div className='attirbute_dropdown_content'>
+            Added Variants SKU: {value}
+          </div>
+          <div div className='attribute_dropdown_icon_container'>
+            <KeyboardArrowDown></KeyboardArrowDown>
+            <KeyboardArrowUp></KeyboardArrowUp>
+            <span className='attribute_dropdown_delete'>Delete</span>
+          </div>
+        </div>
+        <div className='create_attribute_row'>
+          <div className='add_product_title'>
+            <label className='main_title'>Type</label>
+            <select
+              name='subcategoryChildID'
+              onChange={(e) => this.onChange(e)}
+              value={this.state.subcategoryChildID}
+              className='form-control_select'
+              placeholder=''
+            >
+              <option value=''>Select</option>
+              {/* {optionResultSubCategoryChild} */}
+            </select>
+          </div>
+          <div className='add_product_value'>
+            <label className='main_title'>Label</label>
+            <input type='text' className='add_product_input' />
+          </div>
+        </div>
+      </div>)
+    }
+
+
+    console.log(this.state.tempVarLen)
+    console.log(this.state.sku)
+    // console.log(this.state.tempAtbName)
+    // console.log(this.state.dependentField)
     const { listparentattributecategory, parentattributecategoryloading } = this.props.parentattributecategory;
 
     var optionParentCategory = [];
@@ -674,7 +772,7 @@ class AddProductScreen extends React.Component {
                           <div className='add_product_value'>
                             <label className='main_title'>Mapping Name</label>
                             <input type='text' name='mappingValue' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.mappingValue} 
+                              value={res.mappingValue}
                               className='add_product_input' />
                           </div>
                         </div>
@@ -753,6 +851,8 @@ class AddProductScreen extends React.Component {
                 </div>
                 {/* Attribute Container End */}
                 {/* <EditAttributeMapping /> */}
+                {this.state.sku.length}
+                {this.state.sku.forEach((res) => (<div>Hello</div>))}
                 <div className='add_variant_container'>
                   <label className='main_title'>Add Variants</label>
 
@@ -769,38 +869,10 @@ class AddProductScreen extends React.Component {
                     </select>
                     <span className='select_add_btn'>Add</span>
                   </div>
-                  <div className='attribute_dropdown_container'>
-                    <div className='attribute_dropdown_wrapper'>
 
-                      <div className='attirbute_dropdown_content'>
-                        color
-                      </div>
-                      <div div className='attribute_dropdown_icon_container'>
-                        <KeyboardArrowDown></KeyboardArrowDown>
-                        <KeyboardArrowUp></KeyboardArrowUp>
-                        <span className='attribute_dropdown_delete'>Delete</span>
-                      </div>
-                    </div>
-                    <div className='create_attribute_row'>
-                      <div className='add_product_title'>
-                        <label className='main_title'>Type</label>
-                        <select
-                          name='subcategoryChildID'
-                          onChange={(e) => this.onChange(e)}
-                          value={this.state.subcategoryChildID}
-                          className='form-control_select'
-                          placeholder=''
-                        >
-                          <option value=''>Select</option>
-                          {/* {optionResultSubCategoryChild} */}
-                        </select>
-                      </div>
-                      <div className='add_product_value'>
-                        <label className='main_title'>Label</label>
-                        <input type='text' className='add_product_input' />
-                      </div>
-                    </div>
-                  </div>
+                      {items}
+
+
 
                   <div className='create_attribute_row'>
                     <div className='add_product_value'>
@@ -823,7 +895,7 @@ class AddProductScreen extends React.Component {
                     <div className='product_status_value'>Created At: </div>
                   </div>
                   <div style={{ marginLeft: '20px' }} className='product_publish_container'>
-                    <button onClick={this.onReset} className='product_publish_btn'>Publish</button>
+                    <button onClick={() => this.onSkuSubmit(true)} className='product_publish_btn'>Publish</button>
                   </div>
                 </div>
                 <div className='product_group_container'>

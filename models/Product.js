@@ -64,6 +64,11 @@ const ProductSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref : 'subcategorychilds'
     },
+    quickship:{
+        type:String,
+        enum : ['Yes', 'No'], 
+        required:true
+    },
     isEnabled:{
         type:String,
         enum : ['Yes', 'No'], 

@@ -27,8 +27,6 @@ const attributecategory     = require('./routes/api/attributecategory');
 const attributemapping     = require('./routes/api/attributemapping');
 const productsub     = require('./routes/api/productsub');
 
-// My part
-const orderemail = require("./routes/api/orderemail")
 
 
 
@@ -90,7 +88,7 @@ app.use('/api/attributecategory', attributecategory);
 app.use('/api/attributemapping', attributemapping);
 app.use('/api/productsub', productsub);
 
-app.use("/api/orderemail", orderemail);
+
 
 
 

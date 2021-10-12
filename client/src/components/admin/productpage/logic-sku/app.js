@@ -89,8 +89,8 @@ console.log(val4.length);
 };
 
 // let attributes = window.prompt("Enter the arrtribute number: ");
-const skuGen = (val1, val2,val3,val4='',val5='') => {
-
+const skuGen = (val1, val2,val3,val4,val5='') => {
+ 
   // attributes = Number(attributes);
   // ['OTP-1', 'OTP-2', 'OTP-3']
   // let val1 = 'dress';

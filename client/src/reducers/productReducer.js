@@ -54,7 +54,6 @@ export default function (state = initialState, action) {
       };
     case ADD_ORDER_ATTRIBUTES:
       return {
-        ...state,
         selectedAttribute: action.payload,
       };
 
