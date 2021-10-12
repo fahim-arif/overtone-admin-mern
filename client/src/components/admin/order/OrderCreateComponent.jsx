@@ -169,7 +169,6 @@ const OrderCreateComponent = () => {
         name={product.name}
         photo={product.photoUrl1}
       ></Helper>
-      <UserCreateModal></UserCreateModal>
       <div
         // onClick={() => setShowUser(false)}
         id='save-click'
