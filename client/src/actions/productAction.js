@@ -58,10 +58,10 @@ export const listProductOne= (data) => dispatch => {
 };
 
 // Create product
-export const addProduct= (productData) => dispatch => {
+export const addProduct= () => dispatch => {
     dispatch(setProductLoading());
     axios
-    .post('/api/product/',productData)
+    .post('/api/product/')
     .then(res =>
         dispatch({
             type: ADD_PRODUCT,

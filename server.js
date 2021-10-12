@@ -99,6 +99,7 @@ app.use('/api/productsub', productsub);
 
 let reqPath = path.join(__dirname, '../../');
 app.post('/upload',  function(req, res) {
+  console.log(__dirname);
   if (!req.files)
     return res.status(400).send('No files were uploaded.');
     let sampleFile = req.files.file;  

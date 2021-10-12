@@ -19,7 +19,7 @@ render() {
 
   const {isAuthenticated} = this.props.auth;
   return (
-    <div className="kt-footer kt-grid__item kt-grid kt-grid--desktop kt-grid--ver-desktop">
+    <div style={{marginTop:'100px'}} className="kt-footer kt-grid__item kt-grid kt-grid--desktop kt-grid--ver-desktop">
     <div className="kt-footer__copyright">
       2020&nbsp;©&nbsp;<a href={AppSetting.url} target="_blank" className="kt-link">{AppSetting.name}</a>
     </div>

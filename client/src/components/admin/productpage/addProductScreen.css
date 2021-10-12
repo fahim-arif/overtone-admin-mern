@@ -93,7 +93,7 @@ body {
   background-color: black;
   color: #fff;
   display: block;
-  cursor: pointer;
+  /* cursor: pointer; */
   padding: 2px;
   height: 33px;
   width: 36px;
@@ -128,7 +128,7 @@ body {
   padding: 20px 20px 20px 20px;
 }
 .select_container {
-  max-width: 301px;
+  max-width: 380px;
 }
 .form-control_select{
   width: 244px;

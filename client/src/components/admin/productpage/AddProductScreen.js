@@ -25,6 +25,7 @@ import { listSubCategoryOne } from "../../../actions/subCategoryAction";
 import { listSubCategoryChildOne } from "../../../actions/subCategoryChildAction";
 import ListAttributeMapping from "./ListAttributeMapping";
 import EditAttributeMapping from "./EditAttributeMapping";
+import { editProduct } from "../../../actions/productAction";
 
 // import ArrowBackIcon from "@mui/icons-material";
 import {
@@ -51,6 +52,7 @@ class AddProductScreen extends React.Component {
     this.state = {
       errors: {},
       name: "",
+      productId: "",
       description: "",
       price: "",
       discountPrice: "",
@@ -80,6 +82,7 @@ class AddProductScreen extends React.Component {
       tempVarLen: [{ num: '' }],
       demoValue: [{ num: '' }],
       dependentField: [{ type: "", label: "", value: "", additionalPrice: "0", parentCategory: '', mappingName: '', isEnabled: '', subField: '' }],
+      quickship: 'Yes',
 
     };
 
@@ -94,6 +97,7 @@ class AddProductScreen extends React.Component {
 
   componentDidMount() {
     this.props.listCategory();
+    this.props.addProduct();
   }
 
 
@@ -195,6 +199,12 @@ class AddProductScreen extends React.Component {
       forthArg = this.state.dependentField[2].value;
     }
 
+    if (!submit) {
+      Toast.fire({
+        type: 'success',
+        title: 'An Attribute Value was added',
+      })
+    }
 
     if (submit) {
 
@@ -212,6 +222,10 @@ class AddProductScreen extends React.Component {
       }
       this.setState({ tempVarLen: varLength })
 
+      Toast.fire({
+        type: 'success',
+        title: 'SKU has been generated Successfully',
+      })
     }
 
 
@@ -260,9 +274,11 @@ class AddProductScreen extends React.Component {
 
   onSubmit(e) {
     this.setState({ errors: {} });
-    e.preventDefault();
+    // e.preventDefault();
     const Data = {
+      _id: this.props.product.addproduct._id,
       name: this.state.name,
+      productValue: this.state.productValue,
       description: this.state.description,
       price: this.state.price,
       discountPrice: this.state.discountPrice,
@@ -274,13 +290,24 @@ class AddProductScreen extends React.Component {
       maintenanceBtnText: this.state.maintenanceBtnText,
       maintenanceFileUrl: this.state.maintenanceFileUrl,
       acousticsText: this.state.acousticsText,
-      categoryID: this.state.categoryID,
-      subcategoryID: this.state.subcategoryID,
-      subcategoryChildID: this.state.subcategoryChildID,
+      // categoryID: this.state.categoryID,
+      // subcategoryID: this.state.subcategoryID,
+      // subcategoryChildID: this.state.subcategoryChildID,
       isEnabled: this.state.isEnabled,
       keyword: this.state.keyword,
+      quickship: this.state.quickship,
     };
-    this.props.addProduct(Data);
+    console.log(Data)
+    // console.log(this.props.product.addproduct._id)
+    // this.props.addProduct(Data);
+    // const res = axios.get('/api/product/fahim')
+    // console.log(res)
+    this.props.editProduct(Data);
+
+    Toast.fire({
+      type: 'success',
+      title: 'A Product Was Added SuccessFully',
+    })
   }
 
   //Reset all statevalues
@@ -363,13 +390,17 @@ class AddProductScreen extends React.Component {
 
   render() {
 
+    const { addProduct } = this.props.product;
 
+    if (addProduct) {
+
+    }
     const elements = ['one', 'two', 'three'];
 
     const items = []
 
     for (const [index, value] of this.state.sku.entries()) {
-      items.push(<div style={{backgroundColor:'#fff'}} key={index} className='attribute_dropdown_container'>
+      items.push(<div style={{ backgroundColor: '#fff' }} key={index} className='attribute_dropdown_container'>
         <div className='attribute_dropdown_wrapper'>
 
           <div className='attirbute_dropdown_content'>
@@ -647,15 +678,22 @@ class AddProductScreen extends React.Component {
                   <label className='main_title'>Media</label>
                   <div className='media_row'>
                     <div className='media_col'>
-                      <Publish className='upload_img_icon'></Publish>
+                      <label htmlFor='file'>
+
+                        <Publish className='upload_img_icon'></Publish>
+                      </label>
                       <input
                         type='file'
                         name='photoUrl1'
                         onChange={(e) => this.uploadImage(e, "uploadStatus1")}
                         className='form-control_upload'
                         placeholder='Upload Image'
-                        style={{ display: 'none' }}
+                        style={{ margin: '20px 0 15px 100px' }}
+                      // style={{ display: 'none' }}
                       />
+                      <span className="form-text text-danger">{errors.photoUrl1}</span>
+                      <span className="form-text text-success">{this.state.uploadStatus1}</span>
+
                       <div className='product_img_titile'>Product Image 1 <span className='red' style={{ color: '#ff0000' }}>*</span> </div>
                     </div>
                     <div className='media_col'>
@@ -668,7 +706,8 @@ class AddProductScreen extends React.Component {
                         onChange={(e) => this.uploadImage(e, "uploadStatus1")}
                         className='form-control_upload'
                         placeholder='Upload Image'
-                        style={{ display: 'none' }}
+                        style={{ margin: '20px 0 15px 100px' }}
+                      // style={{ display: 'none' }}
                       />
                       <div className='product_img_titile'>Product Image 2</div>
                     </div>
@@ -738,6 +777,7 @@ class AddProductScreen extends React.Component {
                       <option value=''>Custom Add Attribute</option>
                     </select>
                     <span onClick={() => this.onAttributeAdd()} className='select_add_btn'>Add</span>
+                    <span onClick={() => this.onSkuSubmit(true)} className='select_add_btn'>Save</span>
                   </div>
                   {this.state.dependentField.map((res, index) => (
                     <div className='attribute_dropdown_container'>
@@ -870,7 +910,7 @@ class AddProductScreen extends React.Component {
                     <span className='select_add_btn'>Add</span>
                   </div>
 
-                      {items}
+                  {items}
 
 
 
@@ -895,7 +935,7 @@ class AddProductScreen extends React.Component {
                     <div className='product_status_value'>Created At: </div>
                   </div>
                   <div style={{ marginLeft: '20px' }} className='product_publish_container'>
-                    <button onClick={() => this.onSkuSubmit(true)} className='product_publish_btn'>Publish</button>
+                    <button onClick={() => this.onSubmit()} className='product_publish_btn'>Publish</button>
                   </div>
                 </div>
                 <div className='product_group_container'>
@@ -909,21 +949,21 @@ class AddProductScreen extends React.Component {
                       className='form-control_select'
                       placeholder=''
                     >
-                      <option value=''>Select</option>
-                      {/* {optionResultSubCategoryChild} */}
+                      <option value=''>Select Group</option>
+                      {optionResultCategory}
                     </select>
                   </div>
                   <div style={{ padding: '0 20px' }} className='add_product_title'>
                     <label className='main_title'>Select Sub Group</label>
                     <select
-                      name='subcategoryChildID'
+                      name='subcategoryID'
                       onChange={(e) => this.onChange(e)}
                       value={this.state.subcategoryChildID}
                       className='form-control_select'
                       placeholder=''
                     >
-                      <option value=''>Select</option>
-                      {optionResultSubCategoryChild}
+                      <option value=''>Select Sub-Group</option>
+                      {optionResultSubCategory}
                     </select>
                     <span className='form-text text-danger'>
                       {errors.subcategoryID}
@@ -968,14 +1008,15 @@ class AddProductScreen extends React.Component {
                   <div style={{ padding: '0 20px 0 20px' }} className='add_product_title'>
                     <label className='main_title'>Quick Ship</label>
                     <select
-                      name='subcategoryChildID'
-                      onChange={(e) => this.onChange(e)}
-                      value={this.state.subcategoryChildID}
+                      onChange={this.onChange} value={this.state.quickship}
+                      name='quickship'
+
                       className='form-control_select'
                       placeholder=''
                     >
                       <option value=''>Select</option>
-                      {/* {optionResultSubCategoryChild} */}
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
                   <div style={{ padding: '0px 20px 30px 20px' }} className='add_product_title'>
@@ -1065,9 +1106,8 @@ class AddProductScreen extends React.Component {
                 </div>
               </div>
             </div>
-            <div id='parent-attribute-modal'
+            {/* <div id='parent-attribute-modal'
 
-              // style={{display:'none'}} 
 
               className='create_attribute_modal_container'>
 
@@ -1079,14 +1119,12 @@ class AddProductScreen extends React.Component {
                 </div>
                 <div className='modal_attribute_col-2'>
                   <div className='main_heading'>Parent Attribute Category List</div>
-                  {/*Here add Parent Attribute */}
                   <ListParentAttributeCategory />
                 </div>
               </div>
               <ListAttributeMapping history={this.props.history} location={this.props.location}></ListAttributeMapping>
-            </div>
+            </div> */}
           </div>
-          <Footer />
 
           <DemoModal />
         </div>
@@ -1108,6 +1146,7 @@ class AddProductScreen extends React.Component {
           </React.Fragment>}
           onDismiss={(document.getElementById("modal").style.display = "none")}
         ></DeleteModal>
+        <Footer style={{ marginTop: '100px' }} />
       </React.Fragment>
     );
   }
@@ -1138,4 +1177,5 @@ export default connect(mapStateToProps, {
   listCategory,
   listSubCategoryOne,
   listSubCategoryChildOne,
+  editProduct,
 })(AddProductScreen);

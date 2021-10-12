@@ -6,27 +6,27 @@ const Schema = mongoose.Schema;
 const ProductSchema = new Schema({
     name:{
         type:String,
-        required:true
+        // required:true
     },
     description:{
         type:String,
-        required:true
+        // required:true
     },
     price:{
         type:String,
-        required:true
+        // required:true
     },
     discountPrice:{
         type:Number,
-        required:true
+        // required:true
     },
     stockCount:{
         type:String,
-        required:true
+        // required:true
     },
     photoUrl1:{
         type:String,
-        required:true
+        // required:true
     },
     photoUrl2:{
         type:String,
@@ -34,15 +34,15 @@ const ProductSchema = new Schema({
     }, 
     documents:{
         type:String,
-        required:true
+        // required:true
     }, 
     maintenanceText:{
         type:String,
-        required:true
+        // required:true
     },
     maintenanceBtnText:{
         type:String,
-        required:true
+        // required:true
     },
     maintenanceFileUrl:{
         type:String,
@@ -50,7 +50,7 @@ const ProductSchema = new Schema({
     },
     acousticsText:{
         type:String,
-        required:true
+        // required:true
     },
     categoryID:{
         type: Schema.Types.ObjectId,
@@ -67,15 +67,18 @@ const ProductSchema = new Schema({
     quickship:{
         type:String,
         enum : ['Yes', 'No'], 
-        required:true
+        // required:true
     },
     isEnabled:{
         type:String,
         enum : ['Yes', 'No'], 
-        required:true
+        // required:true
     },
     keyword:{
         type:String,
+    },
+    status: {
+        type: String,
     },
     date:{
         type: Date,
