@@ -95,6 +95,7 @@ import AddProductNew from "./components/admin/product-new/AddProduct";
 import EditProductNew from "./components/admin/product-new/EditProduct";
 import ListProductNew from "./components/admin/product-new/ListProduct";
 import AddProductScreen from "./components/admin/productpage/AddProductScreen";
+import AddProductTempScreeen from "./components/admin/productpage/AddProductTempScreeen";
 
 //Check for Token
 if (localStorage.jwtToken) {
@@ -227,12 +228,20 @@ class App extends Component {
 
               <AdminRoute
                 exact
-                path='/admin/productpage'
+                path='/admin/productpage/:id'
                 component={AddProductScreen}
                 menu='PRODUCTS'
                 action='CREATE'
               />
 
+
+              <AdminRoute
+                exact
+                path='/admin/createproduct'
+                component={AddProductTempScreeen}
+                menu='PRODUCTS'
+                action='CREATE'
+              />
               <AdminRoute
                 exact
                 path='/admin/addproductnew'

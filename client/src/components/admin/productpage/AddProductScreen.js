@@ -85,7 +85,7 @@ class AddProductScreen extends React.Component {
       tempVarLen: [{ num: '' }],
       demoValue: [{ num: '' }],
       quickship: 'Yes',
-      dependentField: [{ parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0",  mappingName: '', isEnabled: '', subField: '' }],
+      dependentField: [{ parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '' }],
       parentAttributeCategoryID: '',
 
       productID: "",
@@ -119,10 +119,11 @@ class AddProductScreen extends React.Component {
   }
 
   componentDidMount() {
-    this.props.createDraftProduct();
+    // this.props.createDraftProduct();
     this.props.listCategory();
     this.props.listParentAttributeCategory();
     this.props.listAttributeCategory();
+    this.setState({productID: this.props.match.params.id})
 
 
   }
@@ -204,25 +205,46 @@ class AddProductScreen extends React.Component {
     let atbName = this.state.dependentField.map((res) => res.mappingValue)
     this.setState({ tempAtbName: [...this.state.tempAtbName, atbName] })
     let firstPortion = this.state.productValue;
-    console.log(firstPortion)
+
+    if (!firstPortion) {
+      if (!(atbValue && thirdArg)) {
+          Toast.fire({
+        type: 'danger',
+        title: 'Please Enter the product value',
+      })
+      return;
+      }
+    }
     // second portion
     let atbValue = this.state.dependentField.map((res) => res.mappingValue).toString();
-    console.log(atbValue.toString())
-    // let tempValLen = atbValue.length();
-    // console.log(tempValLen)
+    
     let variantLen = atbValue.toString().split(',').length;
-    console.log(variantLen, 'varinat');
     this.setState({ tempVarLen: [...this.state.tempVarLen, variantLen] });
     let thirdArg = ''
     let forthArg = ''
 
     if (this.state.dependentField.length == 2) {
+
       thirdArg = this.state.dependentField[1].mappingValue;
       atbValue = this.state.dependentField[0].mappingValue;
+      if (!(atbValue && thirdArg)) {
+          Toast.fire({
+        type: 'danger',
+        title: 'Please Enter value field',
+      })
+      return;
+      }
     } else if (this.state.dependentField.length == 3) {
       thirdArg = this.state.dependentField[1].mappingValue;
       atbValue = this.state.dependentField[0].mappingValue;
       forthArg = this.state.dependentField[2].mappingValue;
+      if (!(atbValue && thirdArg && forthArg)) {
+          Toast.fire({
+        type: 'danger',
+        title: 'Please Enter value field',
+      })
+      return;
+      }
     }
 
     if (!submit) {
@@ -269,8 +291,8 @@ class AddProductScreen extends React.Component {
 
       let newVarient = [
         {
-          type:'',
-          label:"",
+          type: '',
+          label: "",
           list: this.state.variantDependentField
         }
       ]
@@ -324,7 +346,7 @@ class AddProductScreen extends React.Component {
     this.setState({ errors: {} });
     // e.preventDefault();
     const Data = {
-      _id: this.props.product.addproduct._id,
+      _id: this.state.productID,
       name: this.state.name,
       productValue: this.state.productValue,
       description: this.state.description,
@@ -345,7 +367,6 @@ class AddProductScreen extends React.Component {
       keyword: this.state.keyword,
       quickship: this.state.quickship,
     };
-    this.setState({ productID: Data._id })
     console.log(Data)
     // console.log(this.props.product.addproduct._id)
     // this.props.addProduct(Data);
@@ -370,11 +391,6 @@ class AddProductScreen extends React.Component {
   }
 
   onSubmitVariant(index) {
-
-
-
-
-
     let temp = this.state.variantDependentField;
 
     let finalVariation = [
@@ -385,7 +401,7 @@ class AddProductScreen extends React.Component {
       }
     ]
 
-    let tempAttribute = this.state.dependentField[index];
+    let tempAttribute = this.state.dependentField[0];
     let saveAttribute = {
       ...tempAttribute,
       photoUrl: '',
@@ -456,7 +472,7 @@ class AddProductScreen extends React.Component {
   }
   onAttributeAdd() {
     this.setState({ attributeCount: this.state.attributeCount + 1 });
-    const dependentField = this.state.dependentField.concat([{ type: "", label: "", value: "", additionalPrice: "0",  mappingName: '', isEnabled: '', subField: '' }]);
+    const dependentField = this.state.dependentField.concat([{ type: "", label: "", value: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '' }]);
     this.setState({ dependentField });
   }
 
@@ -464,7 +480,6 @@ class AddProductScreen extends React.Component {
   onhandleChangeSubField(e, index, indexSub) {
     const name = e.target.name;
     const value = e.target.value;
-    this.setState({ productID: this.props.product.addproduct._id })
     console.log(value)
     const temp = this.state.dependentField;
     if (name === "label") {
@@ -515,44 +530,34 @@ class AddProductScreen extends React.Component {
     });
   }
 
-  submitAllVariants() {
+  resetAllAttribute() {
+    window.location.reload();
+    this.setState({
+      errors: {},
+      parentAttributeCategoryID: '',
+      attributeCategoryID: '',
+      // productID:'',
+      mappingName: '',
+      mappingLabel: '',
+      mappingType: '',
+      mappingValue: '',
+      photoUrl: '',
+      additionalPrice: '',
+      dependentField: [{ type: "", label: "", list: [{ label: "", value: "", additionalPrice: "0" }] }],
+      variantDependentField: [
+        {
 
-
-    //     let tempAttribute = this.state.dependentField[index];
-    //     let saveAttribute = {
-    //       ...tempAttribute,
-    //       photoUrl: '',
-    //       dependentField: JSON.stringify(this.state.variantDependentField),
-    //       productID: this.state.productID
-    //     }
-    //     this.props.editAttributeMapping(saveAttribute);
-
-    //     let temp = this.state.variantDependentField;
-    //     temp = temp.concat([{
-
-    //       label: "", value: "", additionalPrice: "0", type: '', sku: ''
-    //     }])
-    // // let varType = this.state.variantDependentField[index].type;
-
-    //     this.setState({ variantDependentField: temp });
-
-
-    //     let finalVariation = [
-    //   {
-    //     type: "",
-    //     label: "",
-    //     dependentField: this.state.variantDependentField
-    //   }
-    // ]
-    //     this.setState({finalVariant: finalVariation})
-    // console.log(finalVariation)
-
+          label: "", value: "", additionalPrice: "0", type: '', sku: ''
+        },
+      ]
+    })
   }
 
 
 
   render() {
 
+    
     // console.log(this.state.finalVariant)
     // console.log(this.state.variantDependentField)
 
@@ -566,7 +571,6 @@ class AddProductScreen extends React.Component {
 
       // this.setState({ productID: addproduct._id })
     }
-    console.log(this.state.productID)
     const elements = ['one', 'two', 'three'];
 
     const items = []
@@ -626,7 +630,7 @@ class AddProductScreen extends React.Component {
           </div>
           <div className='add_product_value'>
             <label className='main_title'>Value</label>
-            <input name='value' onChange={(e) =>
+            <input required name='value' onChange={(e) =>
               this.onhandleChangeSubField(e, index, value)
             }
               // value={this.state.variantDependentField[index].value}                                                            name='value'        
@@ -1011,7 +1015,7 @@ class AddProductScreen extends React.Component {
                       <option value=''>Custom Add Attribute</option>
                     </select>
                     <span onClick={() => this.onAttributeAdd()} className='select_add_btn'>Add</span>
-                    <span onClick={() => this.onSkuSubmit(true)} className='select_add_btn'>Save</span>
+                    <span onClick={() => this.onSkuSubmit(true)} className='select_add_btn'>Create SKU</span>
                   </div>
                   {this.state.dependentField.map((res, index) => (
                     <div className='attribute_dropdown_container'>
@@ -1146,9 +1150,7 @@ class AddProductScreen extends React.Component {
                 </div>
                 {/* Attribute Container End */}
                 {/* <EditAttributeMapping /> */}
-                {this.state.sku.length}
-                {this.state.sku.forEach((res) => (<div>Hello</div>))}
-                {this.state.dependentField.map((res, index) => (
+                {this.props.attributemapping.addattributemapping  && this.state.dependentField.map((res, index) => (
                   <div className='add_variant_container'>
                     <label className='main_title'>Add Variants</label>
 
@@ -1164,7 +1166,7 @@ class AddProductScreen extends React.Component {
                         <option value=''>Select</option>
                         {this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (<option value={result.mappingName}> {result.mappingName} </option>))}
                       </select>
-                      <span onClick={() => this.submitAllVariants()} className='select_add_btn'>Add</span>
+                      <span onClick={() => this.resetAllAttribute()} className='select_add_btn'>Add New</span>
                     </div>
 
                     {items}
