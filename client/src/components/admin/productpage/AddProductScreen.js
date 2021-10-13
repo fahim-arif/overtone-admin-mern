@@ -116,7 +116,7 @@ class AddProductScreen extends React.Component {
     this.props.createDraftProduct();
     this.props.listCategory();
     this.props.listParentAttributeCategory();
-    this.props.listAttributeCategory();
+    // this.props.listAttributeCategory();
 
     
   }
@@ -201,7 +201,7 @@ class AddProductScreen extends React.Component {
     let firstPortion = this.state.productValue;
     console.log(firstPortion)
     // second portion
-    let atbValue = this.state.dependentField.map((res) => res.value).toString();
+    let atbValue = this.state.dependentField.map((res) => res.mappingValue).toString();
     console.log(atbValue.toString())
     // let tempValLen = atbValue.length();
     // console.log(tempValLen)
