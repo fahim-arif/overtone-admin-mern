@@ -705,7 +705,7 @@ class AddAttribute extends Component {
                           <div className='kt-portlet__head'>
                             <div className='kt-portlet__head-label'>
                               <h3 className='kt-portlet__head-title'>
-                                Add Sub-Fields
+                                Add Sub-Fields 
                               </h3>
                             </div>
                           </div>

@@ -95,7 +95,7 @@ class AddProductScreen extends React.Component {
       mappingValue: '',
       photoUrl: '',
       additionalPrice: "0",
-       attributeDependentField:[{type:"",label:"",list:[{label:"",value:"",additionalPrice:"0"}]}],
+      attributeDependentField: [{ type: "", label: "", list: [{ label: "", value: "", additionalPrice: "0" }] }],
       isEnabled: '',
       subField: "No",
       parsed: "",
@@ -118,7 +118,7 @@ class AddProductScreen extends React.Component {
     this.props.listParentAttributeCategory();
     // this.props.listAttributeCategory();
 
-    
+
   }
 
 
@@ -197,7 +197,6 @@ class AddProductScreen extends React.Component {
   onSkuSubmit(submit = false, index = null) {
     let atbName = this.state.dependentField.map((res) => res.mappingValue)
     this.setState({ tempAtbName: [...this.state.tempAtbName, atbName] })
-    let combineAtbName = this.state.tempAtbName.toString().replace(/,/g, '-');
     let firstPortion = this.state.productValue;
     console.log(firstPortion)
     // second portion
@@ -212,12 +211,12 @@ class AddProductScreen extends React.Component {
     let forthArg = ''
 
     if (this.state.dependentField.length == 2) {
-      thirdArg = this.state.dependentField[1].value;
-      atbValue = this.state.dependentField[0].value;
+      thirdArg = this.state.dependentField[1].mappingValue;
+      atbValue = this.state.dependentField[0].mappingValue;
     } else if (this.state.dependentField.length == 3) {
-      thirdArg = this.state.dependentField[1].value;
-      atbValue = this.state.dependentField[0].value;
-      forthArg = this.state.dependentField[2].value;
+      thirdArg = this.state.dependentField[1].mappingValue;
+      atbValue = this.state.dependentField[0].mappingValue;
+      forthArg = this.state.dependentField[2].mappingValue;
     }
 
     if (!submit) {
@@ -265,7 +264,7 @@ class AddProductScreen extends React.Component {
       let tempAttribute = this.state.dependentField[index];
       let saveAttribute = {
         ...tempAttribute,
-        photoUrl:'',
+        photoUrl: '',
         dependentField: JSON.stringify(this.state.attributeDependentField),
         productID: this.state.productID
       }
@@ -277,7 +276,7 @@ class AddProductScreen extends React.Component {
 
 
   onChange(e) {
-   
+
     this.setState({ [e.target.name]: e.target.value });
     // if(e.target.name==='authorID' && e.target.value !=""){
     //     this.props.listCategory({authorID:e.target.value});
@@ -333,7 +332,7 @@ class AddProductScreen extends React.Component {
       keyword: this.state.keyword,
       quickship: this.state.quickship,
     };
-    this.setState({productID: Data._id})
+    this.setState({ productID: Data._id })
     console.log(Data)
     // console.log(this.props.product.addproduct._id)
     // this.props.addProduct(Data);
@@ -411,7 +410,7 @@ class AddProductScreen extends React.Component {
   onhandleChangeSubField(e, index) {
     const name = e.target.name;
     const value = e.target.value;
-     this.setState({productID: this.props.product.addproduct._id})
+    this.setState({ productID: this.props.product.addproduct._id })
     console.log(value)
     const temp = this.state.dependentField;
     if (name === "label") {
@@ -446,8 +445,8 @@ class AddProductScreen extends React.Component {
 
     if (addproduct) {
 
-    //   let prodId = this.props.product.addproduct._id;
-    //   console.log(prodId)
+      //   let prodId = this.props.product.addproduct._id;
+      //   console.log(prodId)
 
       // this.setState({ productID: addproduct._id })
     }
@@ -486,6 +485,17 @@ class AddProductScreen extends React.Component {
           <div className='add_product_value'>
             <label className='main_title'>Label</label>
             <input type='text' className='add_product_input' />
+          </div>
+
+        </div>
+        <div className='create_attribute_row'>
+          <div className='add_product_value'>
+            <label className='main_title'>Additional Cost</label>
+            <input type='text' className='add_product_input' />
+          </div>
+          <div className='add_product_value'>
+            <label className='main_title'>Value</label>
+            <input name='variantValue' onChange={(e) => this.onChange(e)} type='text' className='add_product_input' />
           </div>
         </div>
       </div>)
@@ -828,7 +838,7 @@ class AddProductScreen extends React.Component {
                   <div className='add_product_title'>
                     <label style={{ width: '100%' }} className='main_title'>Genarated SKU </label>
                     <div className='add_product_input sku_genarated_text'>
-                      {this.state.sku.length > 1 ? <div>
+                      {this.state.sku.length > 0 ? <div>
                         {list}
                       </div> :
                         <p>
@@ -932,7 +942,7 @@ class AddProductScreen extends React.Component {
                           <div className='add_product_value'>
                             <label className='main_title'>Label</label>
                             <input type='text' name='label' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.label} className='add_product_input' />
+                              value={res.mappingLabel} className='add_product_input' />
                           </div>
 
 
@@ -956,7 +966,7 @@ class AddProductScreen extends React.Component {
                             <div className='add_product_title'>
                               <label className='main_title'>Value</label>
                               <input name='value' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                                value={res.value} className='add_product_input' type='text'></input>
+                                value={res.mappingValue} className='add_product_input' type='text'></input>
                             </div>
 
                           </div>
@@ -994,38 +1004,33 @@ class AddProductScreen extends React.Component {
                 {/* <EditAttributeMapping /> */}
                 {this.state.sku.length}
                 {this.state.sku.forEach((res) => (<div>Hello</div>))}
-                <div className='add_variant_container'>
-                  <label className='main_title'>Add Variants</label>
+                {this.state.dependentField.map((res, index) => (
+                  <div className='add_variant_container'>
+                    <label className='main_title'>Add Variants</label>
 
-                  <div className='select_container'>
-                    <select
-                      name='subcategoryChildID'
-                      onChange={(e) => this.onChange(e)}
-                      value={this.state.subcategoryChildID}
-                      className='form-control_select'
-                      placeholder=''
-                    >
-                      <option value=''>Select</option>
-                      {this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (<option value={result.mappingName}> {result.mappingName} </option>))}
-                    </select>
-                    <span className='select_add_btn'>Add</span>
-                  </div>
-
-                  {items}
-
-
-
-                  <div className='create_attribute_row'>
-                    <div className='add_product_value'>
-                      <label className='main_title'>Additional Cost</label>
-                      <input type='text' className='add_product_input' />
+                    <div style={{ marginTop: '35px' }} className='select_container'>
+                      <label className='main_title'>Variant Type</label>
+                      <select
+                        name='subcategoryChildID'
+                        onChange={(e) => this.onChange(e)}
+                        value={this.state.subcategoryChildID}
+                        className='form-control_select'
+                        placeholder=''
+                      >
+                        <option value=''>Select</option>
+                        {this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (<option value={result.mappingName}> {result.mappingName} </option>))}
+                      </select>
+                      <span className='select_add_btn'>Add</span>
                     </div>
-                    <div className='add_product_value'>
-                      <label className='main_title'>Value</label>
-                      <input name='variantValue' onChange={(e) => this.onChange(e)} type='text' className='add_product_input' />
-                    </div>
+
+                    {items}
+
+
+
+
                   </div>
-                </div>
+                ))}
+
               </div>
               <div className='add_product_secondary_col'>
                 <div className='product_status_container'>
