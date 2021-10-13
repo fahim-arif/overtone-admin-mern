@@ -73,6 +73,7 @@ export const addAttributeMapping= (attributemappingData) => dispatch => {
 
 // Edit attributemapping
 export const editAttributeMapping= (attributemappingData) => dispatch => {
+  console.log(attributemappingData)
     dispatch(setAttributeMappingLoading());
     axios
     .post('/api/attributemapping/edit',attributemappingData)

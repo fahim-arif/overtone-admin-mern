@@ -22,7 +22,7 @@ import Footer from "../../layouts/Footer";
 import { addProduct, createDraftProduct } from "../../../actions/productAction";
 import { listParentAttributeCategory } from '../../../actions/parentattributecategoryAction';
 import { listAttributeCategory } from '../../../actions/attributecategoryAction';
-import { addAttributeMapping } from '../../../actions/attributemappingAction';
+import { addAttributeMapping, editAttributeMapping } from '../../../actions/attributemappingAction';
 import { listCategory } from "../../../actions/categoryAction";
 import { listSubCategoryOne } from "../../../actions/subCategoryAction";
 import { listSubCategoryChildOne } from "../../../actions/subCategoryChildAction";
@@ -85,7 +85,7 @@ class AddProductScreen extends React.Component {
       tempVarLen: [{ num: '' }],
       demoValue: [{ num: '' }],
       quickship: 'Yes',
-      dependentField: [{ parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", parentCategory: '', mappingName: '', isEnabled: '', subField: '' }],
+      dependentField: [{ parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0",  mappingName: '', isEnabled: '', subField: '' }],
       parentAttributeCategoryID: '',
 
       productID: "",
@@ -95,11 +95,17 @@ class AddProductScreen extends React.Component {
       mappingValue: '',
       photoUrl: '',
       additionalPrice: "0",
-      attributeDependentField: [{ type: "", label: "", list: [{ label: "", value: "", additionalPrice: "0" }] }],
       isEnabled: '',
       subField: "No",
       parsed: "",
       nextScreen: false,
+      variantDependentField: [
+        {
+
+          label: "", value: "", additionalPrice: "0", type: '', sku: ''
+        },
+      ],
+      finalVariant: [],
 
     };
 
@@ -116,7 +122,7 @@ class AddProductScreen extends React.Component {
     this.props.createDraftProduct();
     this.props.listCategory();
     this.props.listParentAttributeCategory();
-    // this.props.listAttributeCategory();
+    this.props.listAttributeCategory();
 
 
   }
@@ -261,11 +267,18 @@ class AddProductScreen extends React.Component {
 
     if ((typeof index) === 'number') {
 
+      let newVarient = [
+        {
+          type:'',
+          label:"",
+          list: this.state.variantDependentField
+        }
+      ]
       let tempAttribute = this.state.dependentField[index];
       let saveAttribute = {
         ...tempAttribute,
         photoUrl: '',
-        dependentField: JSON.stringify(this.state.attributeDependentField),
+        dependentField: JSON.stringify(newVarient),
         productID: this.state.productID
       }
       this.props.addAttributeMapping(saveAttribute);
@@ -356,6 +369,47 @@ class AddProductScreen extends React.Component {
 
   }
 
+  onSubmitVariant(index) {
+
+
+
+
+
+    let temp = this.state.variantDependentField;
+
+    let finalVariation = [
+      {
+        type: "",
+        label: "",
+        list: temp
+      }
+    ]
+
+    let tempAttribute = this.state.dependentField[index];
+    let saveAttribute = {
+      ...tempAttribute,
+      photoUrl: '',
+      dependentField: JSON.stringify(finalVariation),
+      productID: this.state.productID,
+      _id: this.props.attributemapping.addattributemapping._id,
+    }
+    this.props.editAttributeMapping(saveAttribute);
+
+
+    temp = temp.concat([{
+
+      label: "", value: "", additionalPrice: "0", type: '', sku: ''
+    }])
+    // let varType = this.state.variantDependentField[index].type;
+
+    this.setState({ variantDependentField: temp });
+
+
+
+    this.setState({ finalVariant: finalVariation })
+    console.log(finalVariation)
+  }
+
   //Reset all statevalues
   onReset() {
     this.setState({
@@ -402,12 +456,12 @@ class AddProductScreen extends React.Component {
   }
   onAttributeAdd() {
     this.setState({ attributeCount: this.state.attributeCount + 1 });
-    const dependentField = this.state.dependentField.concat([{ type: "", label: "", value: "", additionalPrice: "0", parentCategory: '', mappingName: '', isEnabled: '', subField: '' }]);
+    const dependentField = this.state.dependentField.concat([{ type: "", label: "", value: "", additionalPrice: "0",  mappingName: '', isEnabled: '', subField: '' }]);
     this.setState({ dependentField });
   }
 
-
-  onhandleChangeSubField(e, index) {
+  // need to uncomment 437 for productId
+  onhandleChangeSubField(e, index, indexSub) {
     const name = e.target.name;
     const value = e.target.value;
     this.setState({ productID: this.props.product.addproduct._id })
@@ -437,8 +491,70 @@ class AddProductScreen extends React.Component {
     })
   }
 
+  onhandleChangeVariantField(e, index, sku) {
+    const name = e.target.name;
+    const value = e.target.value;
+    const temp = this.state.variantDependentField;
+    if (name === "label") {
+      temp[index].label = value;
+    } else if (name === "value") {
+      temp[index].value = value;
+    } else if (name === "additionalPrice") {
+      temp[index].additionalPrice = value;
+    } else if (name === 'type') {
+      temp[index].type = value;
+    }
+    console.log('hello')
+    console.log(sku);
+
+    if (sku) {
+      temp[index].sku = sku;
+    }
+    this.setState({
+      variantDependentField: temp,
+    });
+  }
+
+  submitAllVariants() {
+
+
+    //     let tempAttribute = this.state.dependentField[index];
+    //     let saveAttribute = {
+    //       ...tempAttribute,
+    //       photoUrl: '',
+    //       dependentField: JSON.stringify(this.state.variantDependentField),
+    //       productID: this.state.productID
+    //     }
+    //     this.props.editAttributeMapping(saveAttribute);
+
+    //     let temp = this.state.variantDependentField;
+    //     temp = temp.concat([{
+
+    //       label: "", value: "", additionalPrice: "0", type: '', sku: ''
+    //     }])
+    // // let varType = this.state.variantDependentField[index].type;
+
+    //     this.setState({ variantDependentField: temp });
+
+
+    //     let finalVariation = [
+    //   {
+    //     type: "",
+    //     label: "",
+    //     dependentField: this.state.variantDependentField
+    //   }
+    // ]
+    //     this.setState({finalVariant: finalVariation})
+    // console.log(finalVariation)
+
+  }
+
+
 
   render() {
+
+    // console.log(this.state.finalVariant)
+    // console.log(this.state.variantDependentField)
 
     const { addproduct } = this.props.product;
 
@@ -472,37 +588,60 @@ class AddProductScreen extends React.Component {
           <div className='add_product_title'>
             <label className='main_title'>Type</label>
             <select
-              name='subcategoryChildID'
-              onChange={(e) => this.onChange(e)}
-              value={this.state.subcategoryChildID}
+              name='type'
+              onChange={(e) => this.onhandleChangeVariantField(e, index)}
+              // value={this.state.variantDependentField[index].type}
               className='form-control_select'
               placeholder=''
             >
-              <option value=''>Select</option>
-              {/* {optionResultSubCategoryChild} */}
+              <option value=''>Select type</option>
+              <option value='dropdown'>Dropdown</option>
+              <option value='color'>Color Code</option>
             </select>
           </div>
           <div className='add_product_value'>
             <label className='main_title'>Label</label>
-            <input type='text' className='add_product_input' />
+            <input required name='label' onChange={(e) =>
+              this.onhandleChangeVariantField(e, index, value)
+            }
+              // value={this.state.variantDependentField[index].label}  
+
+              type='text'
+              className='add_product_input' />
+
+
           </div>
 
         </div>
         <div className='create_attribute_row'>
           <div className='add_product_value'>
             <label className='main_title'>Additional Cost</label>
-            <input type='text' className='add_product_input' />
+            <input name='additionalPrice'
+              onChange={(e) =>
+                this.onhandleChangeVariantField(e, index)
+              }
+              // value={this.state.variantDependentField[index].additionalPrice} 
+
+              type='text' className='add_product_input' />
           </div>
           <div className='add_product_value'>
             <label className='main_title'>Value</label>
-            <input name='variantValue' onChange={(e) => this.onChange(e)} type='text' className='add_product_input' />
+            <input name='value' onChange={(e) =>
+              this.onhandleChangeSubField(e, index, value)
+            }
+              // value={this.state.variantDependentField[index].value}                                                            name='value'        
+              onChange={(e) => this.onhandleChangeVariantField(e, index)} type='text' className='add_product_input' />
+
           </div>
         </div>
-      </div>)
+        <button onClick={() => this.onSubmitVariant(index)} className='product_publish_btn mt-3'>Save</button>
+      </div>
+
+      )
     }
 
 
-    console.log(this.state.tempVarLen)
+    // console.log(this.state.tempVarLen)
     console.log(this.state.sku)
     // console.log(this.state.tempAtbName)
     // console.log(this.state.dependentField)
@@ -714,6 +853,11 @@ class AddProductScreen extends React.Component {
         );
       }
     }
+
+    // Variant list
+
+    // 
+
 
     return (
       <React.Fragment>
@@ -1020,7 +1164,7 @@ class AddProductScreen extends React.Component {
                         <option value=''>Select</option>
                         {this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (<option value={result.mappingName}> {result.mappingName} </option>))}
                       </select>
-                      <span className='select_add_btn'>Add</span>
+                      <span onClick={() => this.submitAllVariants()} className='select_add_btn'>Add</span>
                     </div>
 
                     {items}
@@ -1278,6 +1422,7 @@ const mapStateToProps = (state) => ({
   attributemapping: state.attributemapping,
   parentattributecategory: state.parentattributecategory,
   attributecategory: state.attributecategory,
+  addAttributeMapping: state.addAttributeMapping,
 });
 
 export default connect(mapStateToProps, {
@@ -1290,6 +1435,7 @@ export default connect(mapStateToProps, {
   listParentAttributeCategory,
   addAttributeMapping,
   listAttributeCategory,
+  editAttributeMapping,
 
 
 

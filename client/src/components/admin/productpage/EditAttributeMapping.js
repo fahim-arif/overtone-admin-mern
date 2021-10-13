@@ -145,7 +145,8 @@ class EditAttributeMapping extends Component {
       isEnabled: this.state.isEnabled,
       _id: this.state._id,
     }
-    this.props.editAttributeMapping(Data);
+    console.log(Data)
+    // this.props.editAttributeMapping(Data);
   }
   //Reset all statevalues
   onReset() {
@@ -364,7 +365,7 @@ class EditAttributeMapping extends Component {
                       </div>
                     </div>
                     {/*begin::Form*/}
-                    <form className="kt-form kt-form--fit kt-form--label-right" onSubmit={this.onSubmit}>
+                    <form className="kt-form kt-form--fit kt-form--label-right" >
                       <div className="kt-portlet__body">
                         <div className="form-group row">
                           <label className="col-lg-2 col-form-label">Select Parent Category Attribute:</label>
@@ -470,7 +471,7 @@ class EditAttributeMapping extends Component {
                         <div className="kt-portlet__head">
                           <div className="kt-portlet__head-label">
                             <h3 className="kt-portlet__head-title">
-                              Add  Sub-Fields
+                              Add Sub-Fields
                             </h3>
                           </div>
                         </div>
@@ -483,7 +484,7 @@ class EditAttributeMapping extends Component {
                         <div className="kt-form__actions">
                           <div className="row">
                             <div className="col-lg-3 d-flex justify-content-around">
-                              <button type="submit" className={`btn btn-success ml-3 mr-4 ${attributemappingloading ? 'kt-spinner kt-spinner--sm kt-spinner--light' : ''}`}>Submit</button>
+                              <button onClick={() => this.onSubmit()} type="submit" className={`btn btn-success ml-3 mr-4 ${attributemappingloading ? 'kt-spinner kt-spinner--sm kt-spinner--light' : ''}`}>Submit</button>
                               <button type="button" onClick={this.onReset} className="btn btn-secondary">Cancel</button>
                             </div>
                             <div className="col-lg-10" />
