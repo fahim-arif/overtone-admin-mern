@@ -13,3 +13,5 @@ sudo mongorestore --db overtone --drop db/
                         preserveNullAndEmptyArrays: true
                       }
                  },
+
+[{"type":"","label":"","list":[{"label":"","value":"","additionalPrice":"0"}]}]

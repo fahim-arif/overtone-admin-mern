@@ -486,6 +486,30 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
     }
 });
 
+
+
+// @route POST  api/product/
+// @desc  Create A Draft Product
+// @access Private
+
+router.post('/draft', passport.authenticate('jwt', { session: false }), async (req, res) => { 
+
+     if (req.user.userType === 'admin') {
+        const insertdata = {
+            status: 'draft'
+        }
+
+        const product = new Product(insertdata)
+        const createProduct = await product.save();
+        res.status(201).json(createProduct);
+    } else {
+        res.status(201).json({message:'Not an admin'})
+    }
+
+
+})
+
+
 // @route POST  api/product/
 // @desc  Create product data
 // @access Private
@@ -603,7 +627,7 @@ router.post('/delete', passport.authenticate('jwt', { session: false }), (req, r
 router.post('/edit', passport.authenticate('jwt', { session: false }), (req, res) => {
 
     // const { errors, isValid } = validateProductInput(req.body, req.user);
-    //Check Validation
+    // // Check Validation
     // if (!isValid) {
     //     //if Any errors, send 400 with errors object
     //     return res.status(400).json(errors);

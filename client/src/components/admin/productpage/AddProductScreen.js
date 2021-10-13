@@ -19,7 +19,10 @@ import AddParentAttributeCategory from "./AddParentAttributeCategory";
 import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
 import Footer from "../../layouts/Footer";
-import { addProduct } from "../../../actions/productAction";
+import { addProduct, createDraftProduct } from "../../../actions/productAction";
+import { listParentAttributeCategory } from '../../../actions/parentattributecategoryAction';
+import { listAttributeCategory } from '../../../actions/attributecategoryAction';
+import { addAttributeMapping } from '../../../actions/attributemappingAction';
 import { listCategory } from "../../../actions/categoryAction";
 import { listSubCategoryOne } from "../../../actions/subCategoryAction";
 import { listSubCategoryChildOne } from "../../../actions/subCategoryChildAction";
@@ -81,8 +84,22 @@ class AddProductScreen extends React.Component {
       tempAtbValue: [],
       tempVarLen: [{ num: '' }],
       demoValue: [{ num: '' }],
-      dependentField: [{ type: "", label: "", value: "", additionalPrice: "0", parentCategory: '', mappingName: '', isEnabled: '', subField: '' }],
       quickship: 'Yes',
+      dependentField: [{ parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", parentCategory: '', mappingName: '', isEnabled: '', subField: '' }],
+      parentAttributeCategoryID: '',
+
+      productID: "",
+      mappingName: '',
+      mappingLabel: '',
+      mappingType: '',
+      mappingValue: '',
+      photoUrl: '',
+      additionalPrice: "0",
+       attributeDependentField:[{type:"",label:"",list:[{label:"",value:"",additionalPrice:"0"}]}],
+      isEnabled: '',
+      subField: "No",
+      parsed: "",
+      nextScreen: false,
 
     };
 
@@ -96,8 +113,12 @@ class AddProductScreen extends React.Component {
   }
 
   componentDidMount() {
+    this.props.createDraftProduct();
     this.props.listCategory();
-    this.props.addProduct();
+    this.props.listParentAttributeCategory();
+    this.props.listAttributeCategory();
+
+    
   }
 
 
@@ -173,7 +194,7 @@ class AddProductScreen extends React.Component {
       });
   }
 
-  onSkuSubmit(submit = false) {
+  onSkuSubmit(submit = false, index = null) {
     let atbName = this.state.dependentField.map((res) => res.mappingValue)
     this.setState({ tempAtbName: [...this.state.tempAtbName, atbName] })
     let combineAtbName = this.state.tempAtbName.toString().replace(/,/g, '-');
@@ -237,11 +258,26 @@ class AddProductScreen extends React.Component {
 
     const demoValue = this.state.demoValue.concat([{ num: '' }])
     this.setState({ demoValue })
+    console.log(this.state.dependentField)
+
+    if ((typeof index) === 'number') {
+
+      let tempAttribute = this.state.dependentField[index];
+      let saveAttribute = {
+        ...tempAttribute,
+        photoUrl:'',
+        dependentField: JSON.stringify(this.state.attributeDependentField),
+        productID: this.state.productID
+      }
+      this.props.addAttributeMapping(saveAttribute);
+      console.log(saveAttribute)
+    }
 
   }
 
 
   onChange(e) {
+   
     this.setState({ [e.target.name]: e.target.value });
     // if(e.target.name==='authorID' && e.target.value !=""){
     //     this.props.listCategory({authorID:e.target.value});
@@ -292,22 +328,33 @@ class AddProductScreen extends React.Component {
       acousticsText: this.state.acousticsText,
       categoryID: this.state.categoryID,
       subcategoryID: this.state.subcategoryID,
-      // subcategoryChildID: this.state.subcategoryChildID,
+      subcategoryChildID: this.state.subcategoryChildID,
       isEnabled: this.state.isEnabled,
       keyword: this.state.keyword,
       quickship: this.state.quickship,
     };
+    this.setState({productID: Data._id})
     console.log(Data)
     // console.log(this.props.product.addproduct._id)
     // this.props.addProduct(Data);
     // const res = axios.get('/api/product/fahim')
     // console.log(res)
-    this.props.editProduct(Data);
 
-    Toast.fire({
-      type: 'success',
-      title: 'A Product Was Added SuccessFully',
-    })
+    if (this.state.categoryID && this.state.subcategoryID) {
+
+      this.props.editProduct(Data);
+
+      Toast.fire({
+        type: 'success',
+        title: 'A Product Was Added SuccessFully',
+      })
+    } else {
+      Toast.fire({
+        type: 'danger',
+        title: 'Please select a categroy group and sub group',
+      })
+    }
+
   }
 
   //Reset all statevalues
@@ -364,23 +411,27 @@ class AddProductScreen extends React.Component {
   onhandleChangeSubField(e, index) {
     const name = e.target.name;
     const value = e.target.value;
+     this.setState({productID: this.props.product.addproduct._id})
+    console.log(value)
     const temp = this.state.dependentField;
     if (name === "label") {
-      temp[index].label = value;
+      temp[index].mappingLabel = value;
     } else if (name === "value") {
-      temp[index].value = value;
+      temp[index].mappingValue = value;
     } else if (name === "additionalPrice") {
       temp[index].additionalPrice = value;
     } else if (name === 'parentCategory') {
-      temp[index].parentCategory = value;
-    } else if (name === 'mappingValue') {
-      temp[index].mappingValue = value;
+      temp[index].parentAttributeCategoryID = value;
+    } else if (name === 'category') {
+      temp[index].attributeCategoryID = value;
+    } else if (name === 'mappingName') {
+      temp[index].mappingName = value;
     } else if (name === "isEnabled") {
       temp[index].isEnabled = value;
     } else if (name === "subField") {
       temp[index].subField = value;
     } else if (name === 'type') {
-      temp[index].type = value;
+      temp[index].mappingType = value;
     }
     this.setState({
       dependentField: temp
@@ -390,11 +441,17 @@ class AddProductScreen extends React.Component {
 
   render() {
 
-    const { addProduct } = this.props.product;
+    const { addproduct } = this.props.product;
 
-    if (addProduct) {
 
+    if (addproduct) {
+
+    //   let prodId = this.props.product.addproduct._id;
+    //   console.log(prodId)
+
+      // this.setState({ productID: addproduct._id })
     }
+    console.log(this.state.productID)
     const elements = ['one', 'two', 'three'];
 
     const items = []
@@ -447,7 +504,7 @@ class AddProductScreen extends React.Component {
     } else {
       if (Object.keys(listparentattributecategory).length > 0) {
         optionParentCategory = listparentattributecategory.map(result => {
-          return <option value={result.attributeName}>{result.attributeName}</option>
+          return <option value={result._id}>{result.attributeName}</option>
         })
       } else {
         optionParentCategory = (<option value="">No Parent Attributes  Found...</option>)
@@ -545,19 +602,19 @@ class AddProductScreen extends React.Component {
         var filterSub = listsubCategoryChild.filter(
           (x) => x.categoryID === this.state.categoryID
         );
-        // if (Object.keys(filterSub).length > 0) {
-        //   optionResultSubCategoryChild = listsubCategoryChiild.map((result) => {
-        //     return (
-        //       <option value={result._id}>{result.subCategoryChildName}</option>
-        //     );
-        //   });
-        // } else {
-        //   optionResultSubCategoryChild = (
-        //     <option value=''>
-        //       No SubCategory Found For Selected Category..
-        //     </option>
-        //   );
-        // }
+        if (Object.keys(filterSub).length > 0) {
+          optionResultSubCategoryChild = listsubCategoryChild.map((result) => {
+            return (
+              <option value={result._id}>{result.subCategoryChildName}</option>
+            );
+          });
+        } else {
+          optionResultSubCategoryChild = (
+            <option value=''>
+              No SubCategory Found For Selected Category..
+            </option>
+          );
+        }
       } else {
         optionResultSubCategoryChild = (
           <option value=''>No SubCategory Found...</option>
@@ -626,6 +683,27 @@ class AddProductScreen extends React.Component {
       );
     });
 
+
+
+
+    //AttributeCategory list
+    const { listattributecategory, attributecategoryloading } =
+      this.props.attributecategory;
+
+    var optionCategory = [];
+    if (listattributecategory == null || attributecategoryloading) {
+      optionCategory = <option value=''>Loading...</option>;
+    } else {
+      if (Object.keys(listattributecategory).length > 0) {
+        optionCategory = listattributecategory.map((result) => {
+          return <option value={result._id}>{result.attributeName}</option>;
+        });
+      } else {
+        optionCategory = (
+          <option value=''>No Attributes Category Found...</option>
+        );
+      }
+    }
 
     return (
       <React.Fragment>
@@ -702,13 +780,15 @@ class AddProductScreen extends React.Component {
                       </label>
                       <input
                         type='file'
-                        name='photoUrl1'
-                        onChange={(e) => this.uploadImage(e, "uploadStatus1")}
+                        name='photoUrl2'
+                        onChange={(e) => this.uploadImage(e, "uploadStatus2")}
                         className='form-control_upload'
                         placeholder='Upload Image'
                         style={{ margin: '20px 0 15px 100px' }}
                       // style={{ display: 'none' }}
                       />
+                      <span className="form-text text-danger">{errors.photoUrl2}</span>
+                      <span className="form-text text-success">{this.state.uploadStatus2}</span>
                       <div className='product_img_titile'>Product Image 2</div>
                     </div>
                   </div>
@@ -800,21 +880,38 @@ class AddProductScreen extends React.Component {
                             <select
                               name='parentCategory'
                               onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.parentCategory}
+                              value={res.parentAttributeCategoryID}
                               className='form-control_select'
                               placeholder=''
                             >
-                              <option value=''>Select</option>
-                              <option value='modal'>Create New Parent Category</option>
+                              <option value=''>Select Category</option>
                               {optionParentCategory}
                             </select>
+                            <span className="form-text text-danger">{errors.parentAttributeCategoryID}</span>
                           </div>
                           <div className='add_product_value'>
                             <label className='main_title'>Mapping Name</label>
-                            <input type='text' name='mappingValue' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.mappingValue}
+                            <input type='text' name='mappingName' onChange={(e) => this.onhandleChangeSubField(e, index)}
+                              value={res.mappingName}
                               className='add_product_input' />
                           </div>
+                        </div>
+                        <div className='create_attribute_row'>
+                          <div className='add_product_title'>
+                            <label className='main_title'>Select Category</label>
+                            <select name="category" onChange={(e) => this.onhandleChangeSubField(e, index)} value={res.attributeCategoryID} className="form-control_select" placeholder="" >
+                              <option value="">Select</option>
+                              {optionCategory}
+                            </select>
+                            <span className="form-text text-danger">{errors.attributeCategoryID}</span>
+                          </div>
+                          <div className='add_product_value'>
+                            <label className='main_title'>Additional Cost</label>
+                            <input name='additionalPrice' onChange={(e) => this.onhandleChangeSubField(e, index)}
+                              value={res.additionalPrice} type='text' className='add_product_input' />
+                          </div>
+
+                          {/* */}
                         </div>
                         <div className='create_attribute_row'>
                           <div className='add_product_title'>
@@ -837,6 +934,8 @@ class AddProductScreen extends React.Component {
                             <input type='text' name='label' onChange={(e) => this.onhandleChangeSubField(e, index)}
                               value={res.label} className='add_product_input' />
                           </div>
+
+
                         </div>
                         <div className='create_attribute_row'>
                           <div className='add_product_title'>
@@ -854,13 +953,20 @@ class AddProductScreen extends React.Component {
                             </select>
                           </div>
                           <div className='add_product_value'>
-                            <label className='main_title'>Additional Cost</label>
-                            <input name='additionalPrice' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.additionalPrice} type='text' className='add_product_input' />
+                            <div className='add_product_title'>
+                              <label className='main_title'>Value</label>
+                              <input name='value' onChange={(e) => this.onhandleChangeSubField(e, index)}
+                                value={res.value} className='add_product_input' type='text'></input>
+                            </div>
+
                           </div>
+
+
+
                         </div>
                         <div className='create_attribute_row'>
-                          <div className='add_product_value'>
+                          <div className='add_product_title'>
+
                             <label className='main_title'>Sub Field</label>
                             <select
                               name='subField'
@@ -874,15 +980,10 @@ class AddProductScreen extends React.Component {
                               <option value='No'>No</option>
                             </select>
                           </div>
-                          <div className='add_product_title'>
-                            <label className='main_title'>Value</label>
-                            <input name='value' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.value} className='add_product_input' type='text'></input>
-                          </div>
                         </div>
                       </div>
                       <div className='attribute_create_button'>
-                        <button onClick={() => this.onSkuSubmit()} className='product_publish_btn'>Save</button>
+                        <button onClick={() => this.onSkuSubmit(false, index)} className='product_publish_btn'>Save</button>
                       </div>
                     </div>
                   ))}
@@ -941,8 +1042,9 @@ class AddProductScreen extends React.Component {
                 <div className='product_group_container'>
                   <div className='product_status'>Product Group</div>
                   <div style={{ padding: '30px 20px 0 20px' }} className='add_product_title'>
-                    <label className='main_title'>Select Group</label>
+                    <label className='main_title'>Select Group  <span className='red' style={{ color: '#ff0000' }}>*</span></label>
                     <select
+                      required
                       name='categoryID'
                       onChange={(e) => this.onChange(e)}
                       value={this.state.categoryID}
@@ -950,15 +1052,17 @@ class AddProductScreen extends React.Component {
                       placeholder=''
                     >
                       <option value=''>Select Group</option>
+
                       {optionResultCategory}
                     </select>
                   </div>
                   <div style={{ padding: '0 20px' }} className='add_product_title'>
-                    <label className='main_title'>Select Sub Group</label>
+                    <label className='main_title'>Select Sub Group  <span className='red' style={{ color: '#ff0000' }}>*</span></label>
                     <select
+                      required
                       name='subcategoryID'
                       onChange={(e) => this.onChange(e)}
-                      value={this.state.subcategoryChildID}
+                      value={this.state.subcategoryID}
                       className='form-control_select'
                       placeholder=''
                     >
@@ -1031,7 +1135,6 @@ class AddProductScreen extends React.Component {
                       <option value=''>Select isEnabled</option>
                       <option value='Yes'>Yes</option>
                       <option value='No'>No</option>
-                      {/* {optionResultSubCategoryChild} */}
                     </select>
                     <span className='form-text text-danger'>
                       {errors.isEnabled}
@@ -1059,7 +1162,7 @@ class AddProductScreen extends React.Component {
                   <div className='product_status'>Product Maintanence</div>
                   <div className='maintancence_upload'>
                     <div className='add_gallery_link'>
-                      <Link to='#'>Maintenance File Upload <span className='red' style={{ color: '#ff0000' }}>*</span> </Link>
+                      <Link to='#'>Maintenance File Upload </Link>
                       <input
                         type='file'
                         name='maintenanceFileUrl'
@@ -1178,4 +1281,11 @@ export default connect(mapStateToProps, {
   listSubCategoryOne,
   listSubCategoryChildOne,
   editProduct,
+  createDraftProduct,
+  listParentAttributeCategory,
+  addAttributeMapping,
+  listAttributeCategory,
+
+
+
 })(AddProductScreen);

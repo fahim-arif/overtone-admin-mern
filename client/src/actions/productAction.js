@@ -77,6 +77,28 @@ export const addProduct= () => dispatch => {
     });
 };
 
+// Create Draft Product
+
+export const createDraftProduct = () => dispatch => {
+    dispatch(setProductLoading());
+    axios
+    .post('/api/product/draft')
+    .then(res =>
+        dispatch({
+            type: ADD_PRODUCT,
+            payload:res.data
+        })
+    )
+    .catch(err =>{
+        dispatch({
+            type: GET_ERRORS,
+            payload:err.response.data
+        })
+        dispatch(stopProductLoading());
+    });
+};
+
+
 // Edit product
 export const editProduct= (productData) => dispatch => {
     dispatch(setProductLoading());
