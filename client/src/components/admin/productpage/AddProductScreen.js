@@ -8,8 +8,8 @@ import HeaderTopbar from "../../layouts/HeaderTopbar";
 import { Link } from "react-router-dom";
 import axios from 'axios'
 import swal from "sweetalert2";
-import DemoModal from './DemoModal'
-import DeleteModal from "./DeleteUser";
+// import DemoModal from './DemoModal'
+// import DeleteModal from "./DeleteUser";
 
 import skuGen from "./logic-sku/app";
 import ListParentAttributeCategory from "../parentattributecategory/ListParentAttributeCategory";
@@ -21,23 +21,24 @@ import { connect } from "react-redux";
 import Footer from "../../layouts/Footer";
 import { addProduct, createDraftProduct } from "../../../actions/productAction";
 import { listParentAttributeCategory } from '../../../actions/parentattributecategoryAction';
+import {listAttributeMapping,deleteAttributeMapping} from '../../../actions/attributemappingAction'
 import { listAttributeCategory } from '../../../actions/attributecategoryAction';
 import { addAttributeMapping, editAttributeMapping } from '../../../actions/attributemappingAction';
 import { listCategory } from "../../../actions/categoryAction";
 import { listSubCategoryOne } from "../../../actions/subCategoryAction";
 import { listSubCategoryChildOne } from "../../../actions/subCategoryChildAction";
+import { listProductOne } from '../../../actions/productAction';
 import ListAttributeMapping from "./ListAttributeMapping";
 import EditAttributeMapping from "./EditAttributeMapping";
 import { editProduct } from "../../../actions/productAction";
 
 // import ArrowBackIcon from "@mui/icons-material";
-import {
-  ArrowBack,
-  Publish,
-  KeyboardArrowDown,
-  KeyboardArrowUp
-} from "@material-ui/icons";
-import { listAttributeMapping } from "../../../actions/attributemappingAction";
+// import {
+//   ArrowBack,
+//   Publish,
+//   KeyboardArrowDown,
+//   KeyboardArrowUp
+// } from "@material-ui/icons";
 
 
 const Toast = swal.mixin({
@@ -87,7 +88,6 @@ class AddProductScreen extends React.Component {
       quickship: 'Yes',
       dependentField: [{ parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '' }],
       parentAttributeCategoryID: '',
-
       productID: "",
       mappingName: '',
       mappingLabel: '',
@@ -99,6 +99,9 @@ class AddProductScreen extends React.Component {
       subField: "No",
       parsed: "",
       nextScreen: false,
+      // value: '',
+      label: '',
+      type: '',
       variantDependentField: [
         {
 
@@ -123,7 +126,41 @@ class AddProductScreen extends React.Component {
     this.props.listCategory();
     this.props.listParentAttributeCategory();
     this.props.listAttributeCategory();
-    this.setState({productID: this.props.match.params.id})
+    this.setState({ productID: this.props.match.params.id })
+
+    var editResult = {}
+    if (!localStorage.editproduct) {
+      // this.props.history.push('/admin/listproduct')
+
+    } else {
+      editResult = JSON.parse(localStorage.getItem('editproduct'))
+    }
+    this.setState({
+      _id: editResult._id,
+      name: editResult.name,
+      productValue: editResult.value,
+      description: editResult.description,
+      price: editResult.price,
+      discountPrice: editResult.discountPrice,
+      stockCount: editResult.stockCount,
+      photoUrl1: editResult.photoUrl1,
+      photoUrl2: editResult.photoUrl2,
+      documents: editResult.documents ? JSON.parse(editResult.documents) : [{ url: '', uploadstatus: '', fileName: '' }],
+      maintenanceText: editResult.maintenanceText,
+      maintenanceBtnText: editResult.maintenanceBtnText,
+      maintenanceFileUrl: editResult.maintenanceFileUrl,
+      acousticsText: editResult.acousticsText,
+      categoryID: editResult.categoryID,
+      subcategoryID: editResult.subcategoryID,
+      subcategoryChildID: editResult.subcategoryChildID,
+      isEnabled: editResult.isEnabled,
+      quickship: editResult.quickship,
+      keyword: editResult.keyword,
+    }, () => {
+
+      this.props.listSubCategoryOne({ categoryID: this.state.categoryID });
+      this.props.listSubCategoryChildOne({ subcategoryID: this.state.subcategoryID });
+    })
 
 
   }
@@ -208,16 +245,16 @@ class AddProductScreen extends React.Component {
 
     if (!firstPortion) {
       if (!(atbValue && thirdArg)) {
-          Toast.fire({
-        type: 'danger',
-        title: 'Please Enter the product value',
-      })
-      return;
+        Toast.fire({
+          type: 'error',
+          title: 'Please Enter the product value',
+        })
+        return;
       }
     }
     // second portion
     let atbValue = this.state.dependentField.map((res) => res.mappingValue).toString();
-    
+
     let variantLen = atbValue.toString().split(',').length;
     this.setState({ tempVarLen: [...this.state.tempVarLen, variantLen] });
     let thirdArg = ''
@@ -228,22 +265,22 @@ class AddProductScreen extends React.Component {
       thirdArg = this.state.dependentField[1].mappingValue;
       atbValue = this.state.dependentField[0].mappingValue;
       if (!(atbValue && thirdArg)) {
-          Toast.fire({
-        type: 'danger',
-        title: 'Please Enter value field',
-      })
-      return;
+        Toast.fire({
+          type: 'error',
+          title: 'Please Enter value field',
+        })
+        return;
       }
     } else if (this.state.dependentField.length == 3) {
       thirdArg = this.state.dependentField[1].mappingValue;
       atbValue = this.state.dependentField[0].mappingValue;
       forthArg = this.state.dependentField[2].mappingValue;
       if (!(atbValue && thirdArg && forthArg)) {
-          Toast.fire({
-        type: 'danger',
-        title: 'Please Enter value field',
-      })
-      return;
+        Toast.fire({
+          type: 'error',
+          title: 'Please Enter value field',
+        })
+        return;
       }
     }
 
@@ -348,7 +385,7 @@ class AddProductScreen extends React.Component {
     const Data = {
       _id: this.state.productID,
       name: this.state.name,
-      productValue: this.state.productValue,
+      value: this.state.productValue,
       description: this.state.description,
       price: this.state.price,
       discountPrice: this.state.discountPrice,
@@ -383,11 +420,12 @@ class AddProductScreen extends React.Component {
       })
     } else {
       Toast.fire({
-        type: 'danger',
+        type: 'error',
         title: 'Please select a categroy group and sub group',
       })
     }
 
+    localStorage.setItem('editproduct', JSON.stringify(Data))
   }
 
   onSubmitVariant(index) {
@@ -395,8 +433,8 @@ class AddProductScreen extends React.Component {
 
     let finalVariation = [
       {
-        type: "",
-        label: "",
+        type: this.state.type,
+        label: this.state.label,
         list: temp
       }
     ]
@@ -404,7 +442,7 @@ class AddProductScreen extends React.Component {
     let tempAttribute = this.state.dependentField[0];
     let saveAttribute = {
       ...tempAttribute,
-      photoUrl: '',
+      photoUrl: this.state.photoUrl,
       dependentField: JSON.stringify(finalVariation),
       productID: this.state.productID,
       _id: this.props.attributemapping.addattributemapping._id,
@@ -475,6 +513,19 @@ class AddProductScreen extends React.Component {
     const dependentField = this.state.dependentField.concat([{ type: "", label: "", value: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '' }]);
     this.setState({ dependentField });
   }
+
+
+  onhandleChangeField(e, index) {
+    const name = e.target.name;
+    const value = e.target.value;
+    if (name === "type") {
+      this.setState({ type: value });
+    } else if (name === "label") {
+      this.setState({ label: value });
+    }
+
+  }
+
 
   // need to uncomment 437 for productId
   onhandleChangeSubField(e, index, indexSub) {
@@ -553,11 +604,28 @@ class AddProductScreen extends React.Component {
     })
   }
 
+  deleteAttribute(index) {
+    console.log(index)
+    if (this.state.dependentField.length > 1) {
+
+      let temporary = this.state.dependentField;
+      temporary.splice(index,1)
+      console.log(temporary)
+      this.setState({dependentField:temporary})
+    }
+
+  //    const deleteData={
+  //     // id:id
+  // }
+  // this.props.deleteAttributeMapping(deleteData)
+// console.log(this.state.dependentField[index])
+    
+  }
 
 
   render() {
+    console.log(this.state.categoryID);
 
-    
     // console.log(this.state.finalVariant)
     // console.log(this.state.variantDependentField)
 
@@ -583,26 +651,12 @@ class AddProductScreen extends React.Component {
             Added Variants SKU: {value}
           </div>
           <div div className='attribute_dropdown_icon_container'>
-            <KeyboardArrowDown></KeyboardArrowDown>
-            <KeyboardArrowUp></KeyboardArrowUp>
+            {/* <KeyboardArrowDown></KeyboardArrowDown>
+            <KeyboardArrowUp></KeyboardArrowUp> */}
             <span className='attribute_dropdown_delete'>Delete</span>
           </div>
         </div>
         <div className='create_attribute_row'>
-          <div className='add_product_title'>
-            <label className='main_title'>Type</label>
-            <select
-              name='type'
-              onChange={(e) => this.onhandleChangeVariantField(e, index)}
-              // value={this.state.variantDependentField[index].type}
-              className='form-control_select'
-              placeholder=''
-            >
-              <option value=''>Select type</option>
-              <option value='dropdown'>Dropdown</option>
-              <option value='color'>Color Code</option>
-            </select>
-          </div>
           <div className='add_product_value'>
             <label className='main_title'>Label</label>
             <input required name='label' onChange={(e) =>
@@ -612,12 +666,7 @@ class AddProductScreen extends React.Component {
 
               type='text'
               className='add_product_input' />
-
-
           </div>
-
-        </div>
-        <div className='create_attribute_row'>
           <div className='add_product_value'>
             <label className='main_title'>Additional Cost</label>
             <input name='additionalPrice'
@@ -628,6 +677,11 @@ class AddProductScreen extends React.Component {
 
               type='text' className='add_product_input' />
           </div>
+
+
+        </div>
+        <div className='create_attribute_row'>
+
           <div className='add_product_value'>
             <label className='main_title'>Value</label>
             <input required name='value' onChange={(e) =>
@@ -878,7 +932,7 @@ class AddProductScreen extends React.Component {
           <div id='dark-bg' className={"add_main_wrapper"}>
             <div className={"add_heading"}>
               <Link to='/'>
-                <ArrowBack className='arrow_icon'></ArrowBack>
+                {/* <ArrowBack className='arrow_icon'></ArrowBack> */}
               </Link>
               <span className={"add_main_title"}>Add Product</span>
             </div>
@@ -900,7 +954,7 @@ class AddProductScreen extends React.Component {
                     </div>
                     <div className='add_product_value'>
                       <label className='main_title'>Value</label>
-                      <input type='text' name='productValue' onChange={this.onChange} className='add_product_input' />
+                      <input value={this.state.productValue} type='text' name='productValue' onChange={this.onChange} className='add_product_input' />
                     </div>
                   </div>
                   <div className='text_area_container'>
@@ -916,7 +970,7 @@ class AddProductScreen extends React.Component {
                     <div className='media_col'>
                       <label htmlFor='file'>
 
-                        <Publish className='upload_img_icon'></Publish>
+                        {/* <Publish className='upload_img_icon'></Publish> */}
                       </label>
                       <input
                         type='file'
@@ -934,7 +988,7 @@ class AddProductScreen extends React.Component {
                     </div>
                     <div className='media_col'>
                       <label htmlFor="file">
-                        <Publish className='upload_img_icon'></Publish>
+                        {/* <Publish className='upload_img_icon'></Publish> */}
                       </label>
                       <input
                         type='file'
@@ -1026,9 +1080,9 @@ class AddProductScreen extends React.Component {
                           New Attribute
                         </div>
                         <div className='attribute_dropdown_icon_container'>
-                          <KeyboardArrowDown></KeyboardArrowDown>
-                          <KeyboardArrowUp></KeyboardArrowUp>
-                          <span className='attribute_dropdown_delete'>Delete</span>
+                          {/* <KeyboardArrowDown></KeyboardArrowDown>
+                          <KeyboardArrowUp></KeyboardArrowUp> */}
+                          <span onClick={() => this.deleteAttribute(index)} className='attribute_dropdown_delete'>Delete</span>
                         </div>
                       </div>
                       <div className='create_attribute_container'>
@@ -1138,6 +1192,17 @@ class AddProductScreen extends React.Component {
                               <option value='No'>No</option>
                             </select>
                           </div>
+                          <div className='add_product_title'>
+                            {res.mappingType === "image+text" && <React.Fragment>
+                              <label className="main_title">Upload  Image:</label>
+                              <input type="file" name="photoUrl" onChange={this.uploadImage} className='form-control_upload'
+                                placeholder='Upload Image'
+                              />
+                              <span className="form-text text-danger">{errors.photoUrl}</span>
+                              <span className="form-text text-success">{this.state.uploadStatus}</span>
+                              <span className="form-text text-muted">File Resolution (292px X 69px)</span>
+                            </React.Fragment>}
+                          </div>
                         </div>
                       </div>
                       <div className='attribute_create_button'>
@@ -1150,24 +1215,39 @@ class AddProductScreen extends React.Component {
                 </div>
                 {/* Attribute Container End */}
                 {/* <EditAttributeMapping /> */}
-                {this.props.attributemapping.addattributemapping  && this.state.dependentField.map((res, index) => (
+                {this.props.attributemapping.addattributemapping && this.state.dependentField.map((res, index) => (
                   <div className='add_variant_container'>
                     <label className='main_title'>Add Variants</label>
 
-                    <div style={{ marginTop: '35px' }} className='select_container'>
-                      <label className='main_title'>Variant Type</label>
-                      <select
-                        name='subcategoryChildID'
-                        onChange={(e) => this.onChange(e)}
-                        value={this.state.subcategoryChildID}
-                        className='form-control_select'
-                        placeholder=''
-                      >
-                        <option value=''>Select</option>
-                        {this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (<option value={result.mappingName}> {result.mappingName} </option>))}
-                      </select>
-                      <span onClick={() => this.resetAllAttribute()} className='select_add_btn'>Add New</span>
+                    <div style={{ marginTop: '35px' }} className='create_attribute_row'>
+                      <div className='add_product_value'>
+
+                        <label className='main_title'>Variant Type</label>
+                        <select
+                          name='type'
+                          onChange={(e) => this.onhandleChangeField(e)}
+                          value={this.state.type}
+                          className='form-control_select'
+                          placeholder=''
+                        >
+                          <option value=''>Select type</option>
+                          <option value='dropdown'>Dropdown</option>
+                          <option value='color'>Color Code</option>
+                        </select>
+                      </div>
+                      <div className='add_product_value'>
+                        <label className='main_title'>Label</label>
+                        <input
+                          type='text'
+                          name='label'
+                          onChange={(e) => this.onhandleChangeField(e)}
+                          value={this.state.label}
+                          className='add_product_input'
+                          placeholder=''
+                        />
+                      </div>
                     </div>
+                    <button style={{ margin: '17px 0 10px 0' }} onClick={() => this.resetAllAttribute()} className='select_add_btn'>Add New</button>
 
                     {items}
 
@@ -1360,47 +1440,12 @@ class AddProductScreen extends React.Component {
                 </div>
               </div>
             </div>
-            {/* <div id='parent-attribute-modal'
-
-
-              className='create_attribute_modal_container'>
-
-              <div className='modal_attribute_row'>
-                <div className='modal_attribute_col-1'>
-
-                  <AddParentAttributeCategory />
-
-                </div>
-                <div className='modal_attribute_col-2'>
-                  <div className='main_heading'>Parent Attribute Category List</div>
-                  <ListParentAttributeCategory />
-                </div>
-              </div>
-              <ListAttributeMapping history={this.props.history} location={this.props.location}></ListAttributeMapping>
-            </div> */}
           </div>
-
-          <DemoModal />
         </div>
-        <DeleteModal
-          title='Delete Stream'
-          content={`Are you sure you want to delete this user`}
-          actions={<React.Fragment>
-            <button className='ui button negative'>
-              Delete
-            </button>
-            <button
-              onClick={() =>
-                (document.getElementById("modal").style.display = "none")
-              }
-              className='ui button'
-            >
-              Cancel
-            </button>
-          </React.Fragment>}
-          onDismiss={(document.getElementById("modal").style.display = "none")}
-        ></DeleteModal>
-        <Footer style={{ marginTop: '100px' }} />
+        <div style={{ marginTop: '280px' }}>
+
+          <Footer style={{ marginTop: '280px' }} />
+        </div>
       </React.Fragment>
     );
   }
@@ -1438,7 +1483,8 @@ export default connect(mapStateToProps, {
   addAttributeMapping,
   listAttributeCategory,
   editAttributeMapping,
-
+  listProductOne,
+  deleteAttributeMapping,
 
 
 })(AddProductScreen);

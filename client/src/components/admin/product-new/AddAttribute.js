@@ -198,6 +198,7 @@ class AddAttribute extends Component {
     this.setState({
       dependentField: this.state.dependentField.filter(
         (s, sidx) => idx !== sidx
+        
       ),
     });
   }

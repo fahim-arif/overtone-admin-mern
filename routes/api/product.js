@@ -498,15 +498,12 @@ router.post('/draft', passport.authenticate('jwt', { session: false }), async (r
         const insertdata = {
             status: 'draft'
         }
-
         const product = new Product(insertdata)
         const createProduct = await product.save();
         res.status(201).json(createProduct);
     } else {
         res.status(201).json({message:'Not an admin'})
     }
-
-
 })
 
 
@@ -655,6 +652,7 @@ router.post('/edit', passport.authenticate('jwt', { session: false }), (req, res
             isEnabled: req.body.isEnabled,
             keyword: req.body.keyword,
             quickship: req.body.quickship,
+            value: req.body.value
 
         };
 

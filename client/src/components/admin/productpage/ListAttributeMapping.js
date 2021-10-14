@@ -52,6 +52,7 @@ onEditClick(res){
 }
 //calls when delete button is clicked
 onDeleteClick(id){
+  console.log(id)
   const deleteData={
       id:id
   }

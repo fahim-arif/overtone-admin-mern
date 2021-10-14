@@ -48,6 +48,9 @@ onDeleteClick(id){
   const deleteData={
       id:id
   }
+  if (JSON.parse(localStorage.getItem('editproduct')) && JSON.parse(localStorage.getItem('editproduct'))._id === id) {
+    localStorage.removeItem('editproduct')
+  }
   this.props.deleteProduct(deleteData)
 }
 searchUpdated (term) {

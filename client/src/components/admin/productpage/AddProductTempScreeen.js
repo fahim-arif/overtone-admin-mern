@@ -7,14 +7,12 @@ export default function AdddProductTempScreen({history}) {
     const dispatch = useDispatch()
     const product = useSelector((state) => state.product)
     const { addproduct } = product;
+    
     useEffect(() => {
-       
          dispatch(createDraftProduct())
-       
     }, [dispatch])
     if(addproduct) {
-
-        console.log(addproduct._id)
+        localStorage.removeItem('editproduct')
         history.push(`/admin/productpage/${addproduct._id}`)
     }
 
