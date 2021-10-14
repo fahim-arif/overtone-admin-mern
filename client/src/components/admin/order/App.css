@@ -1,0 +1,176 @@
+.body {
+  background: #f4f4f4;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: #000;
+}
+
+.products {
+  display: flex;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  background: #fff;
+  border-radius: 5px;
+
+  width: 650px;
+  padding-left: 25px;
+}
+
+.input-field {
+  width: 600px;
+}
+
+.payment {
+  background-color: #fff;
+  width: 650px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.payment-table {
+  width: 80%;
+}
+
+.payment-table tbody tr td:nth-child(2) {
+  text-align: right;
+}
+
+.create-customer {
+  background: #fff;
+}
+
+.create-customer input {
+  border-radius: 10px;
+}
+
+.row-2 {
+  margin-top: 20px;
+}
+
+.order_user_list_container {
+  background-color: #fff;
+  max-width: 392px;
+  margin: 0;
+  padding: 0;
+  /* padding-left: 25px;
+  padding-right: 25px; */
+}
+
+/* Qty button container */
+.order_create_item_container {
+  display: flex;
+}
+.order_create_input {
+  height: 37px;
+  width: 37px;
+  padding: 10px;
+  border: 1px solid #dbdbdb;
+}
+.order_create_button_container {
+  display: flex;
+  flex-direction: column;
+}
+.order_create_plus_btn,
+.order_create_minus_btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--clr-light-border);
+  height: 18.5px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.order_create_action_icon {
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.order_create_action_icon .fa-times {
+  cursor: pointer;
+  font-size: 19px;
+}
+/* dropdown_container */
+.dropdown_container {
+  position: relative;
+}
+
+.order_create_user_dropdown {
+  position: absolute;
+  top: -39px;
+  right: 0;
+  width: 341px;
+  background-color: #fff;
+  margin: 0 25px;
+  --box-shadow: 0 0 15px -10px rgba(0, 0, 0, 0.75);
+  --webkit-box-shadow: -0 0 15px -10px rgba(0, 0, 0, 0.75);
+  --moz-box-shadow: -1px 2px 10px 1px rgba(123, 123, 123, 0.5) 0 0 15px -10px rgba(0, 0, 0, 0.75);
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+}
+.user_create_container {
+  display: flex;
+  align-items: center;
+  padding: 10px 0 10px 43px;
+  /* border-bottom: 1px solid #dbdbdb; */
+}
+.user_create_container .fa-plus-square {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.user_create_text {
+  font-size: 14px;
+  font-weight: 400;
+  padding-left: 10px;
+  cursor: pointer;
+}
+.user_dropdown_selected {
+  border-top: 1px solid #dbdbdb;
+  padding: 15px 0 15px 45px;
+  color: #898989;
+}
+.order_user_list_container h4 {
+  padding-left: 25px;
+}
+/* At the top when user selected a user */
+.customer_information_container {
+  flex: 1;
+
+  background-color: #fff;
+}
+.customer_info_heading {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.customer_info_title {
+  font-size: 18px;
+  font-weight: 500;
+}
+.customer_info_heading .fa-times {
+  cursor: pointer;
+  font-size: 19px;
+}
+.contact_info_email_container {
+  padding: 20px;
+  border-top: 1px solid #dbdbdb;
+  border-bottom: 1px solid #dbdbdb;
+}
+.contact_info_title {
+  font-size: 16px;
+  font-weight: 400;
+  padding-bottom: 10px;
+}
+.contact_info_email {
+}
+.user_search_input_container {
+  padding: 0 25px;
+}
