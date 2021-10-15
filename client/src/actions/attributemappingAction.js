@@ -22,12 +22,12 @@ export const listAttributeMapping= (data) => dispatch => {
     })
     .catch(err =>{
       console.log("err data",err)
-      dispatch({
-        type: GET_ERRORS,
-        payload:err.response.data
-      })
-
+      // dispatch({
+      //   type: GET_ERRORS,
+      //   payload:err.response.data
+      // })
     });
+
 };
 
 

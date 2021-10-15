@@ -86,7 +86,7 @@ class AddProductScreen extends React.Component {
       tempVarLen: [{ num: '' }],
       demoValue: [{ num: '' }],
       quickship: 'Yes',
-      dependentField: [{ parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '' }],
+      dependentField: [{ type: '', label: '', parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '' }],
       parentAttributeCategoryID: '',
       productID: "",
       mappingName: '',
@@ -180,20 +180,23 @@ class AddProductScreen extends React.Component {
       }).then(getResult => {
         console.log(getResult)
         this.props.listAttributeMapping({ productID: this.props.match.params.id });
+        
         // this.setState({click:!this.state.click})
         // const parsed = queryString.parse(this.props.location.search)
         // this.props.listAttributeMapping({ productID: parsed.productID });
       })
 
     }
-        if (nextProps.attributemapping.listattributemapping !== this.props.attributemapping.listattributemapping) {
-          this.setState({dependentField:this.props.attributemapping.listattributemapping})
+    if (nextProps.attributemapping.listattributemapping !== this.props.attributemapping.listattributemapping) {
+      console.log(this.props.attributemapping.listattributemapping)
+      this.setState({ dependentField: this.props.attributemapping.listattributemapping })
       // this.props.listAttributeMapping({ productID: this.props.match.params.id });
     }
 
     if (nextProps.attributemapping.addattributemapping !== this.props.attributemapping.addattributemapping) {
       console.log('added')
-      this.setState({dependentField:this.props.attributemapping.listattributemapping})
+      //  console.log(nextProps.attributemapping.listattributemapping)
+      // this.setState({ dependentField: this.props.attributemapping.listattributemapping })
       this.props.listAttributeMapping({ productID: this.props.match.params.id });
     }
 
@@ -545,21 +548,23 @@ class AddProductScreen extends React.Component {
   }
   onAttributeAdd() {
     // this.setState({ attributeCount: this.state.attributeCount + 1 });
-     let dependentField = this.state.dependentField.concat([{ parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '', photoUrl:'' }]);
+    let dependentField = this.state.dependentField.concat([{ type: '', label: '', parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '', photoUrl: '', list: [{ label: "", value: "", additionalPrice: "0" }] }]);
     this.setState({ dependentField });
 
 
     let extraVariant = [
       {
-        type: '',
+        type: "",
         label: "",
         list: [{ label: "", value: "", additionalPrice: "0", type: '', sku: '' }]
       }
     ]
     // let tempAttribute = this.state.dependentField[index];
     let saveAttribute = {
+     
       parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '',
       photoUrl: '',
+      list: [{ label: "", value: "", additionalPrice: "0" }],
       dependentField: JSON.stringify(extraVariant),
       productID: this.state.productID
     }
@@ -659,7 +664,7 @@ class AddProductScreen extends React.Component {
   }
 
 
-  onEditAttribute (index) {
+  onEditAttribute(index) {
     console.log(this.state.dependentField[index])
     this.props.editAttributeMapping(this.state.dependentField[index])
   }
@@ -1396,7 +1401,7 @@ class AddProductScreen extends React.Component {
                       </div>
                       <div className='attribute_create_button'>
                         <button onClick={() => this.onSkuSubmit(false, 0)} className='product_publish_btn'>Save New</button>
-                         <button onClick={() => this.onEditAttribute(0)} className='product_publish_btn'>Submit Edit</button>
+                        <button onClick={() => this.onEditAttribute(0)} className='product_publish_btn'>Submit Edit</button>
                       </div>
                     </div>
                   }
