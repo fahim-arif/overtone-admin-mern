@@ -186,7 +186,14 @@ class AddProductScreen extends React.Component {
       })
 
     }
+        if (nextProps.attributemapping.listattributemapping !== this.props.attributemapping.listattributemapping) {
+          this.setState({dependentField:this.props.attributemapping.listattributemapping})
+      // this.props.listAttributeMapping({ productID: this.props.match.params.id });
+    }
+
     if (nextProps.attributemapping.addattributemapping !== this.props.attributemapping.addattributemapping) {
+      console.log('added')
+      this.setState({dependentField:this.props.attributemapping.listattributemapping})
       this.props.listAttributeMapping({ productID: this.props.match.params.id });
     }
 
@@ -297,18 +304,7 @@ class AddProductScreen extends React.Component {
 
       thirdArg = this.state.dependentField[1].mappingValue;
       atbValue = this.state.dependentField[0].mappingValue;
-      if (!(atbValue && thirdArg)) {
-        Toast.fire({
-          type: 'error',
-          title: 'Please Enter value field',
-        })
-        return;
-      }
-    } else if (this.state.dependentField.length == 3) {
-      thirdArg = this.state.dependentField[1].mappingValue;
-      atbValue = this.state.dependentField[0].mappingValue;
-      forthArg = this.state.dependentField[2].mappingValue;
-      if (!(atbValue && thirdArg && forthArg)) {
+      if (!(atbValue)) {
         Toast.fire({
           type: 'error',
           title: 'Please Enter value field',
@@ -316,6 +312,18 @@ class AddProductScreen extends React.Component {
         return;
       }
     }
+    //  else if (this.state.dependentField.length == 3) {
+    //   thirdArg = this.state.dependentField[1].mappingValue;
+    //   atbValue = this.state.dependentField[0].mappingValue;
+    //   forthArg = this.state.dependentField[2].mappingValue;
+    //   if (!(atbValue && thirdArg && forthArg)) {
+    //     Toast.fire({
+    //       type: 'error',
+    //       title: 'Please Enter value field',
+    //     })
+    //     return;
+    //   }
+    // }
 
     if (!submit) {
       Toast.fire({
@@ -353,13 +361,6 @@ class AddProductScreen extends React.Component {
 
     if ((typeof index) === 'number') {
 
-      let extraVariant = [
-        {
-          type: '',
-          label: "",
-          list: [{ label: "", value: "", additionalPrice: "0", type: '', sku: '' }]
-        }
-      ]
       let newVarient = [
         {
           type: '',
@@ -543,8 +544,9 @@ class AddProductScreen extends React.Component {
     }
   }
   onAttributeAdd() {
-    this.setState({ attributeCount: this.state.attributeCount + 1 });
-    const dependentField = this.state.dependentField.concat([{ type: "", label: "", value: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '' }]);
+    // this.setState({ attributeCount: this.state.attributeCount + 1 });
+     let dependentField = this.state.dependentField.concat([{ parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '', photoUrl:'' }]);
+    this.setState({ dependentField });
 
 
     let extraVariant = [
@@ -564,7 +566,6 @@ class AddProductScreen extends React.Component {
     this.props.addAttributeMappingDraft(saveAttribute);
 
 
-    this.setState({ dependentField });
   }
 
 
@@ -657,6 +658,12 @@ class AddProductScreen extends React.Component {
     })
   }
 
+
+  onEditAttribute (index) {
+    console.log(this.state.dependentField[index])
+    this.props.editAttributeMapping(this.state.dependentField[index])
+  }
+
   deleteAttribute(index, id) {
     // console.log(index)
     console.log(id)
@@ -678,8 +685,8 @@ class AddProductScreen extends React.Component {
 
 
   render() {
-    console.log(this.state.attributeList)
-    // console.log(this.state.dependentField);
+    // console.log(this.state.attributeList)
+    console.log(this.state.dependentField);
 
     // console.log(this.state.finalVariant)
     // console.log(this.state.variantDependentField)
@@ -1117,7 +1124,7 @@ class AddProductScreen extends React.Component {
                     <span onClick={() => this.onAttributeAdd()} className='select_add_btn'>Add</span>
                     <span onClick={() => this.onSkuSubmit(true)} className='select_add_btn'>Create SKU</span>
                   </div>
-                  {this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.length > 0 ? this.props.attributemapping.listattributemapping.map((res, index) => (
+                  {this.state.dependentField && this.state.dependentField.length > 1 ? this.props.attributemapping.listattributemapping.map((res, index) => (
                     <div className='attribute_dropdown_container'>
                       <div className='attribute_dropdown_wrapper'>
                         <div className='attirbute_dropdown_content'>
@@ -1136,7 +1143,7 @@ class AddProductScreen extends React.Component {
                             <select
                               name='parentCategory'
                               onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.parentAttributeCategoryID}
+                              value={this.state.dependentField[index].parentAttributeCategoryID}
                               className='form-control_select'
                               placeholder=''
                             >
@@ -1148,7 +1155,7 @@ class AddProductScreen extends React.Component {
                           <div className='add_product_value'>
                             <label className='main_title'>Mapping Name</label>
                             <input type='text' name='mappingName' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.mappingName}
+                              value={this.state.dependentField[index].mappingName}
                               className='add_product_input' />
                           </div>
                         </div>
@@ -1164,7 +1171,7 @@ class AddProductScreen extends React.Component {
                           <div className='add_product_value'>
                             <label className='main_title'>Additional Cost</label>
                             <input name='additionalPrice' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.additionalPrice} type='text' className='add_product_input' />
+                              value={this.state.dependentField[index].additionalPrice} type='text' className='add_product_input' />
                           </div>
 
                           {/* */}
@@ -1175,7 +1182,7 @@ class AddProductScreen extends React.Component {
                             <select
                               name='type'
                               onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.mappingType}
+                              value={this.state.dependentField[index].mappingType}
                               className='form-control_select'
                               placeholder=''
                             >
@@ -1188,7 +1195,7 @@ class AddProductScreen extends React.Component {
                           <div className='add_product_value'>
                             <label className='main_title'>Label</label>
                             <input type='text' name='label' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.mappingLabel} className='add_product_input' />
+                              value={this.state.dependentField[index].mappingLabel} className='add_product_input' />
                           </div>
 
 
@@ -1212,7 +1219,7 @@ class AddProductScreen extends React.Component {
                             <div className='add_product_title'>
                               <label className='main_title'>Value</label>
                               <input name='value' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                                value={res.mappingValue} className='add_product_input' type='text'></input>
+                                value={this.state.dependentField[index].mappingValue} className='add_product_input' type='text'></input>
                             </div>
 
                           </div>
@@ -1227,7 +1234,7 @@ class AddProductScreen extends React.Component {
                             <select
                               name='subField'
                               onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.subField}
+                              value={this.state.dependentField[index].subField}
                               className='form-control_select'
                               placeholder=''
                             >
@@ -1237,7 +1244,7 @@ class AddProductScreen extends React.Component {
                             </select>
                           </div>
                           <div className='add_product_title'>
-                            {res.mappingType === "image+text" && <React.Fragment>
+                            {this.state.dependentField[index].mappingType === "image+text" && <React.Fragment>
                               <label className="main_title">Upload  Image:</label>
                               <input type="file" name="photoUrl" onChange={this.uploadImage} className='form-control_upload'
                                 placeholder='Upload Image'
@@ -1250,7 +1257,8 @@ class AddProductScreen extends React.Component {
                         </div>
                       </div>
                       <div className='attribute_create_button'>
-                        <button onClick={() => this.onSkuSubmit(false, index)} className='product_publish_btn'>Save</button>
+                        <button onClick={() => this.onSkuSubmit(false, index)} className='product_publish_btn'>Save New</button>
+                        <button onClick={() => this.onEditAttribute(index)} className='product_publish_btn'>Submit Edit</button>
                       </div>
                     </div>
                   )) :
@@ -1387,7 +1395,8 @@ class AddProductScreen extends React.Component {
                         </div>
                       </div>
                       <div className='attribute_create_button'>
-                        <button onClick={() => this.onSkuSubmit(false, 0)} className='product_publish_btn'>Save</button>
+                        <button onClick={() => this.onSkuSubmit(false, 0)} className='product_publish_btn'>Save New</button>
+                         <button onClick={() => this.onEditAttribute(0)} className='product_publish_btn'>Submit Edit</button>
                       </div>
                     </div>
                   }

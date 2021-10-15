@@ -146,7 +146,7 @@ class EditAttributeMapping extends Component {
       _id: this.state._id,
     }
     console.log(Data)
-    // this.props.editAttributeMapping(Data);
+    this.props.editAttributeMapping(Data);
   }
   //Reset all statevalues
   onReset() {
