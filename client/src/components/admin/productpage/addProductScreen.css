@@ -271,3 +271,6 @@ border-bottom: 1px solid #dbdbdb;
 .sku_genarated_text {
 
 }
+.attribute_dropdown_delete {
+  cursor: pointer;
+}

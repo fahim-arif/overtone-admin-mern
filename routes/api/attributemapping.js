@@ -97,6 +97,11 @@ router.get('/',passport.authenticate('jwt',{session:false}),(req,res) => {
 });
 
 
+
+
+
+
+
 // @route POST  api/attributemapping/
 // @desc  Create attributemapping data
 // @access Private
@@ -132,6 +137,43 @@ router.post('/',passport.authenticate('jwt',{session:false}),(req,res)=>{
         }
 
     });  
+});
+
+
+
+
+
+
+// @route POST  api/attributemapping/
+// @desc  Create attributemapping data
+// @access Private
+router.post('/draft',passport.authenticate('jwt',{session:false}),(req,res)=>{
+
+    const insertdata = {
+        // parentAttributeCategoryID :   req.body.parentAttributeCategoryID,
+        // attributeCategoryID :   req.body.attributeCategoryID,
+        productID :   req.body.productID,
+        // mappingName :   req.body.mappingName,
+        // mappingLabel :   req.body.mappingLabel,
+        // mappingType :   req.body.mappingType,
+        // mappingValue :   req.body.mappingValue,
+        // photoUrl :   req.body.photoUrl,
+        // additionalPrice :   req.body.additionalPrice,
+        // dependentField :   req.body.dependentField,
+        // isEnabled:   req.body.isEnabled,  
+        // adminID:req.user.id,  
+    };
+    new AttributeMapping(insertdata).save().then(attributemapping=>res.json(attributemapping));
+    // AttributeMapping.findOne({mappingLabel:req.body.productID})
+    // .then(result=>{
+        // if(result){
+            // errors.mappingLabel = 'Attribute Name Already Exists';
+            // return res.status(404).json(errors);
+        // }
+        // else{
+        // }
+
+    // });  
 });
 
 // @route GET  api/attributemapping/delete
@@ -177,6 +219,8 @@ router.post('/edit',passport.authenticate('jwt',{session:false}),(req,res) => {
             isEnabled:   req.body.isEnabled,  
             adminID:req.user.id, 
         };
+
+        console.log('hello there')
       
         AttributeMapping.findOneAndUpdate({_id:req.body._id},{$set: editdata},{new: true})
         .then(attributemapping => {
