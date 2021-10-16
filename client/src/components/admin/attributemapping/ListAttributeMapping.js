@@ -49,12 +49,10 @@ onEditClick(res){
 }
 //calls when delete button is clicked
 onDeleteClick(id){
-  console.log(id)
-//   const deleteData={
-//       id:id
-//   }
-//   this.props.deleteAttributeMapping(deleteData)
-// }
+  const deleteData={
+      id:id
+  }
+  this.props.deleteAttributeMapping(deleteData)
 }
 searchUpdated (term) {
     this.setState({searchTerm: term})

@@ -125,7 +125,10 @@ router.post('/',passport.authenticate('jwt',{session:false}),(req,res)=>{
         dependentField :   req.body.dependentField,
         isEnabled:   req.body.isEnabled,  
         adminID:req.user.id, 
+        subField: req.body.subField,
+        
     };
+    console.log(insertdata.subField)
     AttributeMapping.findOne({mappingLabel:req.body.mappingLabel})
     .then(result=>{
         if(result){
@@ -218,9 +221,10 @@ router.post('/edit',passport.authenticate('jwt',{session:false}),(req,res) => {
             dependentField :   req.body.dependentField,
             isEnabled:   req.body.isEnabled,  
             adminID:req.user.id, 
+            subField: req.body.subField,
         };
 
-        console.log('hello there')
+        console.log(req.body.subField)
       
         AttributeMapping.findOneAndUpdate({_id:req.body._id},{$set: editdata},{new: true})
         .then(attributemapping => {

@@ -53,6 +53,9 @@ const AttributeMappingSchema = new Schema({
         enum : ['Yes', 'No'], 
         // required:true
     },
+    subField: {
+        type: String,
+    },
     date:{
         type: Date,
         default: Date.now

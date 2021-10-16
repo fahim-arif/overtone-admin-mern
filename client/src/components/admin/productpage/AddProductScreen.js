@@ -102,14 +102,16 @@ class AddProductScreen extends React.Component {
       // value: '',
       label: '',
       type: '',
+      imageURL: [],
       variantDependentField: [
         {
 
-          label: "", value: "", additionalPrice: "0", type: '', sku: ''
+          label: "", value: "", additionalPrice: "0", sku: ''
         },
       ],
       finalVariant: [],
       attributeList: [],
+      variantList: [],
 
     };
 
@@ -162,6 +164,7 @@ class AddProductScreen extends React.Component {
       isEnabled: editResult.isEnabled,
       quickship: editResult.quickship,
       keyword: editResult.keyword,
+      subField: editResult.subField,
     }, () => {
 
       this.props.listSubCategoryOne({ categoryID: this.state.categoryID });
@@ -180,7 +183,8 @@ class AddProductScreen extends React.Component {
       }).then(getResult => {
         console.log(getResult)
         this.props.listAttributeMapping({ productID: this.props.match.params.id });
-        
+        this.setState({ dependentField: this.props.attributemapping.listattributemapping })
+        this.setState(prevState => ({ variantDependentField: [...prevState.variantDependentField, this.state.variantDependentField] }))
         // this.setState({click:!this.state.click})
         // const parsed = queryString.parse(this.props.location.search)
         // this.props.listAttributeMapping({ productID: parsed.productID });
@@ -189,15 +193,29 @@ class AddProductScreen extends React.Component {
     }
     if (nextProps.attributemapping.listattributemapping !== this.props.attributemapping.listattributemapping) {
       console.log(this.props.attributemapping.listattributemapping)
-      this.setState({ dependentField: this.props.attributemapping.listattributemapping })
+      if (this.props.attributemapping.listattributemapping[0]) {
+        this.setState({ dependentField: this.props.attributemapping.listattributemapping })
+
+        for (let i = 0; i < this.props.attributemapping.listattributemapping.length - 1; i++) {
+          this.setState(prevState => ({ variantDependentField: [...prevState.variantDependentField, ...this.state.variantDependentField] }))
+
+        }
+        // this.setState({variantDependefinalVariantntField: this.props.attributemapping.listattributemapping})
+      }
       // this.props.listAttributeMapping({ productID: this.props.match.params.id });
     }
 
     if (nextProps.attributemapping.addattributemapping !== this.props.attributemapping.addattributemapping) {
+      this.setState({ dependentField: this.props.attributemapping.listattributemapping })
+      this.props.listAttributeMapping({ productID: this.props.match.params.id });
       console.log('added')
+      console.log(this.props.attributemapping.addattributemapping)
       //  console.log(nextProps.attributemapping.listattributemapping)
       // this.setState({ dependentField: this.props.attributemapping.listattributemapping })
-      this.props.listAttributeMapping({ productID: this.props.match.params.id });
+      this.setState({ dependentField: this.props.attributemapping.listattributemapping })
+      // this.setState(prevState => ({ variantDependentField: [...prevState.variantDependentField, ...this.state.variantDependentField] }))
+      // this.setState(prevState => ({variantDependentField: [...prevState.variantDependentField, this.state.variantDependentField]}))
+      // this.setState({variantDependentField: this.props.attributemapping.listattributemapping})
     }
 
     if (nextProps.errors !== this.props.errors) {
@@ -220,6 +238,28 @@ class AddProductScreen extends React.Component {
     this.setState({
       documents: this.state.documents.filter((s, sidx) => idx !== sidx),
     });
+  }
+
+
+  // upload attribute images
+
+  uploadAttributeImage(e, index) {
+    var self = this;
+    const data = new FormData();
+    data.append("file", e.target.files[0]);
+    data.append("filename", e.target.files[0].name);
+    axios
+      .post("/upload", data)
+      .then(function (response) {
+        self.setState(prevState => ({
+          imageURL: [...prevState.imageURL, response.data.file],
+        }));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+
   }
 
 
@@ -270,31 +310,164 @@ class AddProductScreen extends React.Component {
             title: "File Uploaded SuccessFully",
           });
         });
-
-        // self.setState({
-        //     url:response.data,
-        //     uploadStatus:'Uploaded SuccessFully'
-        // })
       })
       .catch((err) => {
         console.log(err);
       });
   }
 
+
+
+  // Multiple attribute submit
+
+  onAttributeSubmit(index) {
+
+    let tempLabel = this.state.dependentField[index].mappingLabel.split(',');
+    let tempPrice = this.state.dependentField[index].additionalPrice.split(',');
+
+    let demoVariant = [
+      {
+        type: '',
+        label: "",
+        list: [
+          {
+
+            label: "", value: "", additionalPrice: "0", type: '', sku: ''
+          },
+        ],
+      }
+    ]
+
+    // edited
+    let finalVariation = [
+      {
+          type: this.state.type,
+          label: this.state.label,
+          list: this.state.variantDependentField[index]
+        }
+    ]
+
+    if (this.state.dependentField[index].subField === 'No') {
+      finalVariation = [
+        {
+          type: '',
+          label: "",
+          list: [
+            {
+
+              label: "", value: "", additionalPrice: "0", sku: ''
+            },
+          ],
+        }
+      ]
+    }
+
+
+    let attributeValues = this.state.dependentField[index].mappingValue.split(',')
+    let attributeLength = attributeValues.length;
+    console.log(attributeLength)
+    // console.log(this.state.dependentField[0])
+    let attributes = {
+      ...this.state.dependentField[index],
+      photoUrl: '',
+      dependentField: JSON.stringify(finalVariation),
+      productID: this.state.productID,
+    }
+    // console.log(attributes)
+
+    for (let i = 0; i < attributeLength; i++) {
+      attributes = {
+        ...attributes,
+        mappingValue: attributeValues[i],
+        mappingLabel: tempLabel[i],
+        photoUrl: this.state.imageURL[i],
+        additionalPrice: tempPrice[i]
+      }
+      this.props.addAttributeMapping(attributes)
+      console.log(attributes);
+      // console.log(attributeValues[i])
+    }
+    this.setState(prevState => ({ variantDependentField: [...prevState.variantDependentField, this.state.finalVariant] }))
+    window.location.reload();
+    setTimeout(() => {
+      window.location.reload()
+    },1000)
+  }
+
+
+  // handle variant **
+  onVariantSubmit(index) {
+
+
+    let temp = this.state.variantDependentField;
+
+    let varValue = this.state.variantDependentField[index].value.split(',');
+    let varPrice = this.state.variantDependentField[index].additionalPrice.split(',')
+    let varLabel = this.state.variantDependentField[index].label.split(',')
+    let totalVariations = this.state.variantDependentField[index];
+
+
+    let variantDependentField = [
+      {
+
+        label: "", value: "", additionalPrice: "0", sku: ''
+      },
+    ];
+
+    let varLoop = [];
+    for (let i = 0; i < varValue.length; i++) {
+      totalVariations = {
+        ...totalVariations,
+        label: varLabel[i],
+        additionalPrice: varPrice[i],
+        value: varValue[i],
+        // label: varValue[i],
+      }
+      varLoop.push(totalVariations)
+      this.setState(prevState => ({ finalVariant: [...prevState.finalVariant, totalVariations] }));
+      // this.setState(prevState => ({ variantDependentField: [...prevState.variantDependentField, totalVariations] }));
+      console.log(varLoop)
+    }
+    let tempo = this.state.variantDependentField;
+    console.log(temp[index]);
+    temp[index] = [...varLoop];
+    console.log([temp[index]])
+    temp[index] = [...temp[index]]
+    this.setState({ variantDependentField: tempo });
+    console.log(this.state.variantDependentField)
+  }
+
+  // self.setState(prevState => ({
+  //         imageURL: [...prevState.imageURL, response.data.file],
+  //       }));
+  // let finalVariation = [
+  //   {
+  //     type: this.state.type,
+  //     label: this.state.label,
+  //     list: temp
+  //   }
+  // ]
+  // console.log(finalVariation)
+
+  // this.setState({ variantList: finalVariation });
+
+
+  // handle sku
+
   onSkuSubmit(submit = false, index = null) {
     let atbName = this.state.dependentField.map((res) => res.mappingValue)
     this.setState({ tempAtbName: [...this.state.tempAtbName, atbName] })
     let firstPortion = this.state.productValue;
 
-    if (!firstPortion) {
-      if (!(atbValue && thirdArg)) {
-        Toast.fire({
-          type: 'error',
-          title: 'Please Enter the product value',
-        })
-        return;
-      }
-    }
+    // if (!firstPortion) {
+    //   if (!(atbValue && thirdArg)) {
+    //     Toast.fire({
+    //       type: 'error',
+    //       title: 'Please Enter the product value 1',
+    //     })
+    //     return;
+    //   }
+    // }
     // second portion
     let atbValue = this.state.dependentField.map((res) => res.mappingValue).toString();
 
@@ -303,18 +476,18 @@ class AddProductScreen extends React.Component {
     let thirdArg = ''
     let forthArg = ''
 
-    if (this.state.dependentField.length == 2) {
+    // if (this.state.dependentField.length == 2) {
 
-      thirdArg = this.state.dependentField[1].mappingValue;
-      atbValue = this.state.dependentField[0].mappingValue;
-      if (!(atbValue)) {
-        Toast.fire({
-          type: 'error',
-          title: 'Please Enter value field',
-        })
-        return;
-      }
-    }
+    //   thirdArg = this.state.dependentField[1].mappingValue;
+    //   atbValue = this.state.dependentField[0].mappingValue;
+    //   if (!(atbValue)) {
+    //     Toast.fire({
+    //       type: 'error',
+    //       title: 'Enter value field 2',
+    //     })
+    //     return;
+    //   }
+    // }
     //  else if (this.state.dependentField.length == 3) {
     //   thirdArg = this.state.dependentField[1].mappingValue;
     //   atbValue = this.state.dependentField[0].mappingValue;
@@ -360,17 +533,46 @@ class AddProductScreen extends React.Component {
 
 
 
-    console.log(this.state.dependentField)
-
-    if ((typeof index) === 'number') {
-
-      let newVarient = [
+    if (this.state.dependentField[index].subField === 'No') {
+      newVarient = [
         {
           type: '',
           label: "",
-          list: this.state.variantDependentField
+          list: [
+            {
+
+              label: "", value: "", additionalPrice: "0", sku: ''
+            },
+          ],
         }
       ]
+    }
+
+    let newVarient = [];
+    if ((typeof index) === 'number') {
+
+      newVarient = [
+        {
+          type: this.state.type,
+          label: this.state.label,
+          list: this.state.variantDependentField[index]
+        }
+      ]
+      console.log(newVarient,'look');
+      if (this.state.dependentField[index].subField === 'No') {
+        newVarient = [
+          {
+            type: '',
+            label: "",
+            list: [
+              {
+
+                label: "", value: "", additionalPrice: "0", sku: ''
+              },
+            ],
+          }
+        ]
+      }
       let tempAttribute = this.state.dependentField[index];
       let saveAttribute = {
         ...tempAttribute,
@@ -382,6 +584,7 @@ class AddProductScreen extends React.Component {
       console.log(saveAttribute)
     }
 
+    window.location.reload();
   }
 
 
@@ -469,37 +672,37 @@ class AddProductScreen extends React.Component {
   onSubmitVariant(index) {
     let temp = this.state.variantDependentField;
 
-    let finalVariation = [
-      {
-        type: this.state.type,
-        label: this.state.label,
-        list: temp
-      }
-    ]
+    // let finalVariation = [
+    //   {
+    //     type: this.state.type,
+    //     label: this.state.label,
+    //     list: temp
+    //   }
+    // ]
 
-    let tempAttribute = this.state.dependentField[0];
-    let saveAttribute = {
-      ...tempAttribute,
-      photoUrl: this.state.photoUrl,
-      dependentField: JSON.stringify(finalVariation),
-      productID: this.state.productID,
-      _id: this.props.attributemapping.addattributemapping._id,
-    }
-    this.props.editAttributeMapping(saveAttribute);
-
-
-    temp = temp.concat([{
-
-      label: "", value: "", additionalPrice: "0", type: '', sku: ''
-    }])
-    // let varType = this.state.variantDependentField[index].type;
-
-    this.setState({ variantDependentField: temp });
+    // let tempAttribute = this.state.dependentField[0];
+    // let saveAttribute = {
+    //   ...tempAttribute,
+    //   photoUrl: this.state.photoUrl,
+    //   dependentField: JSON.stringify(finalVariation),
+    //   productID: this.state.productID,
+    //   _id: this.props.attributemapping.addattributemapping._id,
+    // }
+    // this.props.editAttributeMapping(saveAttribute);
 
 
+    // temp = temp.concat([{
 
-    this.setState({ finalVariant: finalVariation })
-    console.log(finalVariation)
+    //   label: "", value: "", additionalPrice: "0", type: '', sku: ''
+    // }])
+    // // let varType = this.state.variantDependentField[index].type;
+
+    // this.setState({ variantDependentField: temp });
+
+
+
+    // this.setState({ finalVariant: finalVariation })
+    // console.log(finalVariation)
   }
 
   //Reset all statevalues
@@ -547,10 +750,13 @@ class AddProductScreen extends React.Component {
     }
   }
   onAttributeAdd() {
+    console.log(this.state.dependentField)
     // this.setState({ attributeCount: this.state.attributeCount + 1 });
     let dependentField = this.state.dependentField.concat([{ type: '', label: '', parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '', photoUrl: '', list: [{ label: "", value: "", additionalPrice: "0" }] }]);
+    console.log(dependentField)
     this.setState({ dependentField });
 
+    //  this.props.addAttributeMapping(dependentField)
 
     let extraVariant = [
       {
@@ -561,7 +767,7 @@ class AddProductScreen extends React.Component {
     ]
     // let tempAttribute = this.state.dependentField[index];
     let saveAttribute = {
-     
+
       parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '',
       photoUrl: '',
       list: [{ label: "", value: "", additionalPrice: "0" }],
@@ -569,6 +775,8 @@ class AddProductScreen extends React.Component {
       productID: this.state.productID
     }
     this.props.addAttributeMappingDraft(saveAttribute);
+
+    window.location.reload()
 
 
   }
@@ -587,7 +795,7 @@ class AddProductScreen extends React.Component {
 
 
   // need to uncomment 437 for productId
-  onhandleChangeSubField(e, index, indexSub) {
+  onhandleChangeSubField(e, index) {
     const name = e.target.name;
     const value = e.target.value;
     console.log(value)
@@ -688,12 +896,31 @@ class AddProductScreen extends React.Component {
 
   }
 
+  handleVariantSubmit(index) {
+
+
+    let temp = this.state.variantDependentField;
+
+    let finalVariation = [
+      {
+        type: this.state.type,
+        label: this.state.label,
+        list: temp
+      }
+    ]
+    console.log(finalVariation)
+
+    this.setState({ variantList: finalVariation });
+  }
+
 
   render() {
-    // console.log(this.state.attributeList)
-    console.log(this.state.dependentField);
+    console.log(this.state.variantDependentField)
+    // console.log(this.state.imageURL)
+    // console.log(this.state.photoUrl)
+    console.log(this.state.dependentField,'dependent');
 
-    // console.log(this.state.finalVariant)
+    console.log(this.state.finalVariant)
     // console.log(this.state.variantDependentField)
 
     const { addproduct } = this.props.product;
@@ -711,56 +938,57 @@ class AddProductScreen extends React.Component {
     const items = []
 
     for (const [index, value] of this.state.sku.entries()) {
-      items.push(<div style={{ backgroundColor: '#fff' }} key={index} className='attribute_dropdown_container'>
-        <div className='attribute_dropdown_wrapper'>
+      items.push(
 
-          <div className='attirbute_dropdown_content'>
-            Added Variants SKU: {value}
-          </div>
-          <div div className='attribute_dropdown_icon_container'>
-            {/* <KeyboardArrowDown></KeyboardArrowDown>
+        <div style={{ backgroundColor: '#fff' }} key={index} className='attribute_dropdown_container'>
+          <div className='attribute_dropdown_wrapper'>
+
+            <div className='attirbute_dropdown_content'>
+              Added Variants SKU: {value}
+            </div>
+            <div div className='attribute_dropdown_icon_container'>
+              {/* <KeyboardArrowDown></KeyboardArrowDown>
             <KeyboardArrowUp></KeyboardArrowUp> */}
-            <span className='attribute_dropdown_delete'>Delete</span>
+            </div>
           </div>
-        </div>
-        <div className='create_attribute_row'>
-          <div className='add_product_value'>
-            <label className='main_title'>Label</label>
-            <input required name='label' onChange={(e) =>
-              this.onhandleChangeVariantField(e, index, value)
-            }
-              // value={this.state.variantDependentField[index].label}  
-
-              type='text'
-              className='add_product_input' />
-          </div>
-          <div className='add_product_value'>
-            <label className='main_title'>Additional Cost</label>
-            <input name='additionalPrice'
-              onChange={(e) =>
-                this.onhandleChangeVariantField(e, index)
+          <div className='create_attribute_row'>
+            <div className='add_product_value'>
+              <label className='main_title'>Label</label>
+              <input required name='label' onChange={(e) =>
+                this.onhandleChangeVariantField(e, index, value)
               }
-              // value={this.state.variantDependentField[index].additionalPrice} 
+                // value={this.state.variantDependentField[index].label}  
 
-              type='text' className='add_product_input' />
+                type='text'
+                className='add_product_input' />
+            </div>
+            <div className='add_product_value'>
+              <label className='main_title'>Price</label>
+              <input name='additionalPrice'
+                onChange={(e) =>
+                  this.onhandleChangeVariantField(e, index)
+                }
+                // value={this.state.variantDependentField[index].additionalPrice} 
+
+                type='text' className='add_product_input' />
+            </div>
+
+
           </div>
+          <div className='create_attribute_row'>
 
+            <div className='add_product_value'>
+              <label className='main_title'>Value</label>
+              <input required name='value' onChange={(e) =>
+                this.onhandleChangeSubField(e, index, value)
+              }
+                // value={this.state.variantDependentField[index].value}                                                            name='value'        
+                onChange={(e) => this.onhandleChangeVariantField(e, index)} type='text' className='add_product_input' />
 
-        </div>
-        <div className='create_attribute_row'>
-
-          <div className='add_product_value'>
-            <label className='main_title'>Value</label>
-            <input required name='value' onChange={(e) =>
-              this.onhandleChangeSubField(e, index, value)
-            }
-              // value={this.state.variantDependentField[index].value}                                                            name='value'        
-              onChange={(e) => this.onhandleChangeVariantField(e, index)} type='text' className='add_product_input' />
-
+            </div>
           </div>
+          <button onClick={() => this.onSubmitVariant(index)} className='product_publish_btn mt-3'>Save</button>
         </div>
-        <button onClick={() => this.onSubmitVariant(index)} className='product_publish_btn mt-3'>Save</button>
-      </div>
 
       )
     }
@@ -800,7 +1028,7 @@ class AddProductScreen extends React.Component {
     }
 
 
-    console.log(this.props.attributemapping.listattributemapping)
+    console.log(this.props.attributemapping.listattributemapping,'props.listattribute')
 
     const { errors, productValue, count } = this.state;
     const { productloading } = this.props.product;
@@ -1174,7 +1402,7 @@ class AddProductScreen extends React.Component {
                             <span className="form-text text-danger">{errors.attributeCategoryID}</span>
                           </div>
                           <div className='add_product_value'>
-                            <label className='main_title'>Additional Cost</label>
+                            <label className='main_title'>Price</label>
                             <input name='additionalPrice' onChange={(e) => this.onhandleChangeSubField(e, index)}
                               value={this.state.dependentField[index].additionalPrice} type='text' className='add_product_input' />
                           </div>
@@ -1251,7 +1479,7 @@ class AddProductScreen extends React.Component {
                           <div className='add_product_title'>
                             {this.state.dependentField[index].mappingType === "image+text" && <React.Fragment>
                               <label className="main_title">Upload  Image:</label>
-                              <input type="file" name="photoUrl" onChange={this.uploadImage} className='form-control_upload'
+                              <input type="file" name="photoUrl" onChange={(e) => this.uploadAttributeImage(e, index)} className='form-control_upload'
                                 placeholder='Upload Image'
                               />
                               <span className="form-text text-danger">{errors.photoUrl}</span>
@@ -1260,10 +1488,100 @@ class AddProductScreen extends React.Component {
                             </React.Fragment>}
                           </div>
                         </div>
+                        {/* variant */}
+                        {this.state.dependentField[index].subField === 'Yes' &&
+                          <div style={{ padding: '0' }} className='add_variant_container'>
+                            <label className='main_title'>Add Variants</label>
+
+                            <div style={{ marginTop: '35px' }} className='create_attribute_row'>
+                              <div className='add_product_value'>
+
+                                <label className='main_title'>Variant Type</label>
+                                <select
+                                  name='type'
+                                  onChange={(e) => this.onhandleChangeField(e)}
+                                  value={this.state.type}
+                                  className='form-control_select'
+                                  placeholder=''
+                                >
+                                  <option value=''>Select type</option>
+                                  <option value='dropdown'>Dropdown</option>
+                                  <option value='color'>Color Code</option>
+                                </select>
+                              </div>
+                              <div className='add_product_value'>
+                                <label className='main_title'>Label</label>
+                                <input
+                                  type='text'
+                                  name='label'
+                                  onChange={(e) => this.onhandleChangeField(e)}
+                                  value={this.state.label}
+                                  className='add_product_input'
+                                  placeholder=''
+                                />
+                              </div>
+                            </div>
+                            <button style={{ margin: '17px 0 10px 0' }} onClick={() => this.resetAllAttribute()} className='select_add_btn'>Add New</button>
+
+                            <div style={{ backgroundColor: '#fff' }} className='attribute_dropdown_container'>
+                              <div className='attribute_dropdown_wrapper'>
+
+                                <div className='attirbute_dropdown_content'>
+                                  Added Variants SKU:
+                                </div>
+                                <div div className='attribute_dropdown_icon_container'>
+                                  {/* <KeyboardArrowDown></KeyboardArrowDown>
+                                   <KeyboardArrowUp></KeyboardArrowUp> */}
+                                  <span className='attribute_dropdown_delete'>Delete</span>
+                                </div>
+                              </div>
+                              <div className='create_attribute_row'>
+                                <div className='add_product_value'>
+                                  <label className='main_title'>Label</label>
+                                  <input required name='label' onChange={(e) =>
+                                    this.onhandleChangeVariantField(e, index)
+                                  }
+                                    // value={this.state.variantDependentField[index].label}  
+
+                                    type='text'
+                                    className='add_product_input' />
+                                </div>
+                                <div className='add_product_value'>
+                                  <label className='main_title'>Price</label>
+                                  <input name='additionalPrice'
+                                    onChange={(e) =>
+                                      this.onhandleChangeVariantField(e, index)
+                                    }
+                                    // value={this.state.variantDependentField[index].additionalPrice} 
+
+                                    type='text' className='add_product_input' />
+                                </div>
+
+
+                              </div>
+                              <div className='create_attribute_row'>
+
+                                <div className='add_product_value'>
+                                  <label className='main_title'>Value</label>
+                                  <input required name='value' onChange={(e) =>
+                                    this.onhandleChangeSubField(e, index)
+                                  }
+                                    // value={this.state.variantDependentField[index].value}                                                            name='value'        
+                                    onChange={(e) => this.onhandleChangeVariantField(e, index)} type='text' className='add_product_input' />
+
+                                </div>
+                              </div>
+                              <button style={{ backgroundColor: '#FF5243', marginBottom: '25px' }} onClick={() => this.onVariantSubmit(index)} className='product_publish_btn mt-4'>Save Variant</button>
+                            </div>
+                          </div>
+                        }
+                        {/* variant end */}
+                        {/*     margin-left: 20px;
+    background: #9b9b9b; */}
                       </div>
                       <div className='attribute_create_button'>
-                        <button onClick={() => this.onSkuSubmit(false, index)} className='product_publish_btn'>Save New</button>
-                        <button onClick={() => this.onEditAttribute(index)} className='product_publish_btn'>Submit Edit</button>
+                        <button onClick={() => this.onAttributeSubmit(index)} className='product_publish_btn'>Save New</button>
+                        <button style={{ marginLeft: '20px', backgroundColor: '#9b9b9b' }} onClick={() => this.onEditAttribute(index)} className='product_publish_btn'>Submit Edit</button>
                       </div>
                     </div>
                   )) :
@@ -1276,7 +1594,7 @@ class AddProductScreen extends React.Component {
                         <div className='attribute_dropdown_icon_container'>
                           {/* <KeyboardArrowDown></KeyboardArrowDown>
                           <KeyboardArrowUp></KeyboardArrowUp> */}
-                          <span onClick={() => this.deleteAttribute(0, 0)} className='attribute_dropdown_delete'>Delete</span>
+                          <span onClick={() => this.deleteAttribute(0, this.state.dependentField[0]._id)} className='attribute_dropdown_delete'>Delete</span>
                         </div>
                       </div>
                       <div className='create_attribute_container'>
@@ -1389,7 +1707,7 @@ class AddProductScreen extends React.Component {
                           <div className='add_product_title'>
                             {this.state.dependentField[0].mappingType === "image+text" && <React.Fragment>
                               <label className="main_title">Upload  Image:</label>
-                              <input type="file" name="photoUrl" onChange={this.uploadImage} className='form-control_upload'
+                              <input type="file" name="photoUrl" onChange={(e) => this.uploadAttributeImage(e, 0)} className='form-control_upload'
                                 placeholder='Upload Image'
                               />
                               <span className="form-text text-danger">{errors.photoUrl}</span>
@@ -1397,11 +1715,100 @@ class AddProductScreen extends React.Component {
                               <span className="form-text text-muted">File Resolution (292px X 69px)</span>
                             </React.Fragment>}
                           </div>
+
                         </div>
+                        {/* variant */}
+                        {this.state.dependentField[0].subField === 'Yes' &&
+                          <div style={{ padding: '0' }} className='add_variant_container'>
+                            <label className='main_title'>Add Variants</label>
+
+                            <div style={{ marginTop: '35px' }} className='create_attribute_row'>
+                              <div className='add_product_value'>
+
+                                <label className='main_title'>Variant Type</label>
+                                <select
+                                  name='type'
+                                  onChange={(e) => this.onhandleChangeField(e)}
+                                  value={this.state.type}
+                                  className='form-control_select'
+                                  placeholder=''
+                                >
+                                  <option value=''>Select type</option>
+                                  <option value='dropdown'>Dropdown</option>
+                                  <option value='color'>Color Code</option>
+                                </select>
+                              </div>
+                              <div className='add_product_value'>
+                                <label className='main_title'>Label</label>
+                                <input
+                                  type='text'
+                                  name='label'
+                                  onChange={(e) => this.onhandleChangeField(e)}
+                                  value={this.state.label}
+                                  className='add_product_input'
+                                  placeholder=''
+                                />
+                              </div>
+                            </div>
+                            <button style={{ margin: '17px 0 10px 0' }} onClick={() => this.resetAllAttribute()} className='select_add_btn'>Add New</button>
+
+                            <div style={{ backgroundColor: '#fff' }} className='attribute_dropdown_container'>
+                              <div className='attribute_dropdown_wrapper'>
+
+                                <div className='attirbute_dropdown_content'>
+                                  Added Variants SKU:
+                                </div>
+                                <div div className='attribute_dropdown_icon_container'>
+                                  {/* <KeyboardArrowDown></KeyboardArrowDown>
+                                   <KeyboardArrowUp></KeyboardArrowUp> */}
+                                </div>
+                              </div>
+                              <div className='create_attribute_row'>
+                                <div className='add_product_value'>
+                                  <label className='main_title'>Label</label>
+                                  <input required name='label' onChange={(e) =>
+                                    this.onhandleChangeVariantField(e, 0, 0)
+                                  }
+                                    // value={this.state.variantDependentField[index].label}  
+
+                                    type='text'
+                                    className='add_product_input' />
+                                </div>
+                                <div className='add_product_value'>
+                                  <label className='main_title'>Price</label>
+                                  <input name='additionalPrice'
+                                    onChange={(e) =>
+                                      this.onhandleChangeVariantField(e, 0)
+                                    }
+                                    // value={this.state.variantDependentField[index].additionalPrice} 
+
+                                    type='text' className='add_product_input' />
+                                </div>
+
+
+                              </div>
+                              <div className='create_attribute_row'>
+
+                                <div className='add_product_value'>
+                                  <label className='main_title'>Value</label>
+                                  <input required name='value' onChange={(e) =>
+                                    this.onhandleChangeSubField(e, 0, 0)
+                                  }
+                                    // value={this.state.variantDependentField[index].value}                                                            name='value'        
+                                    onChange={(e) => this.onhandleChangeVariantField(e, 0)} type='text' className='add_product_input' />
+
+                                </div>
+                              </div>
+                              <button style={{ backgroundColor: '#FF5243', marginBottom: '25px' }} onClick={() => this.onVariantSubmit(0)} className='product_publish_btn mt-4'>Save Variant</button>
+                            </div>
+                          </div>
+                        }
+                        {/* variant end */}
                       </div>
                       <div className='attribute_create_button'>
-                        <button onClick={() => this.onSkuSubmit(false, 0)} className='product_publish_btn'>Save New</button>
-                        <button onClick={() => this.onEditAttribute(0)} className='product_publish_btn'>Submit Edit</button>
+                        <button onClick={() => this.onAttributeSubmit(0)} className='product_publish_btn'>Save New</button>
+                        {/* <button onClick={() => this.onSkuSubmit(false, 0)} className='product_publish_btn'>Save New</button> */}
+                        <button style={{ marginLeft: '20px', backgroundColor: '#9b9b9b' }} onClick={() => this.onEditAttribute(0)} className='product_publish_btn'>Submit Edit</button>
                       </div>
                     </div>
                   }
@@ -1410,7 +1817,7 @@ class AddProductScreen extends React.Component {
                 </div>
                 {/* Attribute Container End */}
                 {/* <EditAttributeMapping /> */}
-                {this.props.attributemapping.addattributemapping && this.state.dependentField.map((res, index) => (
+                {/* {this.props.attributemapping.addattributemapping && this.state.dependentField.map((res, index) => (
                   <div className='add_variant_container'>
                     <label className='main_title'>Add Variants</label>
 
@@ -1450,7 +1857,7 @@ class AddProductScreen extends React.Component {
 
 
                   </div>
-                ))}
+                ))} */}
 
               </div>
               <div className='add_product_secondary_col'>
