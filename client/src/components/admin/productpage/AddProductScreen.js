@@ -21,12 +21,13 @@ import { connect } from "react-redux";
 import Footer from "../../layouts/Footer";
 import { addProduct, createDraftProduct } from "../../../actions/productAction";
 import { listParentAttributeCategory } from '../../../actions/parentattributecategoryAction';
+import { listAttributeMapping, deleteAttributeMapping } from '../../../actions/attributemappingAction'
 import { listAttributeCategory } from '../../../actions/attributecategoryAction';
-import { addAttributeMapping, editAttributeMapping } from '../../../actions/attributemappingAction';
+import { addAttributeMapping, addAttributeMappingDraft, editAttributeMapping } from '../../../actions/attributemappingAction';
 import { listCategory } from "../../../actions/categoryAction";
 import { listSubCategoryOne } from "../../../actions/subCategoryAction";
 import { listSubCategoryChildOne } from "../../../actions/subCategoryChildAction";
-import {listProductOne} from '../../../actions/productAction';
+import { listProductOne } from '../../../actions/productAction';
 import ListAttributeMapping from "./ListAttributeMapping";
 import EditAttributeMapping from "./EditAttributeMapping";
 import { editProduct } from "../../../actions/productAction";
@@ -38,7 +39,6 @@ import { editProduct } from "../../../actions/productAction";
 //   KeyboardArrowDown,
 //   KeyboardArrowUp
 // } from "@material-ui/icons";
-import { listAttributeMapping } from "../../../actions/attributemappingAction";
 
 
 const Toast = swal.mixin({
@@ -86,9 +86,8 @@ class AddProductScreen extends React.Component {
       tempVarLen: [{ num: '' }],
       demoValue: [{ num: '' }],
       quickship: 'Yes',
-      dependentField: [{ parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '' }],
+      dependentField: [{ type: '', label: '', parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '' }],
       parentAttributeCategoryID: '',
-
       productID: "",
       mappingName: '',
       mappingLabel: '',
@@ -100,13 +99,27 @@ class AddProductScreen extends React.Component {
       subField: "No",
       parsed: "",
       nextScreen: false,
+      // value: '',
+      label: '',
+      type: '',
+      imageURL: [],
+      listVariants: [{
+        type: '', label: '', list: [{
+          additionalPrice: "0",
+          label: "",
+          sku: "",
+          value: ""
+        }]
+      }],
       variantDependentField: [
         {
 
-          label: "", value: "", additionalPrice: "0", type: '', sku: ''
+          label: "", value: "", additionalPrice: "0", sku: ''
         },
       ],
       finalVariant: [],
+      attributeList: [],
+      variantList: [],
 
     };
 
@@ -124,45 +137,125 @@ class AddProductScreen extends React.Component {
     this.props.listCategory();
     this.props.listParentAttributeCategory();
     this.props.listAttributeCategory();
-    this.setState({productID: this.props.match.params.id})
+    this.setState({ productID: this.props.match.params.id })
+    this.props.listAttributeMapping({ productID: this.props.match.params.id });
+    this.setState({ sku: JSON.parse(localStorage.getItem('sku')) })
 
-var editResult={}
-    if(!localStorage.editproduct){
-        // this.props.history.push('/admin/listproduct')
 
-    }else{
-        editResult=JSON.parse(localStorage.getItem('editproduct'))
+
+    //  setTimeout(() => {
+
+    //    this.setState({dependentField:this.props.attributemapping.listattributemapping})
+    //  },1000)
+    var editResult = {}
+    if (!localStorage.editproduct) {
+      // this.props.history.push('/admin/listproduct')
+
+    } else {
+      editResult = JSON.parse(localStorage.getItem('editproduct'))
     }
     this.setState({
-        _id:editResult._id,
-        name:editResult.name,
-        productValue:editResult.value,
-        description:editResult.description,
-        price:editResult.price,
-        discountPrice:editResult.discountPrice,
-        stockCount:editResult.stockCount,
-        photoUrl1:editResult.photoUrl1,
-        photoUrl2:editResult.photoUrl2,
-        documents:editResult.documents ? JSON.parse(editResult.documents):[{url:'',uploadstatus:'',fileName:''}],
-        maintenanceText:editResult.maintenanceText,
-        maintenanceBtnText:editResult.maintenanceBtnText,
-        maintenanceFileUrl:editResult.maintenanceFileUrl,
-        acousticsText:editResult.acousticsText,
-        categoryID:editResult.categoryID,
-        subcategoryID:editResult.subcategoryID,
-        subcategoryChildID:editResult.subcategoryChildID,
-        isEnabled:editResult.isEnabled,
-        quickship:editResult.quickship,
-        keyword:editResult.keyword,
-    },()=>{
-        
-        this.props.listSubCategoryOne({categoryID:this.state.categoryID});
-        this.props.listSubCategoryChildOne({subcategoryID:this.state.subcategoryID});
+      _id: editResult._id,
+      name: editResult.name,
+      productValue: editResult.value,
+      description: editResult.description,
+      price: editResult.price,
+      discountPrice: editResult.discountPrice,
+      stockCount: editResult.stockCount,
+      photoUrl1: editResult.photoUrl1,
+      photoUrl2: editResult.photoUrl2,
+      documents: editResult.documents ? JSON.parse(editResult.documents) : [{ url: '', uploadstatus: '', fileName: '' }],
+      maintenanceText: editResult.maintenanceText,
+      maintenanceBtnText: editResult.maintenanceBtnText,
+      maintenanceFileUrl: editResult.maintenanceFileUrl,
+      acousticsText: editResult.acousticsText,
+      categoryID: editResult.categoryID,
+      subcategoryID: editResult.subcategoryID,
+      subcategoryChildID: editResult.subcategoryChildID,
+      isEnabled: editResult.isEnabled,
+      quickship: editResult.quickship,
+      keyword: editResult.keyword,
+      subField: editResult.subField,
+    }, () => {
+
+      this.props.listSubCategoryOne({ categoryID: this.state.categoryID });
+      this.props.listSubCategoryChildOne({ subcategoryID: this.state.subcategoryID });
     })
 
 
   }
 
+  componentDidUpdate(nextProps) {
+
+
+    if (nextProps.attributemapping.deleteattributemapping !== this.props.attributemapping.deleteattributemapping) {
+      Toast.fire({
+        type: 'success',
+        title: ' Attribute Deleted Successfully',
+      }).then(getResult => {
+        console.log(getResult)
+        this.props.listAttributeMapping({ productID: this.props.match.params.id });
+        this.setState({ dependentField: this.props.attributemapping.listattributemapping })
+        console.log(this.state.dependentField, 'fahim arif')
+        this.setState(prevState => ({ variantDependentField: [...prevState.variantDependentField, this.state.variantDependentField] }))
+      })
+
+    }
+
+    if (nextProps.attributemapping.listattributemapping !== this.props.attributemapping.listattributemapping) {
+      console.log(this.props.attributemapping.listattributemapping, 'fahim arif2')
+      console.log(this.props.attributemapping.listattributemapping)
+      if (this.props.attributemapping.listattributemapping[0]) {
+
+        // edit here 2 line
+        // this.setState({variantDependentField:JSON.parse([...this.props.attributemapping.listattributemapping[0].dependentField])})
+
+        let varF = []
+        let varFinal = []
+        // if (this.props.attributemapping.listattributemapping > 1) {
+        console.log(this.state.dependentField)
+        console.log('hello')
+        for (let i = 0; i < this.props.attributemapping.listattributemapping.length; i++) {
+          varF = (JSON.parse(this.props.attributemapping.listattributemapping[i].dependentField));
+          varF = [...varF]
+          varFinal.push(...varF)
+        }
+        // }
+        this.setState({ listVariants: varFinal })
+        console.log(varFinal)
+        this.setState({ dependentField: this.props.attributemapping.listattributemapping })
+
+        for (let i = 0; i < this.props.attributemapping.listattributemapping.length - 1; i++) {
+          this.setState(prevState => ({ variantDependentField: [...prevState.variantDependentField, ...this.state.variantDependentField] }))
+
+        }
+        // this.setState({variantDependefinalVariantntField: this.props.attributemapping.listattributemapping})
+      }
+      // this.props.listAttributeMapping({ productID: this.props.match.params.id });
+    }
+
+    if (nextProps.attributemapping.addattributemapping !== this.props.attributemapping.addattributemapping) {
+      console.log(this.state.dependentField, 'fahim arif')
+      this.setState({ dependentField: this.props.attributemapping.listattributemapping })
+      this.props.listAttributeMapping({ productID: this.props.match.params.id });
+      console.log('added')
+      console.log(this.props.attributemapping.addattributemapping)
+      //  console.log(nextProps.attributemapping.listattributemapping)
+      // this.setState({ dependentField: this.props.attributemapping.listattributemapping })
+      this.setState({ dependentField: this.props.attributemapping.listattributemapping })
+      // this.setState(prevState => ({ variantDependentField: [...prevState.variantDependentField, ...this.state.variantDependentField] }))
+      // this.setState(prevState => ({variantDependentField: [...prevState.variantDependentField, this.state.variantDependentField]}))
+      // this.setState({variantDependentField: this.props.attributemapping.listattributemapping})
+    }
+
+    if (nextProps.errors !== this.props.errors) {
+      Toast.fire({
+        type: 'error',
+        title: 'Check all the fields',
+      })
+      this.setState({ errors: nextProps.errors });
+    }
+  }
 
   addDocument() {
     const documents = this.state.documents.concat([
@@ -175,6 +268,28 @@ var editResult={}
     this.setState({
       documents: this.state.documents.filter((s, sidx) => idx !== sidx),
     });
+  }
+
+
+  // upload attribute images
+
+  uploadAttributeImage(e, index) {
+    var self = this;
+    const data = new FormData();
+    data.append("file", e.target.files[0]);
+    data.append("filename", e.target.files[0].name);
+    axios
+      .post("/upload", data)
+      .then(function (response) {
+        self.setState(prevState => ({
+          imageURL: [...prevState.imageURL, response.data.file],
+        }));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+
   }
 
 
@@ -225,17 +340,205 @@ var editResult={}
             title: "File Uploaded SuccessFully",
           });
         });
-
-        // self.setState({
-        //     url:response.data,
-        //     uploadStatus:'Uploaded SuccessFully'
-        // })
       })
       .catch((err) => {
         console.log(err);
       });
   }
 
+
+
+  // Multiple attribute submit
+
+  onAttributeSubmit(index, edit = false) {
+        if (!this.state.sku) {
+        Toast.fire({
+          type: 'error',
+          title: 'Please add sku value first',
+        })
+        // setTimeout(() => {
+        //   window.location.reload()
+        // },500)
+        return;
+      }
+
+      // if (this.state.dependentField[index].m)
+    console.log(index)
+    let tempLabel = this.state.dependentField[index].mappingLabel.split(',');
+    let tempPrice = this.state.dependentField[index].additionalPrice.split(',');
+
+    let demoVariant = [
+      {
+        type: '',
+        label: "",
+        list: [
+          {
+
+            label: "", value: "", additionalPrice: "0", type: '', sku: this.state.sku[index]
+          },
+        ],
+      }
+    ]
+
+    // edited
+    let finalVariation = [
+      {
+        type: this.state.type,
+        label: this.state.label,
+        list: this.state.variantDependentField[index]
+      }
+    ]
+    console.log(finalVariation, 'before')
+
+    // edit
+    if (this.state.dependentField[index].subField === 'No') {
+      finalVariation = [
+        {
+          type: '',
+          label: "",
+          list: [
+            {
+
+              label: "", value: "", additionalPrice: "0", sku: ''
+            },
+          ],
+        }
+      ]
+      console.log('error')
+    }
+
+    console.log(finalVariation, 'important')
+
+    let attributeValues = this.state.dependentField[index].mappingValue.split(',')
+    let attributeLength = attributeValues.length;
+    // let label = this.state.label.split(',');
+    console.log(attributeLength)
+    // console.log(this.state.dependentField[0])
+    let attributes = {
+      ...this.state.dependentField[index],
+      photoUrl: '',
+      dependentField: JSON.stringify(finalVariation),
+      productID: this.state.productID,
+    }
+    console.log(attributes)
+
+    for (let i = 0; i < attributeLength; i++) {
+      attributes = {
+        ...attributes,
+        mappingValue: attributeValues[i],
+        mappingLabel: tempLabel[i],
+        photoUrl: this.state.imageURL[i],
+        additionalPrice: tempPrice[i]
+      }
+
+
+
+      if (edit) {
+        this.props.editAttributeMapping(attributes)
+        return;
+      }
+      this.props.addAttributeMapping(attributes)
+      console.log(attributes);
+      // console.log(attributeValues[i])
+    }
+    // this.setState(prevState => ({ variantDependentField: [...prevState.variantDependentField, this.state.finalVariant] }))
+    // window.location.reload();
+    setTimeout(() => {
+      window.location.reload()
+    }, 500)
+  }
+
+
+  // handle variant **
+  onVariantSubmit(index, edit = false) {
+    // console.log(edit)
+    // if (edit) {
+    //   let temp = this.state.listVariants[index]
+    //   console.log(temp)
+
+
+    //   // if (temp.value.search(',')) {
+    //   //   console.log('listing')
+    //   // }
+    //   let varValue = this.state.listVariants.list[index].value.split(',');
+    //   let varPrice = this.state.listVariants[index].additionalPrice.split(',')
+    //   let varLabel = this.state.listVariants[index].label.split(',')
+    //   let totalVariations = this.state.variantDependentField[index];
+
+    //   let varLoop = [];
+    //   for (let i = 0; i < varValue.length; i++) {
+    //     totalVariations = {
+    //       ...totalVariations,
+    //       label: varLabel[i],
+    //       additionalPrice: varPrice[i],
+    //       value: varValue[i],
+    //       // label: varValue[i],
+    //     }
+    //     varLoop.push(totalVariations)
+    //     this.setState(prevState => ({ finalVariant: [...prevState.finalVariant, totalVariations] }));
+    //     // this.setState(prevState => ({ variantDependentField: [...prevState.variantDependentField, totalVariations] }));
+    //     console.log(varLoop)
+    //   }
+    //   let tempo = this.state.variantDependentField;
+    //   console.log(temp[index]);
+    //   temp[index] = [...varLoop];
+    //   console.log([temp[index]])
+    //   temp[index] = [...temp[index]]
+    //   this.setState({ variantDependentField: tempo });
+    //   // console.log(this.state.variantDependentField)
+    //   return;
+
+    // }
+
+
+    // editing here
+
+    // let temp = this.state.variantDependentField;
+    // let varValue = this.state.variantDependentField[index].value.split(',');
+    // let varPrice = this.state.variantDependentField[index].additionalPrice.split(',')
+    // let varLabel = this.state.variantDependentField[index].label.split(',')
+    // let totalVariations = this.state.variantDependentField[index];
+
+
+    let temp = this.state.variantDependentField;
+    let varValue = this.state.listVariants[index].list[0].value.split(',');
+    let varPrice = this.state.listVariants[index].list[0].additionalPrice.split(',')
+    let varLabel = this.state.listVariants[index].list[0].label.split(',')
+    let totalVariations = this.state.listVariants[index].list[0];
+
+    console.log(this.state.listVariants[index].list[0].value)
+    console.log(varValue)
+    console.log(varPrice)
+    console.log(varLabel)
+    console.log(totalVariations)
+
+
+    let varLoop = [];
+    for (let i = 0; i < varValue.length; i++) {
+      totalVariations = {
+        ...totalVariations,
+        label: varLabel[i],
+        additionalPrice: varPrice[i],
+        value: varValue[i],
+        sku: this.state.sku[i]
+        // label: varValue[i],
+      }
+      varLoop.push(totalVariations)
+      this.setState(prevState => ({ finalVariant: [...prevState.finalVariant, totalVariations] }));
+      // this.setState(prevState => ({ variantDependentField: [...prevState.variantDependentField, totalVariations] }));
+      console.log(totalVariations)
+    }
+    let tempo = this.state.variantDependentField;
+    console.log(temp[index]);
+    temp[index] = [...varLoop];
+    console.log([temp[index]])
+    temp[index] = [...temp[index]]
+    this.setState({ variantDependentField: tempo });
+    console.log(this.state.variantDependentField)
+  }
+
+
+  // handle sku
   onSkuSubmit(submit = false, index = null) {
     let atbName = this.state.dependentField.map((res) => res.mappingValue)
     this.setState({ tempAtbName: [...this.state.tempAtbName, atbName] })
@@ -243,44 +546,98 @@ var editResult={}
 
     if (!firstPortion) {
       if (!(atbValue && thirdArg)) {
-          Toast.fire({
-        type: 'danger',
-        title: 'Please Enter the product value',
-      })
-      return;
+        Toast.fire({
+          type: 'error',
+          title: 'Please Enter the product value',
+        })
+        return;
       }
     }
     // second portion
     let atbValue = this.state.dependentField.map((res) => res.mappingValue).toString();
-    
+
+    console.log(this.state.dependentField, 'depend')
+    console.log(atbValue, 'here is')
+
     let variantLen = atbValue.toString().split(',').length;
     this.setState({ tempVarLen: [...this.state.tempVarLen, variantLen] });
     let thirdArg = ''
     let forthArg = ''
+    let fifthArg = ''
+    let sixthArg = ''
+    let seventhArg = ''
 
-    if (this.state.dependentField.length == 2) {
+    if (this.state.dependentField[0] && this.state.dependentField[0].subField === 'Yes') {
+      thirdArg = this.state.listVariants[0].list[0].value;
+      atbValue = this.state.dependentField[0].mappingValue;
+      forthArg = null;
+      fifthArg = null;
+      sixthArg = null;
+      seventhArg = null;
+      console.log(this.state.listVariants[0].list[0].value)
+    } else if (this.state.dependentField[0] && this.state.dependentField[0].subField === 'No') {
+      thirdArg = null;
+      atbValue = this.state.dependentField[0].mappingValue;
+      forthArg = null;
+      fifthArg = null;
+      sixthArg = null;
+      seventhArg = null;
+    }
 
-      thirdArg = this.state.dependentField[1].mappingValue;
-      atbValue = this.state.dependentField[0].mappingValue;
-      if (!(atbValue && thirdArg)) {
-          Toast.fire({
-        type: 'danger',
-        title: 'Please Enter value field',
-      })
-      return;
-      }
-    } else if (this.state.dependentField.length == 3) {
-      thirdArg = this.state.dependentField[1].mappingValue;
-      atbValue = this.state.dependentField[0].mappingValue;
-      forthArg = this.state.dependentField[2].mappingValue;
-      if (!(atbValue && thirdArg && forthArg)) {
-          Toast.fire({
-        type: 'danger',
-        title: 'Please Enter value field',
-      })
-      return;
+    if (this.state.dependentField[1] && this.state.dependentField[1].subField === 'Yes') {
+      console.log('dep1')
+      forthArg = this.state.dependentField[1].mappingValue;
+      fifthArg = this.state.listVariants[1].list[0].value;
+    } else if (this.state.dependentField[1] && this.state.dependentField[1].subField === 'No') {
+      console.log('dep2')
+      forthArg = null;
+
+      if (thirdArg) {
+        forthArg = this.state.dependentField[1].mappingValue;
+      } else {
+
+        thirdArg = this.state.dependentField[1].mappingValue;
       }
     }
+
+    if (this.state.dependentField[2] && this.state.dependentField[2].subField === 'Yes') {
+      // sixthArg = null;
+      fifthArg = this.state.dependentField[2].mappingValue;
+      // if (fifthArg) {
+      sixthArg = this.state.listVariants[2].list[0].value;
+      // } 
+      // else {
+
+      //   fifthArg = this.state.listVariants[2].list[0].value;
+      // }
+    } else if (this.state.dependentField[2] && this.state.dependentField[2].subField === 'No') {
+      if (fifthArg) {
+        console.log('hi there')
+        sixthArg = this.state.dependentField[2].mappingValue;
+      } else if (forthArg) {
+        fifthArg = this.state.dependentField[2].mappingValue;
+      } else {
+
+        forthArg = this.state.dependentField[2].mappingValue;
+      }
+    }
+
+    if (this.state.dependentField[3] && this.state.dependentField[3].subField === 'Yes') {
+      fifthArg = this.state.listVariants[3].list[0].value;
+
+
+    } else if (this.state.dependentField[3] && this.state.dependentField[3].subField === 'No') {
+
+      if (sixthArg) {
+        seventhArg = this.state.dependentField[3].mappingValue;
+      } else {
+
+        forthArg = this.state.dependentField[3].mappingValue;
+      }
+    }
+
+
+
 
     if (!submit) {
       Toast.fire({
@@ -291,9 +648,14 @@ var editResult={}
 
     if (submit) {
 
-      console.log(forthArg);
-      const result = skuGen(firstPortion, atbValue, thirdArg, forthArg)
+      console.log(atbValue);
+      console.log(thirdArg)
+      console.log(forthArg)
+      console.log(fifthArg)
+      console.log(sixthArg)
+      const result = skuGen(firstPortion, atbValue, thirdArg, forthArg, fifthArg, sixthArg, seventhArg)
       console.log(result);
+      localStorage.setItem('sku', JSON.stringify(result))
       this.setState({ sku: result });
 
       // const tempVarLen = {...result}
@@ -342,7 +704,17 @@ var editResult={}
       console.log(saveAttribute)
     }
 
+
+    if (this.state.dependentField.length > 0) {
+
+      for (let i = 0; i < this.state.dependentField.length; i++) {
+        console.log(i,'index')
+        this.props.editAttributeMapping(this.state.dependentField[i])
+      }
+    }
+    // window.location.reload()
   }
+
 
 
   onChange(e) {
@@ -418,49 +790,45 @@ var editResult={}
       })
     } else {
       Toast.fire({
-        type: 'danger',
+        type: 'error',
         title: 'Please select a categroy group and sub group',
       })
     }
 
-    localStorage.setItem('editproduct',JSON.stringify(Data))
-  }
+    localStorage.setItem('editproduct', JSON.stringify(Data))
 
-  onSubmitVariant(index) {
-    let temp = this.state.variantDependentField;
+    console.log(this.state.dependentField[0].mappingName)
+if (this.state.dependentField[0].mappingName) {
 
-    let finalVariation = [
-      {
-        type: "",
-        label: "",
-        list: temp
+  for (let i = 0; i < this.state.dependentField.length; i++) {
+    let id = this.state.dependentField[i]._id;
+      const deleteData = {
+        id: id
       }
-    ]
+      if(this.state.dependentField[i].mappingName) {
 
-    let tempAttribute = this.state.dependentField[0];
-    let saveAttribute = {
-      ...tempAttribute,
-      photoUrl: '',
-      dependentField: JSON.stringify(finalVariation),
-      productID: this.state.productID,
-      _id: this.props.attributemapping.addattributemapping._id,
+       
+        console.log('chekc', check)
+
+        let check =  this.state.dependentField[i].mappingValue && this.state.dependentField[i].mappingValue.split(',')
+        console.log(this.state.dependentField[i].mappingValue.split(','))
+
+        if (check && check.length > 1) {
+          this.props.deleteAttributeMapping(deleteData)
+
+        }
+
+
+        
+      }
+       if (!(this.state.dependentField[i].mappingName)) {
+          this.props.deleteAttributeMapping(deleteData)
+          return;
+        }
+      }
     }
-    this.props.editAttributeMapping(saveAttribute);
-
-
-    temp = temp.concat([{
-
-      label: "", value: "", additionalPrice: "0", type: '', sku: ''
-    }])
-    // let varType = this.state.variantDependentField[index].type;
-
-    this.setState({ variantDependentField: temp });
-
-
-
-    this.setState({ finalVariant: finalVariation })
-    console.log(finalVariation)
   }
+
 
   //Reset all statevalues
   onReset() {
@@ -506,18 +874,87 @@ var editResult={}
       this.setState({ click: false })
     }
   }
-  onAttributeAdd() {
-    this.setState({ attributeCount: this.state.attributeCount + 1 });
-    const dependentField = this.state.dependentField.concat([{ type: "", label: "", value: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '' }]);
+
+  onAttributeAdd(index, edit = false) {
+    console.log(this.state.dependentField)
+    // this.setState({ attributeCount: this.state.attributeCount + 1 });
+    let dependentField = this.state.dependentField.concat([{ type: '', label: '', parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '', photoUrl: '', list: [{ label: "", value: "", additionalPrice: "0" }] }]);
+    console.log(dependentField)
     this.setState({ dependentField });
+
+
+    // edit here happended
+    let listVariants = [{
+      type: '', label: '', list: [{
+        additionalPrice: "0",
+        label: "",
+        sku: "",
+        value: ""
+      }]
+    }];
+    this.setState({ listVariants })
+
+
+
+
+
+    //  this.props.addAttributeMapping(dependentField)
+
+    let extraVariant = [
+      {
+        type: "",
+        label: "",
+        list: [{ label: "", value: "", additionalPrice: "0", type: '', sku: '' }]
+      }
+    ]
+    // let tempAttribute = this.state.dependentField[index];
+    let saveAttribute = {
+
+      parentAttributeCategoryID: '', attributeCategoryID: '', mappingType: "", mappingLabel: "", mappingValue: "", additionalPrice: "0", mappingName: '', isEnabled: '', subField: '',
+      photoUrl: '',
+      // deoe: extraVariant,
+      dependentField: JSON.stringify(extraVariant),
+      productID: this.state.productID
+    }
+    // this.props.addAttributeMapping(saveAttribute)
+    this.props.addAttributeMappingDraft(saveAttribute);
+
+    setTimeout(() => {
+
+      window.location.reload()
+    }, 1000)
+
+
   }
 
+
+  onhandleChangeField(e, index) {
+    const name = e.target.name;
+    const value = e.target.value;
+    if (name === "type") {
+      this.setState({ type: value });
+    } else if (name === "label") {
+      this.setState({ label: value });
+    }
+
+  }
+
+
   // need to uncomment 437 for productId
-  onhandleChangeSubField(e, index, indexSub) {
+  onhandleChangeSubField(e, index) {
     const name = e.target.name;
     const value = e.target.value;
     console.log(value)
+    console.log(index)
+    // editing here
     const temp = this.state.dependentField;
+    console.log(temp)
+
+
+    // if (name === "label") {
+    //   temp[index].mappingLabel = value;
+    // }
+
     if (name === "label") {
       temp[index].mappingLabel = value;
     } else if (name === "value") {
@@ -542,32 +979,48 @@ var editResult={}
     })
   }
 
-  onhandleChangeVariantField(e, index, sku) {
+  onhandleChangeVariantField(e, index, subIndex, edit = false, sku) {
     const name = e.target.name;
     const value = e.target.value;
-    const temp = this.state.variantDependentField;
-    if (name === "label") {
-      temp[index].label = value;
-    } else if (name === "value") {
-      temp[index].value = value;
-    } else if (name === "additionalPrice") {
-      temp[index].additionalPrice = value;
-    } else if (name === 'type') {
-      temp[index].type = value;
-    }
-    console.log('hello')
-    console.log(sku);
 
-    if (sku) {
-      temp[index].sku = sku;
+    const temp = this.state.listVariants;
+    console.log(this.state.listVariants)
+    console.log(index)
+    console.log(subIndex)
+
+    if (name === 'label') {
+      temp[index].list[subIndex].label = value;
+    } else if (name === "value") {
+      temp[index].list[subIndex].value = value;
     }
-    this.setState({
-      variantDependentField: temp,
-    });
+    else if (name === "additionalPrice") {
+      temp[index].list[subIndex].additionalPrice = value;
+    }
+    this.setState({ listVariants: temp })
+
+    // editing here
+    // const temp = this.state.variantDependentField;
+    // if (name === "label") {
+    //   temp[index].label = value;
+    // } else if (name === "value") {
+    //   temp[index].value = value;
+    // } else if (name === "additionalPrice") {
+    //   temp[index].additionalPrice = value;
+    // } else if (name === 'type') {
+    //   temp[index].type = value;
+    // }
+    // console.log('hello')
+    // console.log(value);
+
+    // if (sku) {
+    //   temp[index].sku = sku;
+    // }
+    // this.setState({
+    //   variantDependentField: temp,
+    // });
   }
 
   resetAllAttribute() {
-    window.location.reload();
     this.setState({
       errors: {},
       parentAttributeCategoryID: '',
@@ -587,14 +1040,114 @@ var editResult={}
         },
       ]
     })
+    // window.location.reload();
   }
 
 
+  onEditAttribute(index) {
+
+
+    let finalVariation = [
+      {
+        type: this.state.type,
+        label: this.state.label,
+        list: this.state.variantDependentField[index]
+      }
+    ]
+    console.log(finalVariation, 'before')
+
+    // edit
+    if (this.state.dependentField[index].subField === 'No') {
+      finalVariation = [
+        {
+          type: '',
+          label: "",
+          list: [
+            {
+
+              label: "", value: "", additionalPrice: "0", sku: ''
+            },
+          ],
+        }
+      ]
+      console.log('error')
+    }
+
+
+    let attributes = {
+      ...this.state.dependentField[index],
+      // photoUrl: '',
+      dependentField: JSON.stringify(finalVariation),
+      productID: this.state.productID,
+    }
+
+    console.log(attributes)
+    console.log(this.state.dependentField[index])
+    this.props.editAttributeMapping(attributes)
+
+
+    Toast.fire({
+      type: 'success',
+      title: 'Attribute was edited successfully',
+    })
+
+
+    setTimeout(() => {
+
+      window.location.reload();
+    }, 1000)
+  }
+
+  deleteAttribute(index, id) {
+    // console.log(index)
+    console.log(id)
+    if (this.state.dependentField.length > 1) {
+
+      let temporary = this.state.dependentField;
+      temporary.splice(index, 1)
+      console.log(temporary)
+      this.setState({ dependentField: temporary })
+    }
+
+    const deleteData = {
+      id: id
+    }
+    this.props.deleteAttributeMapping(deleteData)
+    
+    setTimeout(() => {
+
+      window.location.reload();
+    },1000)
+    // console.log(this.state.dependentField[index])
+
+  }
+
 
   render() {
-console.log(this.state.categoryID); 
-    
-    // console.log(this.state.finalVariant)
+
+
+
+    const skus = []
+
+    if (this.state.sku) {
+
+      for (const [index, value] of this.state.sku.entries()) {
+        skus.push(<li>
+
+          {value}
+        </li>
+        )
+      }
+    }
+
+    console.log(this.state.listVariants, 'list variant')
+    // console.log(this.state.variantDependentField)
+    // console.log(this.state.imageURL)
+    // console.log(this.state.photoUrl)
+
+    console.log(this.state.dependentField, 'dependent');
+
+    console.log(this.state.finalVariant)
     // console.log(this.state.variantDependentField)
 
     const { addproduct } = this.props.product;
@@ -611,78 +1164,65 @@ console.log(this.state.categoryID);
 
     const items = []
 
-    for (const [index, value] of this.state.sku.entries()) {
-      items.push(<div style={{ backgroundColor: '#fff' }} key={index} className='attribute_dropdown_container'>
-        <div className='attribute_dropdown_wrapper'>
+    // for (const [index, value] of this.state.sku.entries()) {
+    //   items.push(
 
-          <div className='attirbute_dropdown_content'>
-            Added Variants SKU: {value}
-          </div>
-          <div div className='attribute_dropdown_icon_container'>
-            {/* <KeyboardArrowDown></KeyboardArrowDown>
-            <KeyboardArrowUp></KeyboardArrowUp> */}
-            <span className='attribute_dropdown_delete'>Delete</span>
-          </div>
-        </div>
-        <div className='create_attribute_row'>
-          <div className='add_product_title'>
-            <label className='main_title'>Type</label>
-            <select
-              name='type'
-              onChange={(e) => this.onhandleChangeVariantField(e, index)}
-              // value={this.state.variantDependentField[index].type}
-              className='form-control_select'
-              placeholder=''
-            >
-              <option value=''>Select type</option>
-              <option value='dropdown'>Dropdown</option>
-              <option value='color'>Color Code</option>
-            </select>
-          </div>
-          <div className='add_product_value'>
-            <label className='main_title'>Label</label>
-            <input required name='label' onChange={(e) =>
-              this.onhandleChangeVariantField(e, index, value)
-            }
-              // value={this.state.variantDependentField[index].label}  
+    //     <div style={{ backgroundColor: '#fff' }} key={index} className='attribute_dropdown_container'>
+    //       <div className='attribute_dropdown_wrapper'>
 
-              type='text'
-              className='add_product_input' />
+    //         <div className='attirbute_dropdown_content'>
+    //           Added Variants SKU: {value}
+    //         </div>
+    //         <div div className='attribute_dropdown_icon_container'>
+    //           {/* <KeyboardArrowDown></KeyboardArrowDown>
+    //         <KeyboardArrowUp></KeyboardArrowUp> */}
+    //         </div>
+    //       </div>
+    //       <div className='create_attribute_row'>
+    //         <div className='add_product_value'>
+    //           <label className='main_title'>Label</label>
+    //           <input required name='label' onChange={(e) =>
+    //             this.onhandleChangeVariantField(e, index, value)
+    //           }
+    //             // value={this.state.variantDependentField[index].label}  
+
+    //             type='text'
+    //             className='add_product_input' />
+    //         </div>
+    //         <div className='add_product_value'>
+    //           <label className='main_title'>Price</label>
+    //           <input name='additionalPrice'
+    //             onChange={(e) =>
+    //               this.onhandleChangeVariantField(e, index)
+    //             }
+    //             // value={this.state.variantDependentField[index].additionalPrice} 
+
+    //             type='text' className='add_product_input' />
+    //         </div>
 
 
-          </div>
+    //       </div>
+    //       <div className='create_attribute_row'>
 
-        </div>
-        <div className='create_attribute_row'>
-          <div className='add_product_value'>
-            <label className='main_title'>Additional Cost</label>
-            <input name='additionalPrice'
-              onChange={(e) =>
-                this.onhandleChangeVariantField(e, index)
-              }
-              // value={this.state.variantDependentField[index].additionalPrice} 
+    //         <div className='add_product_value'>
+    //           <label className='main_title'>Value</label>
+    //           <input required name='value' onChange={(e) =>
+    //             this.onhandleChangeSubField(e, index, value)
+    //           }
+    //             // value={this.state.variantDependentField[index].value}                                                            name='value'        
+    //             onChange={(e) => this.onhandleChangeVariantField(e, index)} type='text' className='add_product_input' />
 
-              type='text' className='add_product_input' />
-          </div>
-          <div className='add_product_value'>
-            <label className='main_title'>Value</label>
-            <input  required name='value' onChange={(e) =>
-              this.onhandleChangeSubField(e, index, value)
-            }
-              // value={this.state.variantDependentField[index].value}                                                            name='value'        
-              onChange={(e) => this.onhandleChangeVariantField(e, index)} type='text' className='add_product_input' />
+    //         </div>
+    //       </div>
+    //       <button onClick={() => this.onVariantSubmit(index)} className='product_publish_btn mt-3'>Save</button>
+    //     </div>
 
-          </div>
-        </div>
-        <button onClick={() => this.onSubmitVariant(index)} className='product_publish_btn mt-3'>Save</button>
-      </div>
-
-      )
-    }
+    //   )
+    // }
 
 
     // console.log(this.state.tempVarLen)
-    console.log(this.state.sku)
+    // console.log(this.state.sku)
     // console.log(this.state.tempAtbName)
     // console.log(this.state.dependentField)
     const { listparentattributecategory, parentattributecategoryloading } = this.props.parentattributecategory;
@@ -701,18 +1241,11 @@ console.log(this.state.categoryID);
     }
 
 
-    if (this.state.click) {
-      document.getElementById('parent-attribute-modal').style.display = 'block';
-      // document.getElementById('pagerender').style.background='#000'
-    }
-
-
-    const list = this.state.sku.toString()
+    // const list = this.state.sku.toString()
     // const list = this.state.sku.length >1 && this.state.sku.forEach(function(result, idx) {
     //   console.log('hiii')
     //   return <li>{this.state.sku[idx]}</li>
     // })
-    console.log(list)
     const { listattributemapping, attributemappingloading } = this.props.attributemapping;
 
     if (Object.keys(listAttributeMapping).length > 0) {
@@ -722,7 +1255,7 @@ console.log(this.state.categoryID);
     }
 
 
-    console.log(this.props.attributemapping.listattributemapping)
+    console.log(this.props.attributemapping.listattributemapping, 'props.listattribute')
 
     const { errors, productValue, count } = this.state;
     const { productloading } = this.props.product;
@@ -896,9 +1429,21 @@ console.log(this.state.categoryID);
 
     // Variant list
 
-    // 
 
-
+    // if ( this.props.attributemapping.listattributemapping.map(){
+    // let varF = []
+    // let varFinal = []
+    // if (this.state.dependentField.length > 1) {
+    //   console.log('hello')
+    //   for (let i = 0; i < this.state.dependentField.length; i++) {
+    //       varF = (JSON.parse(this.props.attributemapping.listattributemapping[i].dependentField));
+    //       varF = [...varF]
+    //       varFinal.push(...varF)
+    //   }
+    // }
+    // // this.setState({listVariants:varFinal})
+    // console.log(varFinal)
+    // console.log(this.state.dependentField.length > 1 && [...this.props.attributemapping.listattributemapping[1].dependentField[0]])
     return (
       <React.Fragment>
         <div className={"add_product_screen"}>
@@ -1022,8 +1567,10 @@ console.log(this.state.categoryID);
                   <div className='add_product_title'>
                     <label style={{ width: '100%' }} className='main_title'>Genarated SKU </label>
                     <div className='add_product_input sku_genarated_text'>
-                      {this.state.sku.length > 0 ? <div>
-                        {list}
+                      {localStorage.getItem('sku') ? <div>
+                        {this.state.sku && skus}
+                        {/* {JSON.parse(localStorage.getItem('sku'))} */}
+                        {/* {list} */}
                       </div> :
                         <p>
 
@@ -1037,10 +1584,8 @@ console.log(this.state.categoryID);
                 </div>
 
                 <div className='add_attribute_container'>
-                  {/* {this.state.demo.forEach((res))} */}
                   <label className='main_title'>Add Attribute</label>
                   <div className='select_container'>
-
                     <select
                       name='subcategoryChildID'
                       onChange={(e) => this.onChange(e)}
@@ -1053,18 +1598,17 @@ console.log(this.state.categoryID);
                     <span onClick={() => this.onAttributeAdd()} className='select_add_btn'>Add</span>
                     <span onClick={() => this.onSkuSubmit(true)} className='select_add_btn'>Create SKU</span>
                   </div>
-                  {this.state.dependentField.map((res, index) => (
+                  {/* change here happended */}
+                  {this.state.dependentField && this.state.dependentField.length > 1 ? this.state.dependentField.map((res, index) => (
                     <div className='attribute_dropdown_container'>
                       <div className='attribute_dropdown_wrapper'>
-
                         <div className='attirbute_dropdown_content'>
-
                           New Attribute
                         </div>
                         <div className='attribute_dropdown_icon_container'>
                           {/* <KeyboardArrowDown></KeyboardArrowDown>
                           <KeyboardArrowUp></KeyboardArrowUp> */}
-                          <span className='attribute_dropdown_delete'>Delete</span>
+                          <span onClick={() => this.deleteAttribute(index, res._id)} className='attribute_dropdown_delete'>Delete</span>
                         </div>
                       </div>
                       <div className='create_attribute_container'>
@@ -1074,7 +1618,7 @@ console.log(this.state.categoryID);
                             <select
                               name='parentCategory'
                               onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.parentAttributeCategoryID}
+                              value={this.state.dependentField[index].parentAttributeCategoryID}
                               className='form-control_select'
                               placeholder=''
                             >
@@ -1084,9 +1628,9 @@ console.log(this.state.categoryID);
                             <span className="form-text text-danger">{errors.parentAttributeCategoryID}</span>
                           </div>
                           <div className='add_product_value'>
-                            <label className='main_title'>Mapping Name</label>
+                            <label className='main_title'>Title</label>
                             <input type='text' name='mappingName' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.mappingName}
+                              value={this.state.dependentField[index].mappingName}
                               className='add_product_input' />
                           </div>
                         </div>
@@ -1100,9 +1644,9 @@ console.log(this.state.categoryID);
                             <span className="form-text text-danger">{errors.attributeCategoryID}</span>
                           </div>
                           <div className='add_product_value'>
-                            <label className='main_title'>Additional Cost</label>
+                            <label className='main_title'>Addional Cost</label>
                             <input name='additionalPrice' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.additionalPrice} type='text' className='add_product_input' />
+                              value={this.state.dependentField[index].additionalPrice} type='text' className='add_product_input' />
                           </div>
 
                           {/* */}
@@ -1113,7 +1657,7 @@ console.log(this.state.categoryID);
                             <select
                               name='type'
                               onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.type}
+                              value={this.state.dependentField[index].mappingType}
                               className='form-control_select'
                               placeholder=''
                             >
@@ -1124,9 +1668,9 @@ console.log(this.state.categoryID);
                             </select>
                           </div>
                           <div className='add_product_value'>
-                            <label className='main_title'>Label</label>
+                            <label className='main_title'>Option Name</label>
                             <input type='text' name='label' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.mappingLabel} className='add_product_input' />
+                              value={this.state.dependentField[index].mappingLabel} className='add_product_input' />
                           </div>
 
 
@@ -1150,7 +1694,7 @@ console.log(this.state.categoryID);
                             <div className='add_product_title'>
                               <label className='main_title'>Value</label>
                               <input name='value' onChange={(e) => this.onhandleChangeSubField(e, index)}
-                                value={res.mappingValue} className='add_product_input' type='text'></input>
+                                value={this.state.dependentField[index].mappingValue} className='add_product_input' type='text'></input>
                             </div>
 
                           </div>
@@ -1165,7 +1709,7 @@ console.log(this.state.categoryID);
                             <select
                               name='subField'
                               onChange={(e) => this.onhandleChangeSubField(e, index)}
-                              value={res.subField}
+                              value={this.state.dependentField[index].subField}
                               className='form-control_select'
                               placeholder=''
                             >
@@ -1174,38 +1718,401 @@ console.log(this.state.categoryID);
                               <option value='No'>No</option>
                             </select>
                           </div>
+                          <div className='add_product_title'>
+                            {this.state.dependentField[index].mappingType === "image+text" && <React.Fragment>
+                              <label className="main_title">Upload  Image:</label>
+                              <input type="file" name="photoUrl" onChange={(e) => this.uploadAttributeImage(e, index)} className='form-control_upload'
+                                placeholder='Upload Image'
+                              />
+                              <span className="form-text text-danger">{errors.photoUrl}</span>
+                              <span className="form-text text-success">{this.state.uploadStatus}</span>
+                              <span className="form-text text-muted">File Resolution (292px X 69px)</span>
+                            </React.Fragment>}
+                          </div>
                         </div>
+                        {/* variant */}
+                        {this.state.dependentField[index].subField === 'Yes' &&
+                          <div style={{ padding: '0' }} className='add_variant_container'>
+                            <label className='main_title'>Add Variants</label>
+
+                            <div style={{ marginTop: '35px' }} className='create_attribute_row'>
+                              <div className='add_product_value'>
+
+                                <label className='main_title'>Variant Type</label>
+                                <select
+                                  name='type'
+                                  onChange={(e) => this.onhandleChangeField(e)}
+                                  value={this.state.type}
+                                  className='form-control_select'
+                                  placeholder=''
+                                >
+                                  <option value=''>Select type</option>
+                                  <option value='dropdown'>Dropdown</option>
+                                  <option value='color'>Color Code</option>
+                                </select>
+                              </div>
+                              <div className='add_product_value'>
+                                <label className='main_title'>Variant Name</label>
+                                <input
+                                  type='text'
+                                  name='label'
+                                  onChange={(e) => this.onhandleChangeField(e)}
+                                  value={this.state.label}
+                                  className='add_product_input'
+                                  placeholder=''
+                                />
+                              </div>
+                            </div>
+                            {/* variation editing */}
+                            {/* <button style={{ margin: '17px 0 10px 0' }} onClick={() => this.resetAllAttribute()} className='select_add_btn'>Add New</button> */}
+                            {/* {res.(JSO)} */}
+                            <div style={{ backgroundColor: '#fff' }} className='attribute_dropdown_container'>
+                              {this.state.listVariants[index].list.map((value, idx) => (
+
+                                <div className='attribute_list_container'>
+                                  <div className='attribute_dropdown_wrapper'>
+
+                                    <div className='attirbute_dropdown_content'>
+                                      Added Variants SKU: {this.state.sku && this.state.sku[idx]}
+                                    </div>
+                                    <div div className='attribute_dropdown_icon_container'>
+                                      {/* <KeyboardArrowDown></KeyboardArrowDown>
+                                   <KeyboardArrowUp></KeyboardArrowUp> */}
+                                      {/* <span className='attribute_dropdown_delete'>Delete</span> */}
+                                    </div>
+                                  </div>
+
+                                  <div className='create_attribute_row'>
+                                    <div className='add_product_value'>
+                                      <label className='main_title'>Label</label>
+                                      <input value={value.label} required name='label' onChange={(e) =>
+                                        this.onhandleChangeVariantField(e, index, idx, true)
+                                      }
+                                        // value={this.state.variantDependentField[index].label}  
+
+                                        type='text'
+                                        className='add_product_input' />
+                                    </div>
+                                    <div className='add_product_value'>
+                                      <label className='main_title'>Price</label>
+                                      <input value={value.additionalPrice} name='additionalPrice'
+                                        onChange={(e) =>
+                                          this.onhandleChangeVariantField(e, index, idx, true)
+                                        }
+                                        // value={this.state.variantDependentField[index].additionalPrice} 
+
+                                        type='text' className='add_product_input' />
+                                    </div>
+
+
+                                  </div>
+                                  <div className='create_attribute_row'>
+
+                                    <div className='add_product_value'>
+                                      <label className='main_title'>Value</label>
+                                      <input value={value.value} required name='value'
+                                        // onChange={(e) =>
+                                        //   this.onhandleChangeSubField(e, index)
+                                        // }
+                                        // value={this.state.variantDependentField[index].value}                                                            name='value'        
+                                        onChange={(e) => this.onhandleChangeVariantField(e, index, idx, true)} type='text' className='add_product_input' />
+
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                              <button style={{ backgroundColor: '#FF5243', marginBottom: '25px' }} onClick={() => this.onVariantSubmit(index, false)} className='product_publish_btn mt-4'>Save Variant</button>
+                            </div>
+                          </div>
+                        }
+                        {/* variant end */}
+                        {/*     margin-left: 20px;
+    background: #9b9b9b; */}
                       </div>
                       <div className='attribute_create_button'>
-                        <button onClick={() => this.onSkuSubmit(false, index)} className='product_publish_btn'>Save</button>
+                        <button onClick={() => this.onAttributeSubmit(index)} className='product_publish_btn'>Save New</button>
+                        <button style={{ marginLeft: '20px', backgroundColor: '#9b9b9b' }} onClick={() => this.onAttributeSubmit(index, true)} className='product_publish_btn'>Edit</button>
                       </div>
                     </div>
-                  ))}
+                  )) :
+
+                    <div className='attribute_dropdown_container'>
+                      <div className='attribute_dropdown_wrapper'>
+                        <div className='attirbute_dropdown_content'>
+                          New Attribute
+                        </div>
+                        <div className='attribute_dropdown_icon_container'>
+                          {/* <KeyboardArrowDown></KeyboardArrowDown>
+                          <KeyboardArrowUp></KeyboardArrowUp> */}
+                          <span onClick={() => this.deleteAttribute(0, this.state.dependentField[0]._id)} className='attribute_dropdown_delete'>Delete</span>
+                        </div>
+                      </div>
+                      <div className='create_attribute_container'>
+                        <div className='create_attribute_row'>
+                          <div className='add_product_title'>
+                            <label className='main_title'>Select Parent Category</label>
+                            <select
+                              name='parentCategory'
+                              onChange={(e) => this.onhandleChangeSubField(e, 0)}
+                              value={this.state.dependentField[0].parentAttributeCategoryID}
+                              className='form-control_select'
+                              placeholder=''
+                            >
+                              <option value=''>Select Category</option>
+                              {optionParentCategory}
+                            </select>
+                            <span className="form-text text-danger">{errors.parentAttributeCategoryID}</span>
+                          </div>
+                          <div className='add_product_value'>
+                            <label className='main_title'>Mapping Name</label>
+                            <input type='text' name='mappingName' onChange={(e) => this.onhandleChangeSubField(e, 0)}
+                              value={this.state.dependentField[0].mappingName}
+                              className='add_product_input' />
+                          </div>
+                        </div>
+                        <div className='create_attribute_row'>
+                          <div className='add_product_title'>
+                            <label className='main_title'>Select Category</label>
+                            <select name="category" onChange={(e) => this.onhandleChangeSubField(e, 0)} value={this.state.dependentField[0].attributeCategoryID} className="form-control_select" placeholder="" >
+                              <option value="">Select</option>
+                              {optionCategory}
+                            </select>
+                            <span className="form-text text-danger">{errors.attributeCategoryID}</span>
+                          </div>
+                          <div className='add_product_value'>
+                            <label className='main_title'>Additional Costs</label>
+                            <input name='additionalPrice' onChange={(e) => this.onhandleChangeSubField(e, 0)}
+                              value={this.state.dependentField[0].additionalPrice} type='text' className='add_product_input' />
+                          </div>
+
+                          {/* */}
+                        </div>
+                        <div className='create_attribute_row'>
+                          <div className='add_product_title'>
+                            <label className='main_title'>Type</label>
+                            <select
+                              name='type'
+                              onChange={(e) => this.onhandleChangeSubField(e, 0)}
+                              value={this.state.dependentField[0].mappingType}
+                              className='form-control_select'
+                              placeholder=''
+                            >
+                              <option value=''>Select</option>
+                              <option value="dropdown">Dropdown</option>
+                              <option value="color">Color Code</option>
+                              <option value="image+text">Image+Text</option>
+                            </select>
+                          </div>
+                          <div className='add_product_value'>
+                            <label className='main_title'>Attribute Title</label>
+                            <input type='text' name='label' onChange={(e) => this.onhandleChangeSubField(e, 0)}
+                              value={this.state.dependentField[0].mappingLabel} className='add_product_input' />
+                          </div>
+
+
+                        </div>
+                        <div className='create_attribute_row'>
+                          <div className='add_product_title'>
+                            <label className='main_title'>isEnabled</label>
+                            <select
+                              name='isEnabled'
+                              onChange={(e) => this.onhandleChangeSubField(e, 0)}
+                              value={this.state.dependentField[0].isEnabled}
+                              className='form-control_select'
+                              placeholder=''
+                            >
+                              <option value="">Select isEnabled</option>
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                            </select>
+                          </div>
+                          <div className='add_product_value'>
+                            <div className='add_product_title'>
+                              <label className='main_title'>Value</label>
+                              <input name='value' onChange={(e) => this.onhandleChangeSubField(e, 0)}
+                                value={this.state.dependentField[0].mappingValue} className='add_product_input' type='text'></input>
+                            </div>
+
+                          </div>
+
+
+
+                        </div>
+                        <div className='create_attribute_row'>
+                          <div className='add_product_title'>
+
+                            <label className='main_title'>Sub Field</label>
+                            <select
+                              name='subField'
+                              onChange={(e) => this.onhandleChangeSubField(e, 0)}
+                              value={this.state.dependentField[0].subField}
+                              className='form-control_select'
+                              placeholder=''
+                            >
+                              <option value='select'>Select</option>
+                              <option value='Yes'>Yes</option>
+                              <option value='No'>No</option>
+                            </select>
+                          </div>
+                          <div className='add_product_title'>
+                            {this.state.dependentField[0].mappingType === "image+text" && <React.Fragment>
+                              <label className="main_title">Upload  Image:</label>
+                              <input type="file" name="photoUrl" onChange={(e) => this.uploadAttributeImage(e, 0)} className='form-control_upload'
+                                placeholder='Upload Image'
+                              />
+                              <span className="form-text text-danger">{errors.photoUrl}</span>
+                              <span className="form-text text-success">{this.state.uploadStatus}</span>
+                              <span className="form-text text-muted">File Resolution (292px X 69px)</span>
+                            </React.Fragment>}
+                          </div>
+
+                        </div>
+                        {/* variant  for the first one*/}
+                        {this.state.dependentField[0].subField === 'Yes' &&
+                          <div style={{ padding: '0' }} className='add_variant_container'>
+                            <label className='main_title'>Add Variants</label>
+
+                            <div style={{ marginTop: '35px' }} className='create_attribute_row'>
+                              <div className='add_product_value'>
+
+                                <label className='main_title'>Variant Type</label>
+                                <select
+                                  name='type'
+                                  onChange={(e) => this.onhandleChangeField(e)}
+                                  value={this.state.type}
+                                  className='form-control_select'
+                                  placeholder=''
+                                >
+                                  <option value=''>Select type</option>
+                                  <option value='dropdown'>Dropdown</option>
+                                  <option value='color'>Color Code</option>
+                                </select>
+                              </div>
+                              <div className='add_product_value'>
+                                <label className='main_title'>Variant Name</label>
+                                <input
+                                  type='text'
+                                  name='label'
+                                  onChange={(e) => this.onhandleChangeField(e)}
+                                  value={this.state.label}
+                                  className='add_product_input'
+                                  placeholder=''
+                                />
+                              </div>
+                            </div>
+                            {/* <button style={{ margin: '17px 0 10px 0' }} onClick={() => this.resetAllAttribute()} className='select_add_btn'>Add New</button> */}
+
+                            {this.state.listVariants[0].list.map((value, idx) => (
+
+
+                              <div style={{ backgroundColor: '#fff' }} className='attribute_dropdown_container'>
+                                <div className='attribute_dropdown_wrapper'>
+
+                                  <div className='attirbute_dropdown_content'>
+                                    Added Variants SKU:
+                                  </div>
+                                  <div div className='attribute_dropdown_icon_container'>
+                                    {/* <KeyboardArrowDown></KeyboardArrowDown>
+                                   <KeyboardArrowUp></KeyboardArrowUp>  */}
+                                  </div>
+                                </div>
+                                <div className='create_attribute_row'>
+                                  <div className='add_product_value'>
+                                    <label className='main_title'>Label</label>
+                                    <input
+                                      value={this.state.listVariants[0].list[idx].label}
+                                      required name='label' onChange={(e) =>
+                                        this.onhandleChangeVariantField(e, 0, idx, true)
+                                      }
+                                      // value={this.state.variantDependentField[index].label}  
+
+                                      type='text'
+                                      className='add_product_input' />
+                                  </div>
+                                  <div className='add_product_value'>
+                                    <label className='main_title'>Price</label>
+                                    <input
+                                      value={this.state.listVariants[0].list[idx].additionalPrice}
+                                      name='additionalPrice'
+                                      onChange={(e) =>
+                                        this.onhandleChangeVariantField(e, 0, idx, true)
+                                      }
+                                      // value={this.state.variantDependentField[index].additionalPrice} 
+
+                                      type='text' className='add_product_input' />
+                                  </div>
+
+
+                                </div>
+                                <div className='create_attribute_row'>
+
+                                  <div className='add_product_value'>
+                                    <label className='main_title'>Value</label>
+                                    <input
+                                      value={this.state.listVariants[0].list[idx].value}
+                                      required name='value' onChange={(e) =>
+                                        this.onhandleChangeVariantField(e, 0, idx)
+                                      }
+                                      // value={this.state.variantDependentField[index].value}                                                            name='value'        
+                                      onChange={(e) => this.onhandleChangeVariantField(e, 0, idx)} type='text' className='add_product_input' />
+
+                                  </div>
+                                </div>
+                                <button style={{ backgroundColor: '#FF5243', marginBottom: '25px' }} onClick={() => this.onVariantSubmit(0)} className='product_publish_btn mt-4'>Save Variant</button>
+                              </div>
+                            ))}
+                          </div>
+                        }
+                        {/* variant end */}
+                      </div>
+                      <div className='attribute_create_button'>
+                        <button onClick={() => this.onAttributeSubmit(0)} className='product_publish_btn'>Save New</button>
+                        {/* <button onClick={() => this.onSkuSubmit(false, 0)} className='product_publish_btn'>Save New</button> */}
+                        <button style={{ marginLeft: '20px', backgroundColor: '#9b9b9b' }} onClick={() => this.onEditAttribute(0)} className='product_publish_btn'>Edit</button>
+                      </div>
+                    </div>
+                  }
 
 
                 </div>
                 {/* Attribute Container End */}
                 {/* <EditAttributeMapping /> */}
-                {this.props.attributemapping.addattributemapping  && this.state.dependentField.map((res, index) => (
+                {this.props.attributemapping.addattributemapping && this.state.dependentField.map((res, index) => (
                   <div className='add_variant_container'>
+                    {/* {JSON.parse(res.dependentField.type)} */}
                     <label className='main_title'>Add Variants</label>
 
-                    <div style={{ marginTop: '35px' }} className='select_container'>
-                      <label className='main_title'>Variant Type</label>
-                      <select
-                        name='subcategoryChildID'
-                        onChange={(e) => this.onChange(e)}
-                        value={this.state.subcategoryChildID}
-                        className='form-control_select'
-                        placeholder=''
-                      >
-                        <option value=''>Select</option>
-                        {this.props.attributemapping.listattributemapping && this.props.attributemapping.listattributemapping.map((result) => (<option value={result.mappingName}> {result.mappingName} </option>))}
-                      </select>
-                      <span onClick={() => this.resetAllAttribute()} className='select_add_btn'>Add New</span>
-                    </div>
+                    <div style={{ marginTop: '35px' }} className='create_attribute_row'>
+                      <div className='add_product_value'>
 
-                    {items}
+                        <label className='main_title'>Variant Type</label>
+                        <select
+                          name='type'
+                          onChange={(e) => this.onhandleChangeField(e)}
+                          value={this.state.type}
+                          className='form-control_select'
+                          placeholder=''
+                        >
+                          <option value=''>Select type</option>
+                          <option value='dropdown'>Dropdown</option>
+                          <option value='color'>Color Code</option>
+                        </select>
+                      </div>
+                      <div className='add_product_value'>
+                        <label className='main_title'>Variant Name</label>
+                        <input
+                          type='text'
+                          name='label'
+                          onChange={(e) => this.onhandleChangeField(e)}
+                          value={this.state.label}
+                          className='add_product_input'
+                          placeholder=''
+                        />
+                      </div>
+                    </div>
+                    <button style={{ margin: '17px 0 10px 0' }} onClick={() => this.resetAllAttribute()} className='select_add_btn'>Add New</button>
+
+                    {/* {items} */}
 
 
 
@@ -1396,47 +2303,12 @@ console.log(this.state.categoryID);
                 </div>
               </div>
             </div>
-            {/* <div id='parent-attribute-modal'
-
-
-              className='create_attribute_modal_container'>
-
-              <div className='modal_attribute_row'>
-                <div className='modal_attribute_col-1'>
-
-                  <AddParentAttributeCategory />
-
-                </div>
-                <div className='modal_attribute_col-2'>
-                  <div className='main_heading'>Parent Attribute Category List</div>
-                  <ListParentAttributeCategory />
-                </div>
-              </div>
-              <ListAttributeMapping history={this.props.history} location={this.props.location}></ListAttributeMapping>
-            </div> */}
           </div>
-
-          {/* <DemoModal /> */}
         </div>
-        {/* <DeleteModal
-          title='Delete Stream'
-          content={`Are you sure you want to delete this user`}
-          actions={<React.Fragment>
-            <button className='ui button negative'>
-              Delete
-            </button>
-            <button
-              onClick={() =>
-                (document.getElementById("modal").style.display = "none")
-              }
-              className='ui button'
-            >
-              Cancel
-            </button>
-          </React.Fragment>}
-          onDismiss={(document.getElementById("modal").style.display = "none")}
-        ></DeleteModal> */}
-        <Footer style={{ marginTop: '100px' }} />
+        <div style={{ marginTop: '280px' }}>
+
+          <Footer style={{ marginTop: '280px' }} />
+        </div>
       </React.Fragment>
     );
   }
@@ -1474,7 +2346,10 @@ export default connect(mapStateToProps, {
   addAttributeMapping,
   listAttributeCategory,
   editAttributeMapping,
- listProductOne,
+  listProductOne,
+  deleteAttributeMapping,
+  listAttributeMapping,
+  addAttributeMappingDraft
 
 
 })(AddProductScreen);

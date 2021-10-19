@@ -90,11 +90,11 @@ export const createDraftProduct = () => dispatch => {
         })
     )
     .catch(err =>{
-        dispatch({
-            type: GET_ERRORS,
-            payload:err.response.data
-        })
-        dispatch(stopProductLoading());
+        // dispatch({
+        //     type: GET_ERRORS,
+        //     payload:err.response.data
+        // })
+        // dispatch(stopProductLoading());
     });
 };
 

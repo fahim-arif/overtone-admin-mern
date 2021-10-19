@@ -26,15 +26,15 @@ const AttributeMappingSchema = new Schema({
     },
     mappingType:{
         type:String,
-        required:true
+        // required:true
     },
     mappingLabel:{
         type:String,
-        required:true
+        // required:true
     },
     mappingValue:{
         type:String,
-        required:true
+        // required:true
     },
     photoUrl:{
         type:String,
@@ -42,16 +42,19 @@ const AttributeMappingSchema = new Schema({
     },
     additionalPrice:{
         type:String,
-        required:true
+        // required:true
     },
     dependentField:{
         type:String,
-        required:true
+        // required:true
     },
     isEnabled:{
         type:String,
         enum : ['Yes', 'No'], 
-        required:true
+        // required:true
+    },
+    subField: {
+        type: String,
     },
     date:{
         type: Date,

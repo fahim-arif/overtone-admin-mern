@@ -97,16 +97,21 @@ router.get('/',passport.authenticate('jwt',{session:false}),(req,res) => {
 });
 
 
+
+
+
+
+
 // @route POST  api/attributemapping/
 // @desc  Create attributemapping data
 // @access Private
 router.post('/',passport.authenticate('jwt',{session:false}),(req,res)=>{
     const {errors, isValid} = validateAttributeMappingInput(req.body,req.user);
     //Check Validation
-    if(!isValid){
-        //if Any errors, send 400 with errors object
-        return res.status(400).json(errors);
-    }
+    // if(!isValid){
+    //     //if Any errors, send 400 with errors object
+    //     return res.status(400).json(errors);
+    // }
     const insertdata = {
         parentAttributeCategoryID :   req.body.parentAttributeCategoryID,
         attributeCategoryID :   req.body.attributeCategoryID,
@@ -120,18 +125,58 @@ router.post('/',passport.authenticate('jwt',{session:false}),(req,res)=>{
         dependentField :   req.body.dependentField,
         isEnabled:   req.body.isEnabled,  
         adminID:req.user.id, 
+        subField: req.body.subField,
+        
     };
+    console.log(insertdata.subField)
     AttributeMapping.findOne({mappingLabel:req.body.mappingLabel})
     .then(result=>{
-        if(result){
-            errors.mappingLabel = 'Attribute Name Already Exists';
-            return res.status(404).json(errors);
-        }
-        else{
+        // if(result){
+        //     errors.mappingLabel = 'Attribute Name Already Exists';
+        //     return res.status(404).json(errors);
+        // }
+        // else{
             new AttributeMapping(insertdata).save().then(attributemapping=>res.json(attributemapping));
-        }
+        // }
 
     });  
+});
+
+
+
+
+
+
+// @route POST  api/attributemapping/
+// @desc  Create attributemapping data
+// @access Private
+router.post('/draft',passport.authenticate('jwt',{session:false}),(req,res)=>{
+
+    const insertdata = {
+        // parentAttributeCategoryID :   req.body.parentAttributeCategoryID,
+        // attributeCategoryID :   req.body.attributeCategoryID,
+        productID :   req.body.productID,
+        // mappingName :   req.body.mappingName,
+        // mappingLabel :   req.body.mappingLabel,
+        // mappingType :   req.body.mappingType,
+        // mappingValue :   req.body.mappingValue,
+        // photoUrl :   req.body.photoUrl,
+        // additionalPrice :   req.body.additionalPrice,
+        dependentField :   req.body.dependentField,
+        // isEnabled:   req.body.isEnabled,  
+        // adminID:req.user.id,  
+    };
+    new AttributeMapping(insertdata).save().then(attributemapping=>res.json(attributemapping));
+    // AttributeMapping.findOne({mappingLabel:req.body.productID})
+    // .then(result=>{
+        // if(result){
+            // errors.mappingLabel = 'Attribute Name Already Exists';
+            // return res.status(404).json(errors);
+        // }
+        // else{
+        // }
+
+    // });  
 });
 
 // @route GET  api/attributemapping/delete
@@ -154,12 +199,12 @@ router.post('/delete',passport.authenticate('jwt',{session:false}),(req,res) => 
 // @access private
 router.post('/edit',passport.authenticate('jwt',{session:false}),(req,res) => {
 
-    const {errors, isValid} = validateAttributeMappingInput(req.body,req.user);
-    //Check Validation
-    if(!isValid){
-        //if Any errors, send 400 with errors object
-        return res.status(400).json(errors);
-    }
+    // const {errors, isValid} = validateAttributeMappingInput(req.body,req.user);
+    // //Check Validation
+    // if(!isValid){
+    //     //if Any errors, send 400 with errors object
+    //     return res.status(400).json(errors);
+    // }
 //GET DATA BY USER TYPE
     //ADMIN TYPE
   
@@ -176,7 +221,10 @@ router.post('/edit',passport.authenticate('jwt',{session:false}),(req,res) => {
             dependentField :   req.body.dependentField,
             isEnabled:   req.body.isEnabled,  
             adminID:req.user.id, 
+            subField: req.body.subField,
         };
+
+        console.log(req.body.subField)
       
         AttributeMapping.findOneAndUpdate({_id:req.body._id},{$set: editdata},{new: true})
         .then(attributemapping => {

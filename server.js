@@ -26,6 +26,7 @@ const parentattributecategory     = require('./routes/api/parentattributecategor
 const attributecategory     = require('./routes/api/attributecategory');
 const attributemapping     = require('./routes/api/attributemapping');
 const productsub     = require('./routes/api/productsub');
+const orderemail = require('./routes/api/orderemail');
 
 
 
@@ -87,7 +88,7 @@ app.use('/api/parentattributecategory', parentattributecategory);
 app.use('/api/attributecategory', attributecategory);
 app.use('/api/attributemapping', attributemapping);
 app.use('/api/productsub', productsub);
-
+app.use('/api/orderemail',orderemail);
 
 
 
@@ -141,17 +142,30 @@ app.post('/musicupload',  function(req, res) {
 //     });
 // }) 
 
+app.use(express.static(path.join(__dirname,'client','build')));
 
-app.get('/*', function(req, res) {
- res.sendFile(path.join(__dirname,"client","build", "index.html"), function(err) { 
+app.get('*', function(req, res) {
+  res.sendFile(path.join(__dirname, '/client/build/index.html'), function(err) {
     if (err) {
       res.status(500).send(err)
     }
   })
 })
 
+
+//  app.use(express.static("client/build"));
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.resolve(__dirname, "../client", "build", "index.html"));
+//   });
+
+
 //Server port & configuration
 const port = process.env.PORT || 5000;
 app.listen(port,()=> {
 console.log(`Server is Listening on ${port}`);
 });
+
+// app.listen(PORT, () => {
+//   console.log(path.join(__dirname, "client/build"));
+//   console.log(`server at ${PORT}`);
+// });

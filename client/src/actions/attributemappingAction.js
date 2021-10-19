@@ -22,12 +22,12 @@ export const listAttributeMapping= (data) => dispatch => {
     })
     .catch(err =>{
       console.log("err data",err)
-      dispatch({
-        type: GET_ERRORS,
-        payload:err.response.data
-      })
-
+      // dispatch({
+      //   type: GET_ERRORS,
+      //   payload:err.response.data
+      // })
     });
+
 };
 
 
@@ -50,12 +50,14 @@ export const listAttributeMappingOne= (data) => dispatch => {
 
     });
 };
-// Create attributemapping
-export const addAttributeMapping= (attributemappingData) => dispatch => {
+
+
+// draft attributemapping
+export const addAttributeMappingDraft= (attributemappingData) => dispatch => {
   console.log(attributemappingData)
     dispatch(setAttributeMappingLoading());
     axios
-    .post('/api/attributemapping/',attributemappingData)
+    .post('/api/attributemapping/draft',attributemappingData)
     .then(res =>
         dispatch({
             type: ADD_ATTRIBUTE_MAPPING,
@@ -69,6 +71,28 @@ export const addAttributeMapping= (attributemappingData) => dispatch => {
         })
         dispatch(stopAttributeMappingLoading());
     });
+};
+
+
+// Create attributemapping
+export const addAttributeMapping= (attributemappingData) => dispatch => {
+  console.log(attributemappingData)
+    dispatch(setAttributeMappingLoading());
+    axios
+    .post('/api/attributemapping/',attributemappingData)
+    .then(res =>
+        dispatch({
+            type: ADD_ATTRIBUTE_MAPPING,
+            payload:res.data
+        })
+    )
+    // .catch(err =>{
+    //     dispatch({
+    //         type: GET_ERRORS,
+    //         payload:err.response.data
+    //     })
+    //     dispatch(stopAttributeMappingLoading());
+    // });
 };
 
 // Edit attributemapping

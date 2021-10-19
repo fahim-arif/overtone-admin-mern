@@ -320,6 +320,16 @@ const OrderCreateComponent = () => {
                             </div> */}
                           </td>
                           <td>
+                                <div className='form-check'>
+                              <input
+                                onClick={() => addProductHandler(product._id)}
+                                className='form-check-input'
+                                type='checkbox'
+                                value=''
+                                id='flexCheckDefault'
+                              />
+                              <label className='form-check-label'>Add</label>
+                            </div>
                             <div className='order_create_action_icon'>
                               <i className='fas fa-times'></i>
                             </div>
@@ -362,7 +372,7 @@ const OrderCreateComponent = () => {
 
             {/* <h4>User List</h4> */}
             <div className='input-group mb-3'></div>
-            {/* <table
+            <table
               className='table table-striped- table-bordered table-hover table-checkable'
               id='kt_table_1'
             >
@@ -398,7 +408,7 @@ const OrderCreateComponent = () => {
                   <th>Action</th>
                 </tr>
               </tfoot>
-            </table> */}
+            </table>
           </div>
         </div>
         <div className='row row-2'>

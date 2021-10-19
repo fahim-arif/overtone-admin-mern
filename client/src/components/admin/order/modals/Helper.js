@@ -9,7 +9,7 @@ import axios from "axios";
 import "./helper.css";
 let datas = [];
 let queryString = "";
-let imgPath = "http://3.238.89.147:5000/static/";
+let imgPath = "http://ec2-3-239-208-80.compute-1.amazonaws.com:5000/static/";
 let qString = "";
 let list = [];
 
@@ -46,7 +46,7 @@ export default function Helper({
   useEffect(() => {
     const attri = async () => {
       const { data } = await axios.post(
-        "http://3.238.89.147:5000/api/product/attribute/",
+        "http://ec2-3-239-208-80.compute-1.amazonaws.com:5000/api/product/attribute/",
         {
           productID: id,
         }

@@ -1,0 +1,91 @@
+    if (this.state.dependentField[0] && this.state.dependentField[0].subField === 'Yes') {
+      thirdArg = this.state.listVariants[0].list[0].value;
+      atbValue = this.state.dependentField[0].mappingValue;
+      forthArg = null;
+      fifthArg = null;
+      sixthArg = null;
+      seventhArg = null;
+      console.log(this.state.listVariants[0].list[0].value)
+    } else if (this.state.dependentField[0] && this.state.dependentField[0].subField === 'No') {
+      thirdArg = null;
+      atbValue = this.state.dependentField[0].mappingValue;
+      forthArg = null;
+      fifthArg = null;
+      sixthArg = null;
+      seventhArg = null;
+    }
+
+    if (this.state.dependentField[1] && this.state.dependentField[1].subField === 'Yes') {
+      console.log('dep1')
+      forthArg = this.state.listVariants[1].list[0].value;
+      fifthArg = null;
+      sixthArg = null;
+      seventhArg = null;
+    } else if (this.state.dependentField[1] && this.state.dependentField[1].subField === 'No') {
+      console.log('dep2')
+      forthArg = null;
+
+      if (thirdArg) {
+        forthArg = this.state.dependentField[1].mappingValue;
+      } else {
+
+        thirdArg = this.state.dependentField[1].mappingValue;
+      }
+
+      fifthArg = null;
+      sixthArg = null;
+      seventhArg = null;
+    }
+
+    if (this.state.dependentField[2] && this.state.dependentField[2].subField === 'Yes') {
+      sixthArg = null;
+
+      if (fifthArg) {
+        sixthArg = this.state.listVariants[2].list[0].value;
+      } else {
+
+        fifthArg = this.state.listVariants[2].list[0].value;
+      }
+      seventhArg = null;
+    } else if (this.state.dependentField[2] && this.state.dependentField[2].subField === 'No') {
+      fifthArg = null;
+      if (forthArg) {
+        fifthArg = this.state.dependentField[2].mappingValue;
+      } else {
+
+        forthArg = this.state.dependentField[2].mappingValue;
+      }
+      sixthArg = null;
+      seventhArg = null;
+
+    }
+
+     if (this.state.dependentField[3] && this.state.dependentField[3].subField === 'Yes') {
+      fifthArg = this.state.listVariants[3].list[0].value;
+      sixthArg = null;
+      seventhArg = null;
+    } else if (this.state.dependentField[3] && this.state.dependentField[3].subField === 'No') {
+      if (fifthArg) {
+        sixthArg = this.state.dependentField[3].mappingLabel
+      }
+      // fifthArg = null;
+// if (forthArg) {
+//         fifthArg = this.state.dependentField[3].mappingValue;
+//       } else {
+
+//         forthArg = this.state.dependentField[3].mappingValue;
+//       }
+//       sixthArg = null;
+//       seventhArg = null;
+    }
+
+
+      if (this.state.dependentField[4] && this.state.dependentField[4].subField === 'Yes') {
+      sixthArg = this.state.listVariants[4].list[0].value;
+      // sixthArg = null;
+      // seventhArg = null;
+    } else if (this.state.dependentField[4] && this.state.dependentField[4].subField === 'No') {
+      if (sixthArg) {
+        seventhArg = this.state.dependentField[4].mappingLabel
+      }
+    }
