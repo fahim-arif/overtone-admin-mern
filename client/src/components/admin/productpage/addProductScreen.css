@@ -1,7 +1,8 @@
-body {
-  z-index: 10;
-}
 
+.add_product_screen {
+position: relative;
+height: 2000px;
+}
 .add_main_wrapper {
   max-width: 1180px;
   padding-left: 255px;
@@ -272,5 +273,21 @@ border-bottom: 1px solid #dbdbdb;
 
 }
 .attribute_dropdown_delete {
-  cursor: pointer;
+  border: none;
+    color: #fff;
+    background: #fd397a;
+        font-size: 12px;
 }
+
+.hide {
+  display: none;
+}
+.show {
+  display: block;
+}
+.collapse_container i {
+  font-size: 22px;
+  display: flex;
+  justify-content: right;
+}
+/* .fa-sort-down */
