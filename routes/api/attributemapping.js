@@ -126,6 +126,7 @@ router.post('/',passport.authenticate('jwt',{session:false}),(req,res)=>{
         isEnabled:   req.body.isEnabled,  
         adminID:req.user.id, 
         subField: req.body.subField,
+        addOn: req.body.addOn,
         
     };
     console.log(insertdata.subField)
@@ -222,6 +223,7 @@ router.post('/edit',passport.authenticate('jwt',{session:false}),(req,res) => {
             isEnabled:   req.body.isEnabled,  
             adminID:req.user.id, 
             subField: req.body.subField,
+            addOn: req.body.addOn,
         };
 
         console.log(req.body.subField)

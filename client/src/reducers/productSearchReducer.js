@@ -5,7 +5,7 @@ import {
 } from "../actions/types";
 
 const initialState = {
-  searchList: null,
+  searchList: [],
 };
 
 export const productSearchReducer = (state = initialState, action) => {

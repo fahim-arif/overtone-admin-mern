@@ -59,6 +59,7 @@ import {
   attributePriceReducer,
 } from "./attributeReducer";
 import { productSearchReducer } from "./productSearchReducer";
+import { userSearchReducer } from "./userSearchReducer";
 
 export default combineReducers({
   auth: authReducer,
@@ -86,4 +87,5 @@ export default combineReducers({
   price: attributePriceReducer,
   attributeItems: attributeItemsReducer,
   productSearch: productSearchReducer,
+  userSearch: userSearchReducer,
 });

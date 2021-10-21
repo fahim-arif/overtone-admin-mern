@@ -158,19 +158,16 @@ export const productAttributes = (data) => (dispatch) => {
   dispatch({ type: ADD_ORDER_ATTRIBUTES, payload: data });
 };
 
-
-
 // Added By Fahim
 
 export const searchProduct = (keyword) => async (dispatch) => {
   console.log(keyword);
   dispatch({ type: SEARCH_PRODUCT_REQUEST });
   try {
-    const { data } = await axios.post(`/api/product/web`, { search: keyword });
 
-    console.log(data);
-
+    const { data } = await axios.get(`/api/product/search?keyword=${keyword}`);
     dispatch({ type: SEARCH_PRODUCT_SUCCESS, payload: data });
+
   } catch (error) {
     dispatch({
       type: SEARCH_PRODUCT_FAIL,

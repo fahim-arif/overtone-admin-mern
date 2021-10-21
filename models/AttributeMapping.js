@@ -56,6 +56,9 @@ const AttributeMappingSchema = new Schema({
     subField: {
         type: String,
     },
+    addOn: {
+        type:String,
+    },
     date:{
         type: Date,
         default: Date.now

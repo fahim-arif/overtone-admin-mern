@@ -17,17 +17,17 @@ const UserSchema = new Schema({
     photo:{
         type:String,
     },
-    origin:{
-        type:String,
-        required:true
-    },
-    deviceID:{
-        type:String,
-    },   
-    socketID:{
-        type:String,
-    }, 
-    // status:{
+    // origin:{
+    //     type:String,
+    //     required:true
+    // },
+    // deviceID:{
+    //     type:String,
+    // },   
+    // socketID:{
+    //     type:String,
+    // }, 
+    // // status:{
     //     type:String,
     //     required:true
     // },

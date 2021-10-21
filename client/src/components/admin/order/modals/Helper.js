@@ -46,7 +46,7 @@ export default function Helper({
   useEffect(() => {
     const attri = async () => {
       const { data } = await axios.post(
-        "http://ec2-3-239-208-80.compute-1.amazonaws.com:5000/api/product/attribute/",
+        "https://warm-lake-60018.herokuapp.com/api/product/attribute/",
         {
           productID: id,
         }
@@ -131,6 +131,9 @@ export default function Helper({
       } catch (error) {
         console.error(error);
       }
+       setTimeout(() => {
+      window.location.reload()
+    }, 1000)
     }
   };
   const onColorClick = async (value) => {
@@ -199,6 +202,9 @@ export default function Helper({
       }
     };
     submitOrder();
+        setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
 
   console.log(attributes);
@@ -218,7 +224,7 @@ export default function Helper({
         </button>
 
         <div
-          class='modal show'
+          class='modal'
           id='exampleModal'
           tabindex='-1'
           role='dialog'

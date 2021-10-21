@@ -7,6 +7,9 @@ import {
   DELETE_USER,
   LIST_USER,
   GET_ERRORS,
+  SEARCH_USER_REQUEST,
+  SEARCH_USER_SUCCESS,
+  SEARCH_USER_FAIL,
 } from './types';
 
 // Get all user
@@ -98,3 +101,23 @@ export const setUserLoading = () => {
       type: USER_STOPLOADING
     };
   };
+
+
+  export const searchUser = (keyword) => async (dispatch) => {
+  console.log(keyword);
+  dispatch({ type: SEARCH_USER_REQUEST });
+  try {
+
+    const { data } = await axios.get(`/api/user/search?keyword=${keyword}`);
+    dispatch({ type: SEARCH_USER_SUCCESS, payload: data });
+
+  } catch (error) {
+    dispatch({
+      type: SEARCH_USER_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};

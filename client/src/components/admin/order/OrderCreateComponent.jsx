@@ -6,14 +6,14 @@ import {
   productId,
   searchProduct,
 } from "../../../actions/productAction";
-import { listUser, addUser } from "../../../actions/userAction";
+import { listUser, addUser, searchUser } from "../../../actions/userAction";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteAttributeItems } from "../../../actions/attributeAction";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 // import DemoModal from "./modals/DemoModal";
 import Helper from "./modals/Helper";
-import UserCreateModal from "./modals/UserCreateModal";
+
 
 const Toast = Swal.mixin({
   toast: true,
@@ -33,8 +33,12 @@ const OrderCreateComponent = () => {
 
   const { listproduct } = useSelector((state) => state.product);
   const { listuser } = useSelector((state) => state.user);
+  const { userList } = useSelector((state) => state.userSearch)
+  const { searchList } = useSelector((state) => state.productSearch);
+  // const {searchList} = productSearch;
+  console.log(userList)
 
-  const { selectedAttribute } = useSelector((state) => state.product);
+  // const { selectedAttribute } = useSelector((state) => state.product);
   const { attributeList } = useSelector((state) => state.attributeItems);
 
   const [username, setUsername] = useState("");
@@ -54,6 +58,7 @@ const OrderCreateComponent = () => {
   const [productSearchInput, SetProductSearchInput] = useState("");
   const [showUser, setShowUser] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
+  const [userSearchInput, setUserSearchInput] = useState('')
 
   // const elementRef = useRef();
 
@@ -61,9 +66,16 @@ const OrderCreateComponent = () => {
 
   // console.log(click);
 
+
+  useEffect(() => {
+    console.log(searchList)
+  }, [searchList])
+
   useEffect(() => {
     dispatch(listProduct());
     dispatch(listUser());
+
+
     // document.getElementById("modal_btn").click();
     // elementRef.current.click();
   }, []);
@@ -159,6 +171,11 @@ const OrderCreateComponent = () => {
   const handleUserDropdown = () => {
     setShowUser(true);
   };
+
+  const onUserSearch = (e) => {
+    e.preventDefault()
+    dispatch(searchUser(userSearchInput))
+  }
   return (
     <React.Fragment>
       <Helper
@@ -174,8 +191,8 @@ const OrderCreateComponent = () => {
         id='save-click'
         className='body container my-4 '
       >
-        <div className='row row-1'>
-          <div className='col dis_flex'>
+        <div style={{maxWidth:'1100px'}} className='row row-1'>
+          <div className='col d-flex justify-content-between'>
             <h4>Admin Create Order</h4>
             <div onClick={submitOrder} className='create_order_submit_btn'>
               Submit Order
@@ -206,7 +223,7 @@ const OrderCreateComponent = () => {
                   />
                   <button
                     className='btn btn-outline-secondary ml-2'
-                    type='button'
+                    type='submit'
                   >
                     Browse
                   </button>
@@ -233,20 +250,24 @@ const OrderCreateComponent = () => {
           {/* Before selecting a user */}
           <div className='col-lg-5 pt-4 order_user_list_container'>
             <h4>Find or create a customer</h4>
-            <div className='input-group user_search_input_container mb-3'>
-              <span className='input-group-text' id='basic-addon1'>
-                <i className='fas fa-search'></i>
-              </span>
-              <input
-                onMouseLeave={() => setShowUser(false)}
-                onClick={handleUserDropdown}
-                type='text'
-                className='form-control'
-                placeholder='Search User'
-                aria-label='Email'
-                aria-describedby='basic-addon1'
-              />
-            </div>
+            <form onSubmit={onUserSearch} >
+              <div className='input-group user_search_input_container mb-3'>
+
+                <span className='input-group-text' id='basic-addon1'>
+                  <i className='fas fa-search'></i>
+                </span>
+                <input
+                  onMouseLeave={() => setShowUser(false)}
+                  onClick={handleUserDropdown}
+                  onChange={(e) => setUserSearchInput(e.target.value)}
+                  type='text'
+                  className='form-control'
+                  placeholder='Search User'
+                  aria-label='Email'
+                  aria-describedby='basic-addon1'
+                />
+              </div>
+            </form>
           </div>
         </div>
 
@@ -266,8 +287,8 @@ const OrderCreateComponent = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {listproduct &&
-                    listproduct.map((product, idx) => {
+                  {searchList &&
+                    searchList.map((product, idx) => {
                       return (
                         <tr key={idx}>
                           <td>
@@ -320,7 +341,7 @@ const OrderCreateComponent = () => {
                             </div> */}
                           </td>
                           <td>
-                                <div className='form-check'>
+                            <div className='form-check'>
                               <input
                                 onClick={() => addProductHandler(product._id)}
                                 className='form-check-input'
@@ -330,9 +351,9 @@ const OrderCreateComponent = () => {
                               />
                               <label className='form-check-label'>Add</label>
                             </div>
-                            <div className='order_create_action_icon'>
+                            {/* <div className='order_create_action_icon'>
                               <i className='fas fa-times'></i>
-                            </div>
+                            </div> */}
                           </td>
                         </tr>
                       );
@@ -372,20 +393,20 @@ const OrderCreateComponent = () => {
 
             {/* <h4>User List</h4> */}
             <div className='input-group mb-3'></div>
-            <table
+            <table style={{background:'#fff'}}
               className='table table-striped- table-bordered table-hover table-checkable'
               id='kt_table_1'
             >
-            <thead>
+              <thead>
                 <tr>
                   <th>User Name</th>
                   <th>Email</th>
                   <th>Action</th>
                 </tr>
               </thead>
-            <tbody>
-                {listuser &&
-                  listuser.map((user, idx) => (
+              <tbody>
+                {userList &&
+                  userList.map((user, idx) => (
                     <tr key={idx}>
                       <td>{user.name}</td>
                       <td>{user.email}</td>
@@ -401,7 +422,7 @@ const OrderCreateComponent = () => {
                     </tr>
                   ))}
               </tbody>
-            <tfoot>
+              <tfoot>
                 <tr>
                   <th>User Name</th>
                   <th>Email</th>
@@ -493,8 +514,8 @@ const OrderCreateComponent = () => {
             </div>
           </div>
           <div className='col-lg-5 p-0'>
-            <div className='order_list_create_user_contianer pt-4'>
-              <h4>Create New User</h4>
+            <div className='order_list_create_user_container mt-5'>
+              <h4 className='pb-3'>Create New User</h4>
               <form onSubmit={createUserHandler}>
                 <div className='form_input_flex'>
                   <label>Email</label>

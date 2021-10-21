@@ -174,3 +174,31 @@
 .user_search_input_container {
   padding: 0 25px;
 }
+.form_input_flex {
+  width: 350px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.order_list_create_user_container {
+  width: 390px;
+  background-color: #fff;
+  padding: 20px;
+} 
+
+.order_user_create_submit_btn {
+  color: #fff;
+    background-color: #0abb87;
+    border-color: #0abb87;
+    border:none;
+        padding: 5px 15px;
+}
+
+.create_order_submit_btn{
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 5px 15px;
+  color: #ffffff;
+  background: #5d78ff;
+}

@@ -67,7 +67,7 @@ router.post("/customer-create", async (req, res) => {
           token: authResponse.token,
         });
       })
-      .catch(function (e) {});
+      .catch(function (e) { });
   }
 
   const PrimaryEmailAddr = {
@@ -172,132 +172,130 @@ router.post("/register", async (req, res) => {
     if (user) {
       errors.email = "Email Already Exists";
       return res.status(400).json(errors);
-    } else {
-      //QUICK BOOK INTEGRATION PART
-      var quickAuthToken;
-      var getSetting = await Setting.findOne();
-      if (getSetting) {
-        quickAuthToken = JSON.parse(getSetting.quickBook);
-      }
-      let oauthClientOrder = new OAuthClient({
-        clientId: "AB2T4UWnpedrpGq33wumOOGMzsG92cTzfytneE8xmJwwS1CtuP",
-        clientSecret: "jMywcYPlGTGA9Fd1Lt1eWbLQXJ5Tx19JbL4VBRC0",
-        environment: "sandbox",
-        redirectUri:
-          "http://ec2-3-238-89-147.compute-1.amazonaws.com:5000/admin/quickbook/callback",
-        //redirectUri: 'http://localhost:3000/admin/quickbook/callback',
-        token: quickAuthToken,
-      });
-      if (!oauthClientOrder.isAccessTokenValid()) {
-        oauthClientOrder
-          .refresh()
-          .then(async function (authResponse) {
-            oauthClientOrder = new OAuthClient({
-              clientId: "AB2T4UWnpedrpGq33wumOOGMzsG92cTzfytneE8xmJwwS1CtuP",
-              clientSecret: "jMywcYPlGTGA9Fd1Lt1eWbLQXJ5Tx19JbL4VBRC0",
-              environment: "sandbox",
-              redirectUri:
-                "http://ec2-3-238-89-147.compute-1.amazonaws.com:5000/admin/quickbook/callback",
-              //redirectUri: 'http://localhost:3000/admin/quickbook/callback',
-              token: authResponse.token,
+    }
+    //QUICK BOOK INTEGRATION PART
+    // var quickAuthToken;
+    // var getSetting = await Setting.findOne();
+    // if (getSetting) {
+    //   quickAuthToken = JSON.parse(getSetting.quickBook);
+    // }
+    // let oauthClientOrder = new OAuthClient({
+    //   clientId: "AB2T4UWnpedrpGq33wumOOGMzsG92cTzfytneE8xmJwwS1CtuP",
+    //   clientSecret: "jMywcYPlGTGA9Fd1Lt1eWbLQXJ5Tx19JbL4VBRC0",
+    //   environment: "sandbox",
+    //   redirectUri:
+    //     "http://ec2-3-238-89-147.compute-1.amazonaws.com:5000/admin/quickbook/callback",
+    //   //redirectUri: 'http://localhost:3000/admin/quickbook/callback',
+    //   token: quickAuthToken,
+    // });
+    // if (!oauthClientOrder.isAccessTokenValid()) {
+    //   oauthClientOrder
+    //     .refresh()
+    //     .then(async function (authResponse) {
+    //       oauthClientOrder = new OAuthClient({
+    //         clientId: "AB2T4UWnpedrpGq33wumOOGMzsG92cTzfytneE8xmJwwS1CtuP",
+    //         clientSecret: "jMywcYPlGTGA9Fd1Lt1eWbLQXJ5Tx19JbL4VBRC0",
+    //         environment: "sandbox",
+    //         redirectUri:
+    //           "http://ec2-3-238-89-147.compute-1.amazonaws.com:5000/admin/quickbook/callback",
+    //         //redirectUri: 'http://localhost:3000/admin/quickbook/callback',
+    //         token: authResponse.token,
+    //       });
+    //     })
+    //     .catch(function (e) {
+    //       errors.email = "Error Occured in Server Contact Admin";
+    //       return res.status(400).json(errors);
+    //     });
+    // }
+
+    // const PrimaryEmailAddr = {
+    //   Address: req.body.email,
+    // };
+    // const PrimaryPhone = {
+    //   FreeFormNumber: req.body.mobile,
+    // };
+    // const BillAddr = {
+    //   CountrySubDivisionCode: "CA",
+    //   City: "Mountain View",
+    //   PostalCode: "94042",
+    //   Line1: "123 Main Street",
+    //   Country: "USA",
+    // };
+
+    // const insertdata = {
+    //   FullyQualifiedName: req.body.name,
+    //   PrimaryEmailAddr: PrimaryEmailAddr,
+    //   PrimaryPhone: PrimaryPhone,
+    //   Suffix: req.body.name,
+    //   Title: req.body.name,
+    //   MiddleName: req.body.name,
+    //   Notes: req.body.name,
+    //   FamilyName: req.body.name,
+    //   BillAddr: BillAddr,
+    //   CompanyName: req.body.name,
+
+    //   GivenName: req.body.name,
+    // };
+
+    // oauthClientOrder
+    //   .makeApiCall({
+    //     url: "https://sandbox-quickbooks.api.intuit.com/v3/company/4620816365177497720/customer?minorversion=40",
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(insertdata),
+    //   })
+    //   .then(function (response) {
+    //     var customerJSON = response.getJson();
+    //     var quickBookCustomerID = customerJSON.Customer;
+    //     console.log("payload", customerJSON, quickBookCustomerID);
+
+    const newUser = new User({
+      name: req.body.name,
+      email: req.body.email,
+      mobile: req.body.mobile,
+      password: req.body.password,
+      // photo: req.body.photo,
+      // origin: "local",
+      // quickbookID: quickBookCustomerID.Id,
+    });
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(newUser.password, salt, (err, hash) => {
+        if (err) throw err;
+        newUser.password = hash;
+        newUser
+          .save()
+          .then((user) => {
+            const payload = {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              userType: "user",
+              mobile: user.mobile,
+              // photo: user.photo,
+              // quickbookID: user.quickbookID,
+            }; //Create JWT Payload
+            console.log("payload", payload);
+            //Sign Token
+            jwt.sign(payload, keys.secretOrKey, async (err, token) => {
+              res.json({
+                success: true,
+                token: "Bearer " + token,
+                payload: payload,
+              });
             });
           })
-          .catch(function (e) {
-            errors.email = "Error Occured in Server Contact Admin";
-            return res.status(400).json(errors);
-          });
-      }
-
-      const PrimaryEmailAddr = {
-        Address: req.body.email,
-      };
-      const PrimaryPhone = {
-        FreeFormNumber: req.body.mobile,
-      };
-      const BillAddr = {
-        CountrySubDivisionCode: "CA",
-        City: "Mountain View",
-        PostalCode: "94042",
-        Line1: "123 Main Street",
-        Country: "USA",
-      };
-
-      const insertdata = {
-        FullyQualifiedName: req.body.name,
-        PrimaryEmailAddr: PrimaryEmailAddr,
-        PrimaryPhone: PrimaryPhone,
-        Suffix: req.body.name,
-        Title: req.body.name,
-        MiddleName: req.body.name,
-        Notes: req.body.name,
-        FamilyName: req.body.name,
-        BillAddr: BillAddr,
-        CompanyName: req.body.name,
-
-        GivenName: req.body.name,
-      };
-
-      oauthClientOrder
-        .makeApiCall({
-          url: "https://sandbox-quickbooks.api.intuit.com/v3/company/4620816365177497720/customer?minorversion=40",
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(insertdata),
-        })
-        .then(function (response) {
-          var customerJSON = response.getJson();
-          var quickBookCustomerID = customerJSON.Customer;
-          console.log("payload", customerJSON, quickBookCustomerID);
-
-          const newUser = new User({
-            name: req.body.name,
-            email: req.body.email,
-            mobile: req.body.mobile,
-            password: req.body.password,
-            photo: req.body.photo,
-            origin: "local",
-            quickbookID: quickBookCustomerID.Id,
-          });
-          bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(newUser.password, salt, (err, hash) => {
-              if (err) throw err;
-              newUser.password = hash;
-              newUser
-                .save()
-                .then((user) => {
-                  const payload = {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    userType: "user",
-                    mobile: user.mobile,
-                    photo: user.photo,
-                    quickbookID: user.quickbookID,
-                  }; //Create JWT Payload
-                  console.log("payload", payload);
-                  //Sign Token
-                  jwt.sign(payload, keys.secretOrKey, async (err, token) => {
-                    res.json({
-                      success: true,
-                      token: "Bearer " + token,
-                      payload: payload,
-                    });
-                  });
-                })
-                .catch((err) => console.log(err));
-            });
-          });
-          //   console.log(response);
-          //   res.json(response.getJson())
-        })
-        .catch(function (e) {
-          errors.email = "Error Occured in Server Contact Admin";
-          return res.status(400).json(errors);
-        });
-    }
-  });
+          .catch((err) => console.log(err));
+      });
+    });
+    //   console.log(response);
+    //   res.json(response.getJson())
+  })
+    .catch(function (e) {
+      errors.email = "Error Occured in Server Contact Admin";
+      return res.status(400).json(errors);
+    });
 });
 
 router.post("/login", (req, res) => {
@@ -649,11 +647,11 @@ router.get(
     console.log("it worked");
     const keyword = req.query.keyword
       ? {
-          name: {
-            $regex: req.query.keyword,
-            $options: "i",
-          },
-        }
+        name: {
+          $regex: req.query.keyword,
+          $options: "i",
+        },
+      }
       : {};
 
     const response = await User.find({ ...keyword });

@@ -130,12 +130,43 @@ router.post('/web/getshop', async (req, res) => {
     res.json({ category: CategoryView, slider: SliderView, other: OtherCategoryView })
 });
 
+
+
+
+// search product
+
+
+router.get(
+  "/search",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    console.log("it worked");
+    const keyword = req.query.keyword
+      ? {
+        name: {
+          $regex: req.query.keyword,
+          $options: "i",
+        },
+      }
+      : {};
+
+    const response = await Product.find({ ...keyword });
+    // res.json({ msg: "hi" });
+    res.json(response);
+  }
+);
+
+
+
 router.post('/web', (req, res) => {
 
     var q = {}; // declare the query object
     q['$and'] = [{ isEnabled: 'Yes' }]; // filter the search by any criteria given by the user
     if (req.body.categoryID) { // if the criteria has a value or 
         q["$and"].push({ categoryID: mongoose.Types.ObjectId(req.body.categoryID) }); // add to the query object
+    }
+     if (req.body.name) { // if the criteria has a value or 
+        q["$and"].push({ name: req.body.name }); // add to the query object
     }
     if (req.body.search) { // if the criteria has a value or 
         q["$and"].push({ $text: { $search: req.body.search } }); // add to the query object

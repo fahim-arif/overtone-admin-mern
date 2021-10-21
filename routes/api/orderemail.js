@@ -15,9 +15,9 @@ const mailRegister = (params, email) => {
   const mailOptions = {
     from: "frstorebd@gmail.com",
     to: email,
-    subject: "User Registration",
+    subject: "An order has been created",
     html: `<p>Hello, We have added an order in your accound. please click the link below to continue </p> <br/>
-    <a href=${`http://ec2-3-239-208-80.compute-1.amazonaws.com/cart/${params}`}>Click Here</a>
+    <a href=${`http://localhost:3001/cart/${params}`}>Click Here</a>
     `,
   };
 
