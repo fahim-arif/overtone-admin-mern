@@ -1525,7 +1525,7 @@ class AddProductScreen extends React.Component {
                   </div>
                   {/* change here happended */}
                   {/* {this.state.dependentField && this.state.dependentField[0] ? this.state.dependentField.map((res, index) => ( */}
-                  {this.state.dependentField && this.state.dependentField.length > 1 ? this.state.dependentField.map((res, index) => (
+                  {this.state.dependentField && this.state.dependentField[0] ? this.state.dependentField.map((res, index) => (
                     <div className={`attribute_dropdown_container`}>
                       <div className='attribute_dropdown_wrapper'>
                         <div className='attirbute_dropdown_content'>
