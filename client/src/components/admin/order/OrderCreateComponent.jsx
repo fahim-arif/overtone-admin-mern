@@ -161,6 +161,7 @@ const OrderCreateComponent = () => {
       type: "error",
       title: "Please select a user or product",
     });
+   
   };
 
   const searchProductHandler = (e) => {
