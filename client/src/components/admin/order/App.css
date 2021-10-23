@@ -201,4 +201,19 @@ align-items: center;
 padding: 5px 15px;
   color: #ffffff;
   background: #5d78ff;
+  cursor: pointer;
+}
+
+.create_order_btn {
+  display: flex;
+  justify-content:center ;
+  background-color: #0abb87;
+      height: 36px;
+    align-items: center;
+    margin-top: 13px;
+color: #fff !important;
+padding: 0 10px;
+}
+.create_order_btn a {
+  color: #fff;
 }

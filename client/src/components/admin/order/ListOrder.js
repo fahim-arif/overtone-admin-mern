@@ -13,7 +13,7 @@ import swal from "sweetalert2";
 import SearchInput, { createFilter } from "react-search-input";
 import { Link } from "react-router-dom";
 
-// import "/css/create-order.css";
+import './App.css'
 
 const KEYS_TO_FILTERS = ["orderNo", "status", "StatusName"];
 const Toast = swal.mixin({
@@ -169,6 +169,7 @@ class ListOrder extends Component {
                         <h3 className='kt-portlet__head-title'>List Orders</h3>
                       </div>
                       <div
+                      style={{color:'#fff'}}
                         className='create_order_btn'
                         // onClick={() => this.onEditClick(result)}
                       >

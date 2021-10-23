@@ -10,6 +10,8 @@ import { listUser, addUser, searchUser } from "../../../actions/userAction";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteAttributeItems } from "../../../actions/attributeAction";
 import { toast } from "react-toastify";
+import Loading from '../../common/Loading'
+import Message from '../../common/Message'
 import Swal from "sweetalert2";
 // import DemoModal from "./modals/DemoModal";
 import Helper from "./modals/Helper";
@@ -32,7 +34,7 @@ const OrderCreateComponent = () => {
   const dispatch = useDispatch();
 
   const { listproduct } = useSelector((state) => state.product);
-  const { listuser } = useSelector((state) => state.user);
+  const { listuser,userloading,adduser } = useSelector((state) => state.user);
   const { userList } = useSelector((state) => state.userSearch)
   const { searchList } = useSelector((state) => state.productSearch);
   // const {searchList} = productSearch;

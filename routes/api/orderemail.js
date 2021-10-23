@@ -17,7 +17,7 @@ const mailRegister = (params, email) => {
     to: email,
     subject: "An order has been created",
     html: `<p>Hello, We have added an order in your accound. please click the link below to continue </p> <br/>
-    <a href=${`https://overtoneclient.herokuapp.com/cart/${params}`}>Click Here</a>
+    <a href=${`http://localhost:5000/cart/${params}`}>Click Here</a>
     `,
   };
 
