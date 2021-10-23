@@ -5,16 +5,18 @@ const nodemailer = require("nodemailer");
 
 const mailRegister = (params, email) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "email-smtp.us-east-1.amazonaws.com",
+    port: 587,
+    secure: false,
     auth: {
-      user: "frstorebd@gmail.com",
-      pass: "appleisred", // naturally, replace both with your real credentials or an application-specific password
+      user: "AKIA2DXTH734PPQZQMEN",
+      pass: "BBkV+3lM6A14QKZ9O5L8QxW1uk3iL38+sC3MKwfKaZJK", // naturally, replace both with your real credentials or an application-specific password
     },
   });
 
   const mailOptions = {
-    from: "frstorebd@gmail.com",
-    to: email,
+    from: "overtone.demo@gmail.com",
+    to: "overtone.demo@gmail.com",
     subject: "An order has been created",
     html: `<p>Hello, We have added an order in your accound. please click the link below to continue </p> <br/>
     <a href=${`http://localhost:5000/cart/${params}`}>Click Here</a>
