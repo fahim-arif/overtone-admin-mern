@@ -121,3 +121,25 @@ export const setUserLoading = () => {
     });
   }
 };
+
+
+// Basic user create without quickbook 
+
+export const createUser = (userData) => dispatch => {
+  dispatch(setUserLoading());
+  axios
+    .post('/api/user/user-create', userData)
+    .then(res =>
+      dispatch({
+        type: ADD_USER,
+        payload: res.data
+      })
+    )
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+      dispatch(stopUserLoading());
+    });
+};

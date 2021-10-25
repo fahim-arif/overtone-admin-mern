@@ -22,10 +22,13 @@ export default function Helper({
   submit,
   elementRef,
 }) {
+
   const dispatch = useDispatch();
 
   const attributeItems = useSelector((state) => state.attributeItems);
   const { attributeList } = attributeItems;
+  const { adduser } = useSelector((state) => state.user)
+
   // console.log(attributeList, "attributeItems");
 
   name = name.split(" ")[0];
@@ -34,7 +37,17 @@ export default function Helper({
   const [attributes, setAttributes] = useState([]);
   const [query, setQuery] = useState("");
   const [totalQuery, SetTotalQuery] = "";
+  const [newUser, setNewUser] = useState(false)
+  const [userInfo, setUserInfo] = useState([])
 
+  // To know that there is a newly created user
+  useEffect(() => {
+
+    if (adduser && adduser.success) {
+      setNewUser(true)
+      setUserInfo(adduser.payload)
+    }
+  },[adduser])
   useEffect(() => {
     attributes.map((attribute) => {
       return (qString = `$&key=${attribute.key}&value=${attribute.mapValue}&price=${attribute.additionalPrice}`);
@@ -125,16 +138,16 @@ export default function Helper({
           `http://localhost:5000/api/orderemail/productId=${result}`,
           // `https://warm-lake-60018.herokuapp.com/api/orderemail/productId=${result}`,
 
-          { email: email },
+          { email: email, newUser: newUser, userInfo },
           config
         );
         // console.log("success");
       } catch (error) {
         console.error(error);
       }
-       setTimeout(() => {
-      window.location.reload()
-    }, 5000)
+      // setTimeout(() => {
+      //   window.location.reload()
+      // }, 5000)
     }
   };
   const onColorClick = async (value) => {
@@ -165,6 +178,7 @@ export default function Helper({
         "Content-Type": "application/json",
       },
     };
+
     let mail = "fahim1.618555@gmail.com";
     let result = `${id}&name=${name}&imgurl=${photo}&prodPrice=${price}&key=${key}&value=${mapValue}&price=${additionalPrice}`;
   };
@@ -185,7 +199,7 @@ export default function Helper({
       },
     };
     const submitOrder = async () => {
-      attributeList.map((item) => {});
+      attributeList.map((item) => { });
 
       let result = `${id}&name=${name}&imgurl=${photo}&prodPrice=${price}${query}`;
       if (submit) {
@@ -194,7 +208,7 @@ export default function Helper({
             `http://localhost:5000/api/orderemail/productId=${result}`,
             // `https://warm-lake-60018.herokuapp.com/api/orderemail/productId=${result}`,
 
-            { email: email },
+            { email: email, newUser,userInfo },
             config
           );
           console.log("success");
@@ -204,9 +218,9 @@ export default function Helper({
       }
     };
     submitOrder();
-        setTimeout(() => {
-      window.location.reload()
-    }, 5000)
+    // setTimeout(() => {
+    //   window.location.reload()
+    // }, 5000)
   }
 
   console.log(attributes);

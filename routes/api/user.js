@@ -160,6 +160,65 @@ router.post(
   }
 );
 
+
+
+
+// basic user create without quickbook
+router.post("/user-create", async (req, res) => {
+  const { errors, isValid } = validateUserInput(req.body);
+
+  //Check Validation
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+
+  User.findOne({ email: req.body.email }).then(async (user) => {
+    if (user) {
+      errors.email = "Email Already Exists";
+      return res.status(400).json(errors);
+    }
+
+    const newUser = new User({
+      name: req.body.name,
+      email: req.body.email,
+      mobile: req.body.mobile,
+      password: req.body.password,
+    });
+
+    // edited
+    
+        newUser
+          .save()
+          .then((user) => {
+            const payload = {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              userType: "user",
+              mobile: user.mobile,
+              password: req.body.password,
+              // photo: user.photo,
+              // quickbookID: user.quickbookID,
+            }; //Create JWT Payload
+            console.log("payload", payload);
+            //Sign Token
+            jwt.sign(payload, keys.secretOrKey, async (err, token) => {
+              res.json({
+                success: true,
+                token: "Bearer " + token,
+                payload: payload,
+              });
+            });
+          })
+          .catch((err) => console.log(err));
+      });
+    })
+
+  //   console.log(response);
+  //   res.json(response.getJson())
+
+
+
 router.post("/register", async (req, res) => {
   const { errors, isValid } = validateUserInput(req.body);
 

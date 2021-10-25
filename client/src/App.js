@@ -92,8 +92,6 @@ import ListProductSub from "./components/admin/productsub/ListProductSub";
 import QuickbookCallback from "./components/admin/productsub/QuickbookCallback";
 import CreateOrder from "./components/admin/order/CreateOrder";
 import AddProductNew from "./components/admin/product-new/AddProduct";
-import EditProductNew from "./components/admin/product-new/EditProduct";
-import ListProductNew from "./components/admin/product-new/ListProduct";
 import AddProductScreen from "./components/admin/productpage/AddProductScreen";
 import AddProductTempScreeen from "./components/admin/productpage/AddProductTempScreeen";
 

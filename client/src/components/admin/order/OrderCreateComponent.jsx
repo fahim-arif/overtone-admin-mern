@@ -6,7 +6,7 @@ import {
   productId,
   searchProduct,
 } from "../../../actions/productAction";
-import { listUser, addUser, searchUser } from "../../../actions/userAction";
+import { listUser, createUser, addUser, searchUser } from "../../../actions/userAction";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteAttributeItems } from "../../../actions/attributeAction";
 import { toast } from "react-toastify";
@@ -91,7 +91,7 @@ const OrderCreateComponent = () => {
       password2: password,
     };
     // console.log(userData);
-    await dispatch(addUser(userData));
+    await dispatch(createUser(userData));
 
     Toast.fire({
       type: "success",
