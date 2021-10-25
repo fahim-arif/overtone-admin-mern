@@ -38,11 +38,9 @@ const OrderCreateComponent = () => {
   const { userList } = useSelector((state) => state.userSearch)
   const { searchList } = useSelector((state) => state.productSearch);
   // const {searchList} = productSearch;
-  console.log(userList)
-
   // const { selectedAttribute } = useSelector((state) => state.product);
   const { attributeList } = useSelector((state) => state.attributeItems);
-
+  const [numStock, setNumStock] = useState(0)
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [mailing, setMailing] = useState("");
@@ -99,10 +97,23 @@ const OrderCreateComponent = () => {
     });
   };
 
+  const handleAddition = (id) =>{
+    var product = searchList.find((product) => product._id == id);
+    product.numStock += 1 
+    console.log(product)
+  }
+
+  const handleDeletion = (id) =>{
+    var product = searchList.find((product) => product._id == id);
+    if(product.numStock != 0)
+      product.numStock -= 1 
+    console.log(product)
+  }
   // Product Selection and filtering
   // let subtotal = 0;
   // let discount = 0;
   const addProductHandler = (id) => {
+    console.log(pid)
     found = pid.find((_id) => _id == id);
     found = productIds.find((_id) => _id == id);
     if (found) {
@@ -137,11 +148,13 @@ const OrderCreateComponent = () => {
   // console.log(userId);
 
   const userSelectHandler = (userId) => {
+    console.log("userId", userId, listuser)
     let mail = listuser.find((user) => {
       if (user._id == userId) {
         return user.email;
       }
     }).email;
+    console.log(mail)
 
     // console.log(mail);
     setUserId(userId);
@@ -292,6 +305,7 @@ const OrderCreateComponent = () => {
                 <tbody>
                   {searchList &&
                     searchList.map((product, idx) => {
+                      product.numStock = 0
                       return (
                         <tr key={idx}>
                           <td>
@@ -307,23 +321,19 @@ const OrderCreateComponent = () => {
                           <td>
                             <div className='order_create_item_container'>
                               <input
-                                // value={numStock}
+                                value={product.numStock}
                                 className='order_create_input'
                               />
                               <div className='order_create_button_container'>
                                 <button
-                                  // onClick={() =>
-                                  //   setNumStock((count) => count + 1)
-                                  // }
+                                  onClick={() => handleAddition(product._id)}
                                   className='order_create_plus_btn'
                                 >
                                   +
                                 </button>
                                 <button
-                                  // onClick={() =>
-                                  //   setNumStock((count) => count - 1)
-                                  // }
-                                  className='order_create_minus_btn'
+                                onClick={() => handleDeletion(product._id)}
+                                className='order_create_minus_btn'
                                 >
                                   -
                                 </button>
@@ -382,7 +392,8 @@ const OrderCreateComponent = () => {
                 onMouseEnter={() => setShowUser(true)}
                 className='order_create_user_dropdown'
               >
-                <div className='user_create_container'>
+                <div className='user_create_container' data-toggle="modal" data-target="#userModal"
+                  onClick={()=> setShowUserModal(true)}>
                   <i className='far fa-plus-square'></i>
                   <span className='user_create_text'>
                     Create a new customer
@@ -516,10 +527,23 @@ const OrderCreateComponent = () => {
               </table>
             </div>
           </div>
-          <div className='col-lg-5 p-0'>
+          {
+            showUserModal &&
+<div className="modal show" id="userModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div className="modal-dialog" role="document">
+        <div className="modal-content">
+            <div className="modal-header">
+             
+                <h5 className="modal-title" id="exampleModalLabel">Create New User</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form onSubmit={createUserHandler}>
+            <div className="modal-body">
+            <div className='col-lg-5 w-100 p-0'>
             <div className='order_list_create_user_container mt-5'>
-              <h4 className='pb-3'>Create New User</h4>
-              <form onSubmit={createUserHandler}>
                 <div className='form_input_flex'>
                   <label>Email</label>
                   <input
@@ -552,12 +576,23 @@ const OrderCreateComponent = () => {
                     type='text'
                   />
                 </div>
-                <button className='order_user_create_submit_btn' type='submit'>
-                  Create
-                </button>
-              </form>
+          
             </div>
           </div>
+       
+            </div>
+            <div class="modal-footer">
+                <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" className="btn btn-primary" type= "submit">Create</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+           }
+          
         </div>
       </div>
     </React.Fragment>
