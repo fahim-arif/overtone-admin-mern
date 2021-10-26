@@ -5,14 +5,24 @@ import {
   createAttributeItems,
 } from "../../../../actions/attributeAction";
 import { productAttributes } from "../../../../actions/productAction";
+import { addToCart, getCart } from "../../../../actions/cartAction";
 import { groupBy } from "./groupBy";
 import axios from "axios";
 import "./helper.css";
+import swal from 'sweetalert2';
 let datas = [];
 let queryString = "";
 let imgPath = "https://warm-lake-60018.herokuapp.com/static/";
 let qString = "";
 let list = [];
+
+
+const Toast = swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000
+});
 
 export default function Helper({
   id,
@@ -37,6 +47,7 @@ export default function Helper({
   const dispatch = useDispatch();
 
   const attributeItems = useSelector((state) => state.attributeItems);
+  const cart = useSelector((state) => state.cart)
   const { attributeList } = attributeItems;
   const { adduser } = useSelector((state) => state.user)
 
@@ -255,31 +266,35 @@ export default function Helper({
     };
     let mail = "fahim1.618555@gmail.com";
     let result = `${id}&name=${name}&imgurl=${photo}&prodPrice=${price}&qty=${qty}&key=${key}&value=${mapValue}&price=${additionalPrice}`;
+
     // console.log(result);
     if (submit) {
       try {
 
 
-         const cartItem = {
-            "id": id,
-            "image": photo,
-            "name": name,
-            "categoryID": productData.categoryID,
-            "quantity": qty,
-            "price": totalPrice,
-            "selectedAttribute": selectedAttribute
-          }
-          // console.log(cartItem)
+        const cartItem = {
+          "id": id,
+          "image": photo,
+          "name": name,
+          "categoryID": productData.categoryID,
+          "quantity": qty,
+          "price": totalPrice,
+          "selectedAttribute": selectedAttribute
+        }
+        // console.log(cartItem)
 
-           const finalCart = JSON.stringify(cartItem)
-            const encodedString = btoa(finalCart)
-            console.log(encodedString)
-          // let u = new URLSearchParams(finalCart).toString();
+        const finalCart = JSON.stringify(cartItem)
+        const encodedString = btoa(finalCart)
+        console.log(encodedString)
+        console.log(cart)
 
-          // console.log(u);
+        
+        // let u = new URLSearchParams(finalCart).toString();
+
+        // console.log(u);
 
 
-          // JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+        // JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
 
         // await axios.post(
         //   `http://localhost:5000/api/orderemail/productId=${result}`,
@@ -353,26 +368,19 @@ export default function Helper({
       let result = `${id}&name=${name}&imgurl=${photo}&prodPrice=${price}&qty=${qty}${query}`;
       if (submit) {
         try {
-          const cartItem = {
-            "id": id,
-            "image": photo,
-            "name": name,
-            "categoryID": productData.categoryID,
-            "quantity": qty,
-            "price": totalPrice,
-            "selectedAttribute": selectedAttribute
-          }
-          const finalCart = JSON.stringify(cartItem)
+         
 
           // let u = new URLSearchParams(finalCart).toString();
 
           // console.log(u);
 
-           const encodedString = btoa(finalCart)
-            console.log(encodedString)
-          // console.log(cartItem)
+        
+         
+          console.log(cart)
+          const totalCart = JSON.stringify(cart)
+          const encodedCart = btoa(totalCart)
           await axios.post(
-            `http://localhost:5000/api/orderemail/${encodedString}`,
+            `http://localhost:5000/api/orderemail/${encodedCart}`,
             // `http://localhost:5000/api/orderemail/productId=${result}`,
             // `https://warm-lake-60018.herokuapp.com/api/orderemail/productId=${result}`,
 
@@ -388,13 +396,44 @@ export default function Helper({
     submitOrder();
     // setTimeout(() => {
     //   window.location.reload()
-    // }, 5000)
+    // }, 10000)
   }
 
-  console.log(selectedAttribute)
-  // console.log(attributeData);
-  // console.log(productData)
 
+  const OnSaveCart = () => {
+    document.querySelector("#exampleModal").click()
+
+    // cart Data
+    const cartItem = {
+      "id": id,
+      "image": photo,
+      "name": productData.name,
+      "categoryID": productData.categoryID,
+      "quantity": qty,
+      "price": totalPrice,
+      "selectedAttribute": selectedAttribute
+    }
+
+
+    if (totalPrice === 0) {
+      Toast.fire({
+        type: 'error',
+        title: 'Select Attribute List',
+      })
+      return;
+    }
+
+        if (!qty) {
+      Toast.fire({
+        type: 'error',
+        title: 'Please Add Quantity',
+      })
+      return;
+    }
+    dispatch(addToCart(cartItem))
+    setSelectedAttribute([])
+// this.props.addToCart(cartItem);
+  }
   const demo = () => {
     return <h1>Dropdown</h1>
   }
@@ -640,9 +679,8 @@ export default function Helper({
                 </button>
                 <button
                   type='button'
-                  onClick={() =>
-                    document.querySelector("#exampleModal").click()
-                  }
+                  onClick={
+                    OnSaveCart}
                   class='btn btn-primary'
                 >
                   Save changes

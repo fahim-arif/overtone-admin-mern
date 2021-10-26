@@ -12,6 +12,7 @@ import { deleteAttributeItems } from "../../../actions/attributeAction";
 import { toast } from "react-toastify";
 import Loading from '../../common/Loading'
 import Message from '../../common/Message'
+import { removeFromCart } from "../../../actions/cartAction";
 import Swal from "sweetalert2";
 // import DemoModal from "./modals/DemoModal";
 import Helper from "./modals/Helper";
@@ -42,6 +43,7 @@ const OrderCreateComponent = () => {
 
   // const { selectedAttribute } = useSelector((state) => state.product);
   const { attributeList } = useSelector((state) => state.attributeItems);
+  const cart = useSelector((state) => state.cart)
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -71,6 +73,8 @@ const OrderCreateComponent = () => {
   // console.log(click);
 
 
+  var totalCost = cart.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0)
+
   useEffect(() => {
     if (searchList) {
 
@@ -79,8 +83,8 @@ const OrderCreateComponent = () => {
         tempStock.push(1)
       }
       console.log(tempStock)
-      
-      setNumStock([{...tempStock}])
+
+      setNumStock([{ ...tempStock }])
       // Object.assign({}, ['a','b','c']);
       // setNumStock((prevState) => [{...prevState, i:1}])
     }
@@ -90,10 +94,17 @@ const OrderCreateComponent = () => {
     dispatch(listProduct());
     dispatch(listUser());
 
+    if (adduser && adduser.success) {
+
+      Toast.fire({
+        type: "success",
+        title: "An New user has been created",
+      });
+    };
 
     // document.getElementById("modal_btn").click();
     // elementRef.current.click();
-  }, []);
+  }, [adduser]);
   const createUserHandler = async (e) => {
     e.preventDefault();
     const userData = {
@@ -106,18 +117,16 @@ const OrderCreateComponent = () => {
     // console.log(userData);
     await dispatch(createUser(userData));
 
-    Toast.fire({
-      type: "success",
-      title: "An New user has been created",
-    });
-  };
+
+  }
 
   // Product Selection and filtering
   // let subtotal = 0;
   // let discount = 0;
-  const addProductHandler = (id) => {
+  const addProductHandler = (id, index) => {
     found = pid.find((_id) => _id == id);
     found = productIds.find((_id) => _id == id);
+    // for deselecting
     if (found) {
       setProductIds((item) => item.filter((p) => p !== id));
       pid = pid.filter((p) => p !== id);
@@ -126,8 +135,19 @@ const OrderCreateComponent = () => {
       setSubtotal((prev) => prev - Number(prod.price));
       setDiscount((prev) => prev - Number(prod.discountPrice));
       dispatch(deleteAttributeItems(id));
+      console.log('deselected')
+
+      // cart item found
+      let cartFound = cart.find((result) => result.id === id)
+      if (cartFound) {
+
+        console.log("cartFound")
+        dispatch(removeFromCart(cartFound))
+      }
       return;
+
     } else {
+      // for selecting
       setProductIds((state) => [...state, id]);
       pid.push(id);
       prod = listproduct.find((prod) => prod._id == id);
@@ -163,7 +183,7 @@ const OrderCreateComponent = () => {
   };
 
   const submitOrder = async () => {
-    if (userId.length > 0) {
+    if (userId.length > 0 && cart.length > 0) {
       setSubmit(true);
       Toast.fire({
         type: "success",
@@ -200,7 +220,7 @@ const OrderCreateComponent = () => {
     // console.log('bnow')
     // console.log(numStock[0][idx])
     let counter = numStock;
-    counter[0][idx] += 1; 
+    counter[0][idx] += 1;
     // counter.idx += +1;
     // console.log(numStock.0)
     // console.log(counter)
@@ -343,7 +363,7 @@ const OrderCreateComponent = () => {
                             <div className='order_create_ item_container'>
                               {/* {qty} */}
                               <input
-                              onChange={(e) => setQty(e.target.value)}
+                                onChange={(e) => setQty(e.target.value)}
                                 // value={numStock[0][idx]}
                                 className='order_create_input'
                               />
@@ -383,7 +403,7 @@ const OrderCreateComponent = () => {
                           <td>
                             <div className='form-check'>
                               <input
-                                onClick={() => addProductHandler(product._id)}
+                                onClick={() => addProductHandler(product._id, idx)}
                                 className='form-check-input'
                                 type='checkbox'
                                 value=''
@@ -531,21 +551,27 @@ const OrderCreateComponent = () => {
                       </p>
                     </td>
                     <td>
-                      {attributeList.length > 0 ? (
+                      ${cart.length > 0 ? totalCost : 0}
+                      {/* ${cart.length > 0 ? cart.map((result) => (parseFloat(result.quantity) * parseFloat(result.price))) : 0} */}
+                      {/* {totalCost} */}
+                      {/* {attributeList.length > 0 ? (
                         <p>
                           $
-                          {Number(
-                            attributeList.reduce(
-                              (acc, item) => Number(acc) + Number(item.price),
-                              Number(discount)
-                            )
-                            // .slice(-1)
-                            // .slice()
-                          )}
+                          {
+                            totalCost
+                            // Number(
+                            //   attributeList.reduce(
+                            //     (acc, item) => Number(acc) + Number(item.price),
+                            //     Number(discount)
+                            //   )
+                            //   // .slice(-1)
+                            //   // .slice()
+                            // )
+                          }
                         </p>
                       ) : (
                         <p>${subtotal + discount}</p>
-                      )}
+                      )} */}
                       {/* <p>${subtotal + discount}</p> */}
                     </td>
                   </tr>

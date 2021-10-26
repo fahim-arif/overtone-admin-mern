@@ -54,12 +54,15 @@ import attributemappingReducer from "./attributemappingReducer";
 //productsubReducer Reducer
 import productsubReducer from "./productsubReducer";
 import { attributePrice } from "../actions/attributeAction";
+
+// added by fahim
 import {
   attributeItemsReducer,
   attributePriceReducer,
 } from "./attributeReducer";
 import { productSearchReducer } from "./productSearchReducer";
 import { userSearchReducer } from "./userSearchReducer";
+import cartReducer from "./cartReducer";
 
 export default combineReducers({
   auth: authReducer,
@@ -88,4 +91,5 @@ export default combineReducers({
   attributeItems: attributeItemsReducer,
   productSearch: productSearchReducer,
   userSearch: userSearchReducer,
+  cart: cartReducer,
 });
