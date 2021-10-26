@@ -503,11 +503,12 @@ export default function Helper({
           }
         })
         return <div>
-          <input id={`ac-${index}`} name="accordion-1" type="radio"
+          {/* edited here */}
+          {/* <input id={`ac-${index}`} name="accordion-1" type="radio"
 
             defaultChecked={index === currentIndex}
 
-          />
+          /> */}
           <label htmlFor={`ac-${index}`}><span>{index + 1}</span> {result.parentAttributeName}</label>
           <article>
             <div className="row">

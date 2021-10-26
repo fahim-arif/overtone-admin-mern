@@ -306,6 +306,7 @@ const OrderCreateComponent = () => {
             </div>
           </div> */}
           {/* Before selecting a user */}
+          {/* Before selecting a user */}
           <div className='col-lg-5 pt-4 order_user_list_container'>
             <h4>Find or create a customer</h4>
             <form onSubmit={onUserSearch} >
@@ -439,7 +440,8 @@ const OrderCreateComponent = () => {
                 onMouseEnter={() => setShowUser(true)}
                 className='order_create_user_dropdown'
               >
-                <div className='user_create_container'>
+                <div className='user_create_container' data-toggle="modal" data-target="#userModal"
+                  onClick={() => setShowUserModal(true)}>
                   <i className='far fa-plus-square'></i>
                   <span className='user_create_text'>
                     Create a new customer
@@ -579,48 +581,71 @@ const OrderCreateComponent = () => {
               </table>
             </div>
           </div>
-          <div className='col-lg-5 p-0'>
-            <div className='order_list_create_user_container mt-5'>
-              <h4 className='pb-3'>Create New User</h4>
-              <form onSubmit={createUserHandler}>
-                <div className='form_input_flex'>
-                  <label>Email</label>
-                  <input
-                    onChange={(e) => setEmail(e.target.value)}
-                    value={email}
-                    type='email'
-                  />
+          {
+            showUserModal &&
+            <div className="modal show" id="userModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+              aria-hidden="true">
+              <div className="modal-dialog" role="document">
+                <div className="modal-content">
+                  <div className="modal-header">
+
+                    <h5 className="modal-title" id="exampleModalLabel">Create New User</h5>
+                    <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <form onSubmit={createUserHandler}>
+                    <div className="modal-body">
+                      <div className='col-lg-5 w-100 p-0'>
+                        <div className='order_list_create_user_container mt-5'>
+                          <div className='form_input_flex'>
+                            <label>Email</label>
+                            <input
+                              onChange={(e) => setEmail(e.target.value)}
+                              value={email}
+                              type='email'
+                            />
+                          </div>
+                          <div className='form_input_flex'>
+                            <label>Password</label>
+                            <input
+                              onChange={(e) => setPassword(e.target.value)}
+                              value={password}
+                              type='password'
+                            />
+                          </div>
+                          <div className='form_input_flex'>
+                            <label>Username</label>
+                            <input
+                              onChange={(e) => setUsername(e.target.value)}
+                              value={username}
+                              type='text'
+                            />
+                          </div>
+                          <div className='form_input_flex'>
+                            <label>Mobile</label>
+                            <input
+                              onChange={(e) => setMobile(e.target.value)}
+                              value={mobile}
+                              type='text'
+                            />
+                          </div>
+
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="button" className="btn btn-primary" type="submit">Create</button>
+                    </div>
+                  </form>
                 </div>
-                <div className='form_input_flex'>
-                  <label>Password</label>
-                  <input
-                    onChange={(e) => setPassword(e.target.value)}
-                    value={password}
-                    type='password'
-                  />
-                </div>
-                <div className='form_input_flex'>
-                  <label>Username</label>
-                  <input
-                    onChange={(e) => setUsername(e.target.value)}
-                    value={username}
-                    type='text'
-                  />
-                </div>
-                <div className='form_input_flex'>
-                  <label>Mobile</label>
-                  <input
-                    onChange={(e) => setMobile(e.target.value)}
-                    value={mobile}
-                    type='text'
-                  />
-                </div>
-                <button className='order_user_create_submit_btn' type='submit'>
-                  Create
-                </button>
-              </form>
+              </div>
             </div>
-          </div>
+
+
+          }
         </div>
       </div>
     </React.Fragment>

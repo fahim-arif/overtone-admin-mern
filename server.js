@@ -144,20 +144,22 @@ app.post('/musicupload',  function(req, res) {
 
 app.use(express.static(path.join(__dirname,'client','build')));
 
-app.get('*', function(req, res) {
-  res.sendFile(path.join(__dirname, '/client/build/index.html'), function(err) {
+// app.get('*', function(req, res) {
+//   res.sendFile(path.join(__dirname, '/client/build/index.html'), function(err) {
+//     if (err) {
+//       res.status(500).send(err)
+//     }
+//   })
+// })
+
+
+app.get('/*', function(req, res) {
+  res.sendFile(path.join(__dirname, '../../dist/index.html'), function(err) {
     if (err) {
       res.status(500).send(err)
     }
   })
 })
-
-
-//  app.use(express.static("client/build"));
-//   app.get("*", (req, res) => {
-//     res.sendFile(path.resolve(__dirname, "../client", "build", "index.html"));
-//   });
-
 
 //Server port & configuration
 const port = process.env.PORT || 5000;
