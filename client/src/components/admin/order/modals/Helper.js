@@ -5,6 +5,7 @@ import {
   createAttributeItems,
 } from "../../../../actions/attributeAction";
 import { productAttributes } from "../../../../actions/productAction";
+import { groupBy } from "./groupBy";
 import axios from "axios";
 import "./helper.css";
 let datas = [];
@@ -23,7 +24,16 @@ export default function Helper({
   qty
 }) {
 
-  console.log(qty)
+  // const API_URL = 'http://3.239.208.80:5000';
+  // const IMAGE_URL = 'http://3.239.208.80:5000/static/';
+  // const SUCCESS_URL = 'http://3.239.208.80:5000/paymentsuccess';
+  // const FAILURE_URL = 'http://3.239.208.80:5000/paymentfailed';
+
+  const API_URL = 'https://warm-lake-60018.herokuapp.com';
+  const IMAGE_URL = 'https://warm-lake-60018.herokuapp.com/static/';
+  const SUCCESS_URL = 'https://warm-lake-60018.herokuapp.com/paymentsuccess';
+  const FAILURE_URL = 'https://warm-lake-60018.herokuapp.com/paymentfailed';
+
   const dispatch = useDispatch();
 
   const attributeItems = useSelector((state) => state.attributeItems);
@@ -40,6 +50,17 @@ export default function Helper({
   const [totalQuery, SetTotalQuery] = "";
   const [newUser, setNewUser] = useState(false)
   const [userInfo, setUserInfo] = useState([])
+  const [imgAttribute, setImgAttribute] = useState('')
+  const [productData, setProductData] = useState({})
+  const [productLoading, setProductLoading] = useState(false)
+  const [attributeLoading, setAttributeLoading] = useState(false)
+  const [attributeData, setAttributeData] = useState({})
+  const [selectedAttribute, setSelectedAttribute] = useState([])
+  const [totalPrice, setTotalPrice] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+
+
 
   // To know that there is a newly created user
   useEffect(() => {
@@ -48,7 +69,66 @@ export default function Helper({
       setNewUser(true)
       setUserInfo(adduser.payload)
     }
-  },[adduser])
+  }, [adduser])
+
+  useEffect(() => {
+    if (id) {
+      axios.post(API_URL + `api/attributemapping/getattributebyproduct`, { productID: id })
+        .then(result => {
+          setImgAttribute(result.data)
+
+        })
+        .catch(err => {
+          setProductData({})
+          setProductLoading(false)
+          // this.setState({
+          //     productLoading: false,
+          //     productData: {}
+          // })
+        })
+
+
+      axios.post(API_URL + `/api/product/detail`, { productID: id })
+        .then(result => {
+          setProductLoading(false)
+          setProductData(result.data)
+          // this.setState({
+          //     productLoading: false,
+          //     productData: result.data
+          // })
+        })
+        .catch(err => {
+          // this.setState({
+          //     productLoading: false,
+          //     productData: {}
+          // })
+          setProductLoading(false)
+          setProductData({})
+        })
+
+
+      axios.post(API_URL + `/api/product/attribute`, { productID: id })
+        .then(result => {
+
+          setAttributeLoading(false)
+          setAttributeData(result.data)
+          // this.setState({
+          //   attributeLoading: false,
+          //   attributeData: result.data
+          // })
+        })
+        .catch(err => {
+          setAttributeData(false)
+          setAttributeData({})
+          // this.setState({
+          //   attributeLoading: false,
+          //   attributeData: {}
+          // })
+        })
+    }
+  }, [id])
+
+
   useEffect(() => {
     attributes.map((attribute) => {
       return (qString = `$&key=${attribute.key}&value=${attribute.mapValue}&price=${attribute.additionalPrice}`);
@@ -101,6 +181,49 @@ export default function Helper({
     };
   };
 
+  // select attribute list
+
+  const onSelectList = (key, value, price, parentKey = "") => {
+    var temp = selectedAttribute;
+    var findKey = temp.find(x => x.key === key)
+
+    if (findKey) {
+      temp = temp.filter(x => x.key != key)
+      temp = temp.filter(x => x.parentKey != key)
+    }
+    temp.push({ key: key, value: value, price: price, parentKey: parentKey })
+    var total = temp.reduce((acc, curr) => acc + parseFloat(curr.price), 0)
+    setTotalPrice(total)
+    setSelectedAttribute(temp)
+    // this.setState({
+    //     selectedAttribute: temp,
+    //     totalPrice: total
+    // })
+  }
+
+
+  // on selecting dropdown
+  const onSelectDropdown = (e, keys, parentKey = "") => {
+    var temp = selectedAttribute;
+    var price = e.target.selectedOptions[0].getAttribute('data-price');
+    var findKey = temp.find(x => x.key === keys)
+
+    if (findKey) {
+      temp = temp.filter(x => x.key != keys)
+      temp = temp.filter(x => x.parentKey != keys)
+
+    }
+    temp.push({ key: keys, value: e.target.value, price: price, parentKey: parentKey })
+    var total = temp.reduce((acc, curr) => acc + parseFloat(curr.price), 0)
+
+    setSelectedAttribute(temp)
+    setTotalPrice(total)
+    // this.setState({
+    //     selectedAttribute: temp,
+    //     totalPrice: total
+    // })
+  }
+
   const onChangeDropdown = async (value) => {
     let key = value.attributeName;
     let mapValue = value.mappingValue;
@@ -135,13 +258,36 @@ export default function Helper({
     // console.log(result);
     if (submit) {
       try {
-        await axios.post(
-          `http://localhost:5000/api/orderemail/productId=${result}`,
-          // `https://warm-lake-60018.herokuapp.com/api/orderemail/productId=${result}`,
 
-          { email: email, newUser: newUser, userInfo },
-          config
-        );
+
+         const cartItem = {
+            "id": id,
+            "image": photo,
+            "name": name,
+            "categoryID": productData.categoryID,
+            "quantity": qty,
+            "price": totalPrice,
+            "selectedAttribute": selectedAttribute
+          }
+          // console.log(cartItem)
+
+           const finalCart = JSON.stringify(cartItem)
+            const encodedString = btoa(finalCart)
+            console.log(encodedString)
+          // let u = new URLSearchParams(finalCart).toString();
+
+          // console.log(u);
+
+
+          // JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+
+        // await axios.post(
+        //   `http://localhost:5000/api/orderemail/productId=${result}`,
+        //   // `https://warm-lake-60018.herokuapp.com/api/orderemail/productId=${result}`,
+
+        //   { email: email, newUser: newUser, userInfo },
+        //   config
+        // );
         // console.log("success");
       } catch (error) {
         console.error(error);
@@ -171,6 +317,7 @@ export default function Helper({
 
       setAttributes(filtered);
     }
+
 
     setAttributes((state) => [...state, newData]);
     dispatch(productAttributes(newData));
@@ -206,11 +353,30 @@ export default function Helper({
       let result = `${id}&name=${name}&imgurl=${photo}&prodPrice=${price}&qty=${qty}${query}`;
       if (submit) {
         try {
+          const cartItem = {
+            "id": id,
+            "image": photo,
+            "name": name,
+            "categoryID": productData.categoryID,
+            "quantity": qty,
+            "price": totalPrice,
+            "selectedAttribute": selectedAttribute
+          }
+          const finalCart = JSON.stringify(cartItem)
+
+          // let u = new URLSearchParams(finalCart).toString();
+
+          // console.log(u);
+
+           const encodedString = btoa(finalCart)
+            console.log(encodedString)
+          // console.log(cartItem)
           await axios.post(
-            `http://localhost:5000/api/orderemail/productId=${result}`,
+            `http://localhost:5000/api/orderemail/${encodedString}`,
+            // `http://localhost:5000/api/orderemail/productId=${result}`,
             // `https://warm-lake-60018.herokuapp.com/api/orderemail/productId=${result}`,
 
-            { email: email, newUser,userInfo },
+            { email: email, newUser, userInfo },
             config
           );
           console.log("success");
@@ -225,7 +391,139 @@ export default function Helper({
     // }, 5000)
   }
 
-  console.log(attributes);
+  console.log(selectedAttribute)
+  // console.log(attributeData);
+  // console.log(productData)
+
+  const demo = () => {
+    return <h1>Dropdown</h1>
+  }
+
+  let attributeLists;
+  const atbList = () => {
+
+    if (!attributeLoading && Object.keys(attributeData).length > 0) {
+      // return <h1>fahim</h1>
+      attributeLists = attributeData.map((result, index) => {
+        var attributes = result.attributes;
+        const groupedAttribute = groupBy(attributes, 'attributeName');
+
+        var fields = [];
+
+        Object.entries(groupedAttribute).map(([key, value]) => {
+          if (value.length > 0) {
+            var mappingType = value[0].mappingType;
+
+            if (mappingType === "dropdown") {
+              fields.push(<h3 key={key}>{key}</h3>)
+              fields.push(<select id="select-el" className="combo combo-input" onChange={(e) => onSelectDropdown(e, key)}>
+                <option value="">Select</option>
+                {value.sort(function (a, b) {
+                  return new Date(a.date) - new Date(b.date);
+                }).map(attrres => {
+                  var findSelected = selectedAttribute.find(x => x.value === attrres.mappingValue)
+                  return <option selected={findSelected ? true : null} value={attrres.mappingValue} data-price={attrres.additionalPrice} >{attrres.mappingLabel} {parseInt(attrres.additionalPrice) > 0 && `[+ $ ${attrres.additionalPrice} ]`}</option>
+                })}
+              </select>)
+
+            }
+            if (mappingType === "image+text") {
+              fields.push(<ul className="profile-g pointer">
+                {value.sort(function (a, b) {
+                  return new Date(a.date) - new Date(b.date);
+                }).map(attrres => {
+                  var findSelected = selectedAttribute.find(x => x.value === attrres.mappingValue)
+                  return <li className={findSelected ? "border" : null} onClick={() => onSelectList(key, attrres.mappingValue, attrres.additionalPrice)}>
+                    <img src={`${IMAGE_URL}${attrres.photoUrl}`} />
+                    <span>{attrres.mappingLabel} {parseInt(attrres.additionalPrice) > 0 && `[+ $ ${attrres.additionalPrice} ]`}</span>
+                  </li>
+                })}
+              </ul>)
+            }
+            if (mappingType === "color") {
+              fields.push(<ul className="profile-g pointer">
+                {value.sort(function (a, b) {
+                  return new Date(a.date) - new Date(b.date);
+                }).map(attrres => {
+                  var findSelected = selectedAttribute.find(x => x.value === attrres.mappingValue)
+                  return <li className={findSelected ? "border" : null} onClick={() => onSelectList(key, attrres.mappingValue, attrres.additionalPrice)}><span>{attrres.mappingLabel} {parseInt(attrres.additionalPrice) > 0 && `[+ $ ${attrres.additionalPrice} ]`}</span></li>
+                })}
+              </ul>)
+            }
+            //FIND ARRAY
+            var findSelectedAttribute = selectedAttribute.find(x => x.key === key)
+            if (findSelectedAttribute) {
+              var subFields = value.find(x => x.mappingValue === findSelectedAttribute.value);
+              if (subFields) {
+                var dependentField = JSON.parse(subFields.dependentField)
+
+                fields.push(onRenderSubField(dependentField, findSelectedAttribute.key))
+              }
+            }
+
+          }
+        })
+        return <div>
+          <input id={`ac-${index}`} name="accordion-1" type="radio"
+
+            defaultChecked={index === currentIndex}
+
+          />
+          <label htmlFor={`ac-${index}`}><span>{index + 1}</span> {result.parentAttributeName}</label>
+          <article>
+            <div className="row">
+              <div className="col-md-12">
+                {fields}
+              </div>
+            </div>
+          </article>
+        </div>
+
+      })
+
+    }
+    return attributeLists
+  }
+
+
+  const onRenderSubField = (data, parentKey) => {
+    var dependentField = [];
+    var datas = data.map(result => {
+      if (result.type === "dropdown") {
+        return <React.Fragment>
+          <h3 key={parentKey} style={{ marginTop: 20 }}>{result.label}</h3>
+          <select id="select-el" className="combo combo-input" onChange={(e) => onSelectDropdown(e, result.label, parentKey)}>
+            <option value="">Select</option>
+            {result.list.map(attrres => {
+              var findSelected = selectedAttribute.find(x => x.value === attrres.value)
+              return <option selected={findSelected ? true : null} value={attrres.value} data-price={attrres.additionalPrice}>{attrres.label} {parseInt(attrres.additionalPrice) > 0 && `[+ $ ${attrres.additionalPrice} ]`}</option>
+            })}
+          </select>
+        </React.Fragment>
+      }
+      if (result.type === "image+text") {
+        return <ul className="profile-g pointer" style={{ marginTop: 20 }}>
+          {result.list.map(attrres => {
+            var findSelected = selectedAttribute.find(x => x.value === attrres.mappingValue)
+
+            return <li className={findSelected ? "border" : null} onClick={() => onSelectList(attrres.label, attrres.value, attrres.additionalPrice, parentKey)}><img src={`${IMAGE_URL}${attrres.photoUrl}`} /><span>{attrres.mappingLabel} {parseInt(attrres.additionalPrice) > 0 && `[+ $ ${attrres.additionalPrice} ]`}</span></li>
+          })}
+        </ul>
+      }
+      if (result.type === "color") {
+        return <ul className="profile-g pointer" style={{ marginTop: 20 }}>
+          {result.list.map(attrres => {
+            var findSelected = selectedAttribute.find(x => x.value === attrres.value)
+            return <li className={findSelected ? "border" : null} onClick={() => onSelectList(attrres.label, attrres.value, attrres.additionalPrice, parentKey)}><span style={{ width: 25, height: 25, backgroundColor: attrres.value, borderColor: "#fff" }}></span><span>{attrres.label} {parseInt(attrres.additionalPrice) > 0 && `[+ $ ${attrres.additionalPrice} ]`}</span></li>
+          })}
+        </ul>
+      }
+
+    })
+    return datas
+  }
+
+
   return (
     <div>
       <div>
@@ -265,7 +563,9 @@ export default function Helper({
                 </button>
               </div>
               <div class='modal-body'>
-                {dat.length > 0 &&
+                {atbList()}
+
+                {/* {dat.length > 0 &&
                   dat.map((result, index) => (
                     <React.Fragment key={index}>
                       {result.attributes[0].mappingType === "image+text" && (
@@ -327,7 +627,7 @@ export default function Helper({
                         </div>
                       )}
                     </React.Fragment>
-                  ))}
+                  ))} */}
               </div>
               {/*  */}
               <div class='modal-footer'>
