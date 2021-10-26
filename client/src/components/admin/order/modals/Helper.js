@@ -20,9 +20,10 @@ export default function Helper({
   name = "",
   email,
   submit,
-  elementRef,
+  qty
 }) {
 
+  console.log(qty)
   const dispatch = useDispatch();
 
   const attributeItems = useSelector((state) => state.attributeItems);
@@ -130,7 +131,7 @@ export default function Helper({
       },
     };
     let mail = "fahim1.618555@gmail.com";
-    let result = `${id}&name=${name}&imgurl=${photo}&prodPrice=${price}&key=${key}&value=${mapValue}&price=${additionalPrice}`;
+    let result = `${id}&name=${name}&imgurl=${photo}&prodPrice=${price}&qty=${qty}&key=${key}&value=${mapValue}&price=${additionalPrice}`;
     // console.log(result);
     if (submit) {
       try {
@@ -173,14 +174,14 @@ export default function Helper({
 
     setAttributes((state) => [...state, newData]);
     dispatch(productAttributes(newData));
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
+    // const config = {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // };
 
-    let mail = "fahim1.618555@gmail.com";
-    let result = `${id}&name=${name}&imgurl=${photo}&prodPrice=${price}&key=${key}&value=${mapValue}&price=${additionalPrice}`;
+    // let mail = "fahim1.618555@gmail.com";
+    // let result = `${id}&name=${name}&imgurl=${photo}&prodPrice=${price}&qty=${qty}&key=${key}&value=${mapValue}&price=${additionalPrice}`;
   };
   // console.log(totalQuery);
   if (submit) {
@@ -201,7 +202,8 @@ export default function Helper({
     const submitOrder = async () => {
       attributeList.map((item) => { });
 
-      let result = `${id}&name=${name}&imgurl=${photo}&prodPrice=${price}${query}`;
+      // important
+      let result = `${id}&name=${name}&imgurl=${photo}&prodPrice=${price}&qty=${qty}${query}`;
       if (submit) {
         try {
           await axios.post(

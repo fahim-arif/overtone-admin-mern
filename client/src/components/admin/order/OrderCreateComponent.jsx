@@ -34,7 +34,7 @@ const OrderCreateComponent = () => {
   const dispatch = useDispatch();
 
   const { listproduct } = useSelector((state) => state.product);
-  const { listuser,userloading,adduser } = useSelector((state) => state.user);
+  const { listuser, userloading, adduser } = useSelector((state) => state.user);
   const { userList } = useSelector((state) => state.userSearch)
   const { searchList } = useSelector((state) => state.productSearch);
   // const {searchList} = productSearch;
@@ -61,7 +61,8 @@ const OrderCreateComponent = () => {
   const [showUser, setShowUser] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
   const [userSearchInput, setUserSearchInput] = useState('')
-  const [numStock,setNumStock] = useState(1)
+  const [numStock, setNumStock] = useState([])
+  const [qty, setQty] = useState(0)
 
   // const elementRef = useRef();
 
@@ -71,7 +72,18 @@ const OrderCreateComponent = () => {
 
 
   useEffect(() => {
-    console.log(searchList)
+    if (searchList) {
+
+      let tempStock = [];
+      for (let i = 0; i < searchList.length; i++) {
+        tempStock.push(1)
+      }
+      console.log(tempStock)
+      
+      setNumStock([{...tempStock}])
+      // Object.assign({}, ['a','b','c']);
+      // setNumStock((prevState) => [{...prevState, i:1}])
+    }
   }, [searchList])
 
   useEffect(() => {
@@ -164,7 +176,7 @@ const OrderCreateComponent = () => {
       type: "error",
       title: "Please select a user or product",
     });
-   
+
   };
 
   const searchProductHandler = (e) => {
@@ -180,6 +192,27 @@ const OrderCreateComponent = () => {
     e.preventDefault()
     dispatch(searchUser(userSearchInput))
   }
+  const handleIncreaseQty = (e, idx) => {
+    // let counter = numStock;
+    // counter[idx] += +1;
+    // console.log(counter)
+    // setNumStock(counter)
+    // console.log('bnow')
+    // console.log(numStock[0][idx])
+    let counter = numStock;
+    counter[0][idx] += 1; 
+    // counter.idx += +1;
+    // console.log(numStock.0)
+    // console.log(counter)
+    setNumStock(counter)
+    console.log(numStock)
+    console.log(numStock[0][idx])
+
+  }
+  const handleDecreaseQty = (e, idx) => {
+    console.log(numStock)
+  }
+  console.log(numStock)
   return (
     <React.Fragment>
       <Helper
@@ -189,13 +222,14 @@ const OrderCreateComponent = () => {
         price={subtotal}
         name={product.name}
         photo={product.photoUrl1}
+        qty={qty}
       ></Helper>
       <div
         // onClick={() => setShowUser(false)}
         id='save-click'
         className='body container my-4 '
       >
-        <div style={{maxWidth:'1100px'}} className='row row-1'>
+        <div style={{ maxWidth: '1100px' }} className='row row-1'>
           <div className='col d-flex justify-content-between'>
             <h4>Admin Create Order</h4>
             <div onClick={submitOrder} className='create_order_submit_btn'>
@@ -306,29 +340,31 @@ const OrderCreateComponent = () => {
                           </td>
 
                           <td>
-                            <div className='order_create_item_container'>
+                            <div className='order_create_ item_container'>
+                              {/* {qty} */}
                               <input
-                                value={numStock}
+                              onChange={(e) => setQty(e.target.value)}
+                                // value={numStock[0][idx]}
                                 className='order_create_input'
                               />
-                              <div className='order_create_button_container'>
+                              {/* <div className='order_create_button_container'>
                                 <button
-                                  onClick={() =>
-                                    setNumStock((count) => count + 1)
+                                onClick={(e) => setQty((prev) => prev + +qty)
+                                  // onClick={(e) =>handleIncreaseQty(e,idx)
                                   }
                                   className='order_create_plus_btn'
                                 >
                                   +
                                 </button>
                                 <button
-                                  onClick={() =>
-                                    setNumStock((count) => count - 1)
+                                  onClick={(e) => handleDecreaseQty(e,idx)
+                                    
                                   }
                                   className='order_create_minus_btn'
                                 >
                                   -
                                 </button>
-                              </div>
+                              </div> */}
                             </div>
                           </td>
                           <td>
@@ -397,7 +433,7 @@ const OrderCreateComponent = () => {
 
             {/* <h4>User List</h4> */}
             <div className='input-group mb-3'></div>
-            <table style={{background:'#fff'}}
+            <table style={{ background: '#fff' }}
               className='table table-striped- table-bordered table-hover table-checkable'
               id='kt_table_1'
             >
