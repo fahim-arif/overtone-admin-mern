@@ -61,6 +61,7 @@ const OrderCreateComponent = () => {
   const [showUser, setShowUser] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
   const [userSearchInput, setUserSearchInput] = useState('')
+  const [numStock,setNumStock] = useState(1)
 
   // const elementRef = useRef();
 
@@ -307,22 +308,22 @@ const OrderCreateComponent = () => {
                           <td>
                             <div className='order_create_item_container'>
                               <input
-                                // value={numStock}
+                                value={numStock}
                                 className='order_create_input'
                               />
                               <div className='order_create_button_container'>
                                 <button
-                                  // onClick={() =>
-                                  //   setNumStock((count) => count + 1)
-                                  // }
+                                  onClick={() =>
+                                    setNumStock((count) => count + 1)
+                                  }
                                   className='order_create_plus_btn'
                                 >
                                   +
                                 </button>
                                 <button
-                                  // onClick={() =>
-                                  //   setNumStock((count) => count - 1)
-                                  // }
+                                  onClick={() =>
+                                    setNumStock((count) => count - 1)
+                                  }
                                   className='order_create_minus_btn'
                                 >
                                   -

@@ -28,34 +28,40 @@ console.log(newUser)
       from: "overtone.demo@gmail.com",
       to: "overtone.demo@gmail.com",
       subject: "An order has been created",
-      html: `  <div>
-
-    <img height=50 width=50 src="http://3.239.208.80:5000/static/1633059488logo.png" alt='logo'>
+      html: ` <div style="max-width:400px; margin: 0 auto; font-family:'Google Sans',Roboto,RobotoDraft,Helvetica,Arial,sans-serif;color:rgba(0,0,0,0.87);line-height:32px;padding-bottom:24px;text-align:center;word-break:break-word">
+   <div style='background:#000000; height: 57px;' >
+      
+    <img heigh=50 width=280 src="http://3.239.208.80:5000/static/1633059488logo.png" alt='logo'>
+    </div>
+  <div style="border: 1px solid #dbdbdb; padding: 20px">
+   
     <div>
-      <p>We have added an order in your account. </p>
+      <p style="font-size:24px; text-align:center">We have added an order in your account. </p>
       <p>Your newly created email and password:</p>
-      <table>
+        <table style="width:100%;border-collapse: collapse;border: 1px solid black;">
         <thead>
           <tr>
-            <th>Email</th>
-            <th>Password</th>
+            <th style="border: 1px solid black;">Email</th>
+            <th style="border: 1px solid black;">Password</th>
 
           </tr>
         </thead>
         <tbody>
 
           <tr>
-            <td>${userInfo.email}</td>
-            <td>${userInfo.password}</td>
+            <td style="border: 1px solid black;">${userInfo.email}</td>
+            <td style="border: 1px solid black;">${userInfo.password}</td>
 
           </tr>
         </tbody>
       </table>
+   
+      <div style="font-family:Roboto-Regular,Helvetica,Arial,sans-serif;font-size:14px;color:rgba(0,0,0,0.87);line-height:20px;padding-top:20px;text-align:center"> Use this account information to login. Please bear in mind that after loggin in, change your password as soon as possible.<div style="padding-top:32px;text-align:center"><a href="http://localhost:5000/cart/${params}" style="font-family:'Google Sans',Roboto,RobotoDraft,Helvetica,Arial,sans-serif;line-height:16px;color:#524f4f;font-weight:500;text-decoration:none;font-size:13px;display:inline-block;padding:10px 24px;background-color:#4184f3;border-radius:5px;min-width:90px" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://accounts.google.com/AccountChooser?Email%3Dovertone.demo@gmail.com%26continue%3Dhttps://myaccount.google.com/alert/nt/1634906931000?rfn%253D31%2526rfnc%253D1%2526eid%253D-7969835243991180896%2526et%253D0%2526anexp%253Dnret-fa&amp;source=gmail&amp;ust=1635273382397000&amp;usg=AFQjCNEx4qt293y8qL5-0BabzzAxZ0a4Tw">View My Order</a></div></div>
     </div>
-    please click the link to continue shopping
-    <a href=${`http://localhost:5000/cart/${params}`}>Click Here</a>
+    
+    <a href=${`http://localhost:5000/cart/${params}`}></a>
   </div>
-      `,
+  </div>`,
     };
   } else {
 
@@ -63,9 +69,21 @@ console.log(newUser)
       from: "overtone.demo@gmail.com",
       to: "overtone.demo@gmail.com",
       subject: "An order has been created",
-      html: `<p>Hello, We have added an order in your accound. please click the link below to continue </p> <br/>
-      <a href=${`http://localhost:5000/cart/${params}`}>Click Here</a>
-      `,
+      html: `<div style="max-width:400px; margin: 0 auto; font-family:'Google Sans',Roboto,RobotoDraft,Helvetica,Arial,sans-serif;color:rgba(0,0,0,0.87);line-height:32px;padding-bottom:24px;text-align:center;word-break:break-word">
+   <div style='background:#000000;height: 57px;' >
+      
+    <img heigh=50 width=280 src="http://3.239.208.80:5000/static/1633059488logo.png" alt='logo'>
+    </div>
+  <div style="border: 1px solid #dbdbdb; padding: 20px">
+   
+    <div>
+      <p style="font-size:24px; text-align:center">We have added an order in your account. </p>
+      <div style="font-family:Roboto-Regular,Helvetica,Arial,sans-serif;font-size:14px;color:rgba(0,0,0,0.87);line-height:20px;padding-top:20px;text-align:center"> Use this account information to login. Please bear in mind that after loggin in, change your password as soon as possible.<div style="padding-top:32px;text-align:center"><a href="http://localhost:5000/cart/${params}" style="font-family:'Google Sans',Roboto,RobotoDraft,Helvetica,Arial,sans-serif;line-height:16px;color:#ffffff;font-weight:500;text-decoration:none;font-size:13px;display:inline-block;padding:10px 24px;background-color:#524f4f;border-radius:5px;min-width:90px" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://accounts.google.com/AccountChooser?Email%3Dovertone.demo@gmail.com%26continue%3Dhttps://myaccount.google.com/alert/nt/1634906931000?rfn%253D31%2526rfnc%253D1%2526eid%253D-7969835243991180896%2526et%253D0%2526anexp%253Dnret-fa&amp;source=gmail&amp;ust=1635273382397000&amp;usg=AFQjCNEx4qt293y8qL5-0BabzzAxZ0a4Tw">View My Order</a></div></div>
+    </div>
+    
+    <a href=${`http://localhost:5000/cart/${params}`}></a>
+  </div>
+  </div>`,
     };
   }
 
