@@ -12,7 +12,7 @@ import "./helper.css";
 import swal from 'sweetalert2';
 let datas = [];
 let queryString = "";
-let imgPath = "https://warm-lake-60018.herokuapp.com/static/";
+let imgPath = "http://54.227.86.199:3000/static/";
 let qString = "";
 let list = [];
 
@@ -34,15 +34,15 @@ export default function Helper({
   qty
 }) {
 
-  // const API_URL = 'http://3.239.208.80:5000';
-  // const IMAGE_URL = 'http://3.239.208.80:5000/static/';
-  // const SUCCESS_URL = 'http://3.239.208.80:5000/paymentsuccess';
-  // const FAILURE_URL = 'http://3.239.208.80:5000/paymentfailed';
+  const API_URL = 'http://54.227.86.199:3000';
+  const IMAGE_URL = 'http://54.227.86.199:3000/static/';
+  const SUCCESS_URL = 'http://54.227.86.199:3000/paymentsuccess';
+  const FAILURE_URL = 'http://54.227.86.199:3000/paymentfailed';
 
-  const API_URL = 'https://warm-lake-60018.herokuapp.com';
-  const IMAGE_URL = 'https://warm-lake-60018.herokuapp.com/static/';
-  const SUCCESS_URL = 'https://warm-lake-60018.herokuapp.com/paymentsuccess';
-  const FAILURE_URL = 'https://warm-lake-60018.herokuapp.com/paymentfailed';
+  // const API_URL = 'https://warm-lake-60018.herokuapp.com';
+  // const IMAGE_URL = 'https://warm-lake-60018.herokuapp.com/static/';
+  // const SUCCESS_URL = 'https://warm-lake-60018.herokuapp.com/paymentsuccess';
+  // const FAILURE_URL = 'https://warm-lake-60018.herokuapp.com/paymentfailed';
 
   const dispatch = useDispatch();
 
@@ -151,7 +151,7 @@ export default function Helper({
   useEffect(() => {
     const attri = async () => {
       const { data } = await axios.post(
-        "https://warm-lake-60018.herokuapp.com/api/product/attribute/",
+        "http://54.227.86.199:3000/api/product/attribute/",
         {
           productID: id,
         }
@@ -380,7 +380,7 @@ export default function Helper({
           const totalCart = JSON.stringify(cart)
           const encodedCart = btoa(totalCart)
           await axios.post(
-            `http://localhost:5000/api/orderemail/${encodedCart}`,
+            `http://54.227.86.199:3000/api/orderemail/${encodedCart}`,
             // `http://localhost:5000/api/orderemail/productId=${result}`,
             // `https://warm-lake-60018.herokuapp.com/api/orderemail/productId=${result}`,
 
